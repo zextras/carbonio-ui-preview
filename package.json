@@ -2,7 +2,7 @@
 	"name": "carbonio-ui-previewer",
 	"version": "0.0.1",
 	"description": "Mails module for Zextras Carbonio",
-	"main": "src/index.tsx",
+	"main": "src/index.ts",
 	"scripts": {
 		"postinstall": "is-ci || husky install",
 		"prepublishOnly": "pinst --disable",
@@ -24,8 +24,10 @@
 		"@babel/preset-typescript": "7.16.0",
 		"@commitlint/cli": "14.1.0",
 		"@commitlint/config-conventional": "14.1.0",
+		"@types/lodash": "^4.14.181",
 		"@types/react": "17.0.36",
 		"@types/react-dom": "17.0.11",
+		"@types/react-pdf": "^5.0.9",
 		"@types/styled-components": "^5.1.15",
 		"@zextras/carbonio-ui-configs": "^0.1.11",
 		"babel-jest": "27.3.1",
@@ -37,9 +39,12 @@
 		"pinst": "2.1.6"
 	},
 	"dependencies": {
+		"@zextras/carbonio-design-system": "^0.1.4",
 		"core-js": "3.19.1",
+		"lodash": "^4.17.21",
 		"react": "17.0.2",
 		"react-dom": "17.0.2",
+		"react-pdf": "^5.7.1",
 		"styled-components": "5.3.3"
 	},
 	"browserslist": [
