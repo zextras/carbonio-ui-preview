@@ -39,13 +39,15 @@
 		"pinst": "2.1.6"
 	},
 	"dependencies": {
-		"@zextras/carbonio-design-system": "^0.1.4",
 		"core-js": "3.19.1",
+		"react-pdf": "^5.7.1"
+	},
+	"peerDependencies": {
+		"@zextras/carbonio-design-system": "^0.1.4",
 		"lodash": "^4.17.21",
-		"react": "17.0.2",
-		"react-dom": "17.0.2",
-		"react-pdf": "^5.7.1",
-		"styled-components": "5.3.3"
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"styled-components": "^5.3.3"
 	},
 	"browserslist": [
 		">1%",
