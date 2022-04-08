@@ -20,4 +20,4 @@
 /LICENSES
 tsconfig.json
 /.reuse
-vite.config.js
+vite.config.ts

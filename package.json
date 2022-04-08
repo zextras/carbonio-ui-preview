@@ -1,11 +1,10 @@
 {
-	"name": "carbonio-ui-preview",
+	"name": "@zextras/carbonio-ui-preview",
 	"version": "0.0.1",
 	"description": "Preview ui utility for Zextras Carbonio",
 	"main": "dist/carbonio-ui-preview.es.js",
 	"module": "dist/carbonio-ui-preview.es.js",
 	"types": "dist/carbonio-ui-preview.es.d.ts",
-	"private": true,
 	"scripts": {
 		"build": "vite build",
 		"build:watch": "vite build --watch",
