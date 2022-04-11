@@ -16,7 +16,7 @@ import findIndex from 'lodash/findIndex';
 import findLastIndex from 'lodash/findLastIndex';
 import map from 'lodash/map';
 import type { DocumentProps } from 'react-pdf';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+import { Document, Page } from 'react-pdf';
 import styled, { css, SimpleInterpolation } from 'styled-components';
 
 import FocusWithin from './FocusWithin';

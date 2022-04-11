@@ -8,8 +8,6 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-dts';
 
-const isExternal = (id: string): boolean => !id.startsWith('.') && !path.isAbsolute(id);
-
 export default defineConfig(() => ({
 	build: {
 		lib: {
@@ -17,8 +15,16 @@ export default defineConfig(() => ({
 			formats: ['es']
 		},
 		rollupOptions: {
-			external: isExternal
+			external: [
+				'@zextras/carbonio-design-system',
+				'lodash',
+				'react',
+				'react-dom',
+				'styled-components'
+			]
 		}
 	},
-	plugins: [dts()]
+	plugins: [
+		dts()
+	]
 }));
