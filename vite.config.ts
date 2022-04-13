@@ -7,6 +7,8 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-dts';
+import shimReactPdf from 'vite-plugin-shim-react-pdf';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(() => ({
 	build: {
@@ -25,6 +27,20 @@ export default defineConfig(() => ({
 		}
 	},
 	plugins: [
-		dts()
+		dts(),
+		shimReactPdf(),
+		viteStaticCopy({
+			targets: [
+				{
+					src: path.join(
+						path.dirname(require.resolve('pdfjs-dist/package.json')),
+						'legacy',
+						'build',
+						'pdf.worker.js'
+					),
+					dest: '.'
+				}
+			]
+		})
 	]
 }));
