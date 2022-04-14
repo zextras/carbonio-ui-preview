@@ -21,14 +21,28 @@ const AttachmentLink = styled.a`
 	//position: relative;
 `;
 
-interface PreviewCriteriaAlternativeContentProps {
+export interface PreviewCriteriaAlternativeContentProps {
 	downloadSrc?: string;
+	/** Src that allow open in separate tab */
 	openSrc?: string;
+	titleLabel?: string;
+	contentLabel?: string;
+	downloadLabel?: string;
+	openLabel?: string;
+	noteLabel?: string;
 }
 
 export const PreviewCriteriaAlternativeContent: React.VFC<
 	PreviewCriteriaAlternativeContentProps
-> = ({ downloadSrc, openSrc }) => {
+> = ({
+	downloadSrc,
+	openSrc,
+	titleLabel = 'This item cannot be displayed',
+	contentLabel= 'The file size exceeds the limit allowed and cannot be displayed',
+	downloadLabel= 'DOWNLOAD FILE',
+	openLabel= 'OPEN IN A SEPARATE TAB',
+	noteLabel = 'Please, download it or open it in a separate tab'
+}) => {
 	const ancRef = useRef<HTMLAnchorElement>(null);
 	const ancRef2 = useRef<HTMLAnchorElement>(null);
 
@@ -61,15 +75,15 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 			gap="16px"
 		>
 			<Text size="large" color="gray6">
-				{'This item cannot be displayed'}
+				{titleLabel}
 			</Text>
 			<Text size="medium" color="gray6" weight="bold">
-				{'This file exceeds the maximum weight we support and thus, it cannot be displayed'}
+				{contentLabel}
 			</Text>
 			<ContainerWithGap orientation="horizontal" height="fit" gap="8px">
 				{downloadSrc && (
 					<Button
-						label="DOWNLOAD FILE"
+						label={downloadLabel}
 						icon="DownloadOutline"
 						size="fill"
 						onClick={downloadClick}
@@ -77,7 +91,7 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 				)}
 				{openSrc && (
 					<Button
-						label="OPEN IN A SEPARATE TAB"
+						label={openLabel}
 						icon="DiagonalArrowRightUp"
 						size="fill"
 						onClick={openClick}
@@ -85,7 +99,7 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 				)}
 			</ContainerWithGap>
 			<Text size="small" color="gray6">
-				{'Please, download it or open it in a separate tab'}
+				{noteLabel}
 			</Text>
 			{downloadSrc && <AttachmentLink rel="noopener" ref={ancRef} href={downloadSrc} />}
 			{openSrc && <AttachmentLink rel="noopener" ref={ancRef2} href={openSrc} />}

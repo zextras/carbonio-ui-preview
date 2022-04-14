@@ -21,7 +21,10 @@ import styled, { css, SimpleInterpolation } from 'styled-components';
 
 import FocusWithin from './FocusWithin';
 import Header, { HeaderProps } from './Header';
-import { PreviewCriteriaAlternativeContent } from './PreviewCriteriaAlternativeContent';
+import {
+	PreviewCriteriaAlternativeContent,
+	PreviewCriteriaAlternativeContentProps
+} from './PreviewCriteriaAlternativeContent';
 
 const CustomIconButton = styled(IconButton)`
 	${({ disabled }): SimpleInterpolation =>
@@ -50,7 +53,7 @@ const Overlay = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 3;
+	z-index: 1003;
 `;
 
 const MiddleContainer = styled(Container)`
@@ -138,9 +141,13 @@ type PdfPreviewProps = Partial<HeaderProps> & {
 	customContent?: React.ReactElement;
 	/** Whether a text layer should be rendered */
 	renderTextLayer?: boolean;
-	/** Src that allow open in separate tab */
-	openSrc?: string;
-};
+	zoomOutLabel?: string;
+	lowerLimitReachedLabel?: string;
+	resetZoomLabel?: string;
+	fitToWidthLabel?: string;
+	zoomInLabel?: string;
+	upperLimitReachedLabel?: string;
+} & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const zoomStep = [800, 1000, 1200, 1400, 1600, 2000, 2400, 3200];
 
@@ -159,7 +166,18 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		useFallback = false,
 		customContent,
 		renderTextLayer = false,
-		openSrc
+		openSrc,
+		titleLabel,
+		contentLabel,
+		downloadLabel,
+		openLabel,
+		noteLabel,
+		zoomOutLabel= 'Zoom out',
+		fitToWidthLabel= 'Fit to width',
+		lowerLimitReachedLabel= 'Minimum zoom level reached',
+		resetZoomLabel= 'Reset zoom',
+		upperLimitReachedLabel= 'Maximum zoom level reached',
+		zoomInLabel= 'Zoom in'
 	},
 	ref
 ) {
@@ -304,11 +322,19 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const $customContent = useMemo(() => {
 		if (useFallback) {
 			return (
-				customContent || <PreviewCriteriaAlternativeContent downloadSrc={src} openSrc={openSrc} />
+				customContent || <PreviewCriteriaAlternativeContent
+					downloadSrc={src}
+					openSrc={openSrc}
+					contentLabel={contentLabel}
+					downloadLabel={downloadLabel}
+					noteLabel={noteLabel}
+					openLabel={openLabel}
+					titleLabel={titleLabel}
+				/>
 			);
 		}
 		return undefined;
-	}, [customContent, openSrc, src, useFallback]);
+	}, [customContent, openSrc, src, useFallback, contentLabel, downloadLabel, noteLabel, openLabel, titleLabel]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
@@ -317,7 +343,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 					<ExternalContainer>
 						{!$customContent && (
 							<Navigator onClick={(ev): void => ev.stopPropagation()}>
-								<Tooltip label={decrementable ? 'Zoom out' : 'Minimum zoom level reached'}>
+								<Tooltip label={decrementable ? zoomOutLabel : lowerLimitReachedLabel}>
 									<CustomIconButton
 										disabled={!decrementable}
 										icon="Minus"
@@ -327,7 +353,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 										onClick={decreaseOfOneStep}
 									/>
 								</Tooltip>
-								<Tooltip label={fitToWidthActive ? 'Reset zoom' : 'Fit to width'}>
+								<Tooltip label={fitToWidthActive ? resetZoomLabel : fitToWidthLabel}>
 									<CustomIconButton
 										icon={fitToWidthActive ? 'MinimizeOutline' : 'MaximizeOutline'}
 										size="small"
@@ -336,7 +362,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 										onClick={fitToWidthActive ? resetWidth : fitToWidth}
 									/>
 								</Tooltip>
-								<Tooltip label={incrementable ? 'Zoom in' : 'Maximum zoom level reached'}>
+								<Tooltip label={incrementable ? zoomInLabel : upperLimitReachedLabel}>
 									<CustomIconButton
 										icon="Plus"
 										size="small"
