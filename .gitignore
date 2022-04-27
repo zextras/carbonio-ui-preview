@@ -8,10 +8,9 @@
 /dist/
 /lib/
 /lib-esm/
-/.idea/workspace.xml
-/.idea/compiler.xml
+/.idea
 /e2e/output/
-.idea/jsLibraryMappings.xml
 /junit.xml
 /coverage/cobertura-coverage.xml
 .DS_Store
+/.reuse/

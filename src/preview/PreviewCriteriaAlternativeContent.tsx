@@ -38,9 +38,9 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 	downloadSrc,
 	openSrc,
 	titleLabel = 'This item cannot be displayed',
-	contentLabel= 'The file size exceeds the limit allowed and cannot be displayed',
-	downloadLabel= 'DOWNLOAD FILE',
-	openLabel= 'OPEN IN A SEPARATE TAB',
+	contentLabel = 'The file size exceeds the limit allowed and cannot be displayed',
+	downloadLabel = 'DOWNLOAD FILE',
+	openLabel = 'OPEN IN A SEPARATE TAB',
 	noteLabel = 'Please, download it or open it in a separate tab'
 }) => {
 	const ancRef = useRef<HTMLAnchorElement>(null);
@@ -90,12 +90,7 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 					/>
 				)}
 				{openSrc && (
-					<Button
-						label={openLabel}
-						icon="DiagonalArrowRightUp"
-						size="fill"
-						onClick={openClick}
-					/>
+					<Button label={openLabel} icon="DiagonalArrowRightUp" size="fill" onClick={openClick} />
 				)}
 			</ContainerWithGap>
 			<Text size="small" color="gray6">
