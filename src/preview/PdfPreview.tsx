@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
 	Container,
@@ -182,6 +182,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	ref
 ) {
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
+	const documentLoaded = useRef(useFallback);
 
 	const [numPages, setNumPages] = useState<number | null>(null);
 
@@ -195,18 +196,37 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		return closeAction;
 	}, [closeAction, onClose]);
 
+	const escapeEvent = useCallback<(e: KeyboardEvent) => void>(
+		(event) => {
+			if (event.key === 'Escape') {
+				onClose(event);
+			}
+		},
+		[onClose]
+	);
+
+	useEffect(() => {
+		if (show) {
+			document.addEventListener('keyup', escapeEvent);
+		}
+
+		return (): void => {
+			document.removeEventListener('keyup', escapeEvent);
+		};
+	}, [escapeEvent, show]);
+
 	const onOverlayClick = useCallback<React.ReactEventHandler>(
 		(event) => {
-			// TODO: stop propagation or not?
 			event.stopPropagation();
-			(useFallback || numPages) &&
+			// close preview on click on overlay only if document is loaded (both success or error)
+			documentLoaded.current &&
 				previewRef.current &&
 				!event.isDefaultPrevented() &&
 				(previewRef.current === event.target ||
 					!previewRef.current.contains(event.target as Node)) &&
 				onClose(event);
 		},
-		[numPages, onClose, previewRef, useFallback]
+		[onClose, previewRef]
 	);
 
 	const [currentZoom, setCurrentZoom] = useState(zoomStep[0]);
@@ -315,6 +335,15 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>((args) => {
 		setNumPages(args.numPages);
+		documentLoaded.current = true;
+	}, []);
+
+	const onDocumentLoadError = useCallback(() => {
+		documentLoaded.current = true;
+	}, []);
+
+	const onDocumentLoadProgress = useCallback(() => {
+		documentLoaded.current = false;
 	}, []);
 
 	const file = useMemo(() => ({ url: src }), [src]);
@@ -408,7 +437,12 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							{/* </Container> */}
 							<PreviewContainer ref={previewRef}>
 								{$customContent || (
-									<Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
+									<Document
+										file={file}
+										onLoadSuccess={onDocumentLoadSuccess}
+										onLoadError={onDocumentLoadError}
+										onLoadProgress={onDocumentLoadProgress}
+									>
 										{pageElements}
 									</Document>
 								)}
