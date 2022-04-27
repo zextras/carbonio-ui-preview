@@ -1,7 +1,7 @@
 {
-	"name": "carbonio-ui-previewer",
+	"name": "@zextras/carbonio-ui-preview",
 	"version": "0.1.4",
-	"description": "Mails module for Zextras Carbonio",
+	"description": "Preview ui utility for Zextras Carbonio",
 	"main": "lib/index.js",
 	"module": "lib-esm/index.js",
 	"types": "lib/index.d.ts",
@@ -14,7 +14,7 @@
 		"build-esm": "tsc -m es6 --outDir lib-esm",
 		"clean": "rm -rf lib",
 		"build-all": "npm run clean && npm run build && npm run build-esm",
-		"_postinstall": "is-ci || husky install",
+		"postinstall": "is-ci || husky install",
 		"prepublishOnly": "pinst --disable && npm run build-all",
 		"postpublish": "pinst --enable",
 		"type-check": "tsc --noEmit",
