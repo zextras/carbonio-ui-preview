@@ -6,6 +6,8 @@
 /build/
 /sdk/
 /dist/
+/lib/
+/lib-esm/
 /.idea/workspace.xml
 /.idea/compiler.xml
 /e2e/output/
