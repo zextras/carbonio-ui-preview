@@ -10,8 +10,9 @@ module.exports = {
 		'notice/notice': [
 			'error',
 			{
-				templateFile: '.reuse/template.js'
+				templateFile: './notice.template.js'
 			}
 		]
-	}
+	},
+	ignorePatterns: ['notice.template.js']
 };

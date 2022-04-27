@@ -172,12 +172,12 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		downloadLabel,
 		openLabel,
 		noteLabel,
-		zoomOutLabel= 'Zoom out',
-		fitToWidthLabel= 'Fit to width',
-		lowerLimitReachedLabel= 'Minimum zoom level reached',
-		resetZoomLabel= 'Reset zoom',
-		upperLimitReachedLabel= 'Maximum zoom level reached',
-		zoomInLabel= 'Zoom in'
+		zoomOutLabel = 'Zoom out',
+		fitToWidthLabel = 'Fit to width',
+		lowerLimitReachedLabel = 'Minimum zoom level reached',
+		resetZoomLabel = 'Reset zoom',
+		upperLimitReachedLabel = 'Maximum zoom level reached',
+		zoomInLabel = 'Zoom in'
 	},
 	ref
 ) {
@@ -322,19 +322,31 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const $customContent = useMemo(() => {
 		if (useFallback) {
 			return (
-				customContent || <PreviewCriteriaAlternativeContent
-					downloadSrc={src}
-					openSrc={openSrc}
-					contentLabel={contentLabel}
-					downloadLabel={downloadLabel}
-					noteLabel={noteLabel}
-					openLabel={openLabel}
-					titleLabel={titleLabel}
-				/>
+				customContent || (
+					<PreviewCriteriaAlternativeContent
+						downloadSrc={src}
+						openSrc={openSrc}
+						contentLabel={contentLabel}
+						downloadLabel={downloadLabel}
+						noteLabel={noteLabel}
+						openLabel={openLabel}
+						titleLabel={titleLabel}
+					/>
+				)
 			);
 		}
 		return undefined;
-	}, [customContent, openSrc, src, useFallback, contentLabel, downloadLabel, noteLabel, openLabel, titleLabel]);
+	}, [
+		customContent,
+		openSrc,
+		src,
+		useFallback,
+		contentLabel,
+		downloadLabel,
+		noteLabel,
+		openLabel,
+		titleLabel
+	]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>

@@ -9,7 +9,7 @@ import React, { useCallback, createContext, useReducer } from 'react';
 import { ImagePreviewProps } from './ImagePreview';
 import { PdfPreviewProps } from './PdfPreview';
 import { PreviewWrapper, PreviewWrapperProps } from './PreviewWrapper';
-import {MakeOptional} from "../utils";
+import { MakeOptional } from '../utils';
 
 type CreatePreviewArgType = (
 	| MakeOptional<Omit<ImagePreviewProps, 'show'>, 'onClose'>
