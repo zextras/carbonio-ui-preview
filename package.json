@@ -1,11 +1,21 @@
 {
-	"name": "carbonio-ui-previewer",
-	"version": "0.0.1",
-	"description": "Mails module for Zextras Carbonio",
-	"main": "src/index.ts",
+	"name": "@zextras/carbonio-ui-preview",
+	"version": "0.1.4",
+	"description": "Preview ui utility for Zextras Carbonio",
+	"main": "lib/index.js",
+	"module": "lib-esm/index.js",
+	"types": "lib/index.d.ts",
+	"files": [
+		"/lib",
+		"/lib-esm"
+	],
 	"scripts": {
+		"build": "tsc",
+		"build-esm": "tsc -m es6 --outDir lib-esm",
+		"clean": "rm -rf lib",
+		"build-all": "npm run clean && npm run build && npm run build-esm",
 		"postinstall": "is-ci || husky install",
-		"prepublishOnly": "pinst --disable",
+		"prepublishOnly": "pinst --disable && npm run build-all",
 		"postpublish": "pinst --enable",
 		"type-check": "tsc --noEmit",
 		"type-check:watch": "npm run type-check -- --watch",
@@ -43,7 +53,7 @@
 		"react-pdf": "^5.7.1"
 	},
 	"peerDependencies": {
-		"@zextras/carbonio-design-system": "^0.1.4",
+		"@zextras/carbonio-design-system": "^0.3.0",
 		"lodash": "^4.17.21",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
