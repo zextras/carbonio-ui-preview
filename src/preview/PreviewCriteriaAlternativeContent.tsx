@@ -5,12 +5,10 @@
  */
 import React, { useCallback, useRef } from 'react';
 
-import { Button, Text } from '@zextras/carbonio-design-system';
+import { Button, Container, Text } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
-import { ContainerWithGap } from './ContainerWithGap';
-
-const FakeModalContainer = styled(ContainerWithGap)`
+const FakeModalContainer = styled(Container)`
 	border-radius: 16px;
 	padding: 32px 64px 32px 64px;
 	margin: auto;
@@ -46,8 +44,8 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 	const ancRef = useRef<HTMLAnchorElement>(null);
 	const ancRef2 = useRef<HTMLAnchorElement>(null);
 
-	const downloadClick = useCallback<React.ReactEventHandler>(
-		(ev) => {
+	const downloadClick = useCallback(
+		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.preventDefault();
 			if (ancRef.current) {
 				ancRef.current.click();
@@ -56,8 +54,8 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 		[ancRef]
 	);
 
-	const openClick = useCallback<React.ReactEventHandler>(
-		(ev) => {
+	const openClick = useCallback(
+		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.preventDefault();
 			if (ancRef2.current) {
 				ancRef2.current.click();
@@ -80,19 +78,19 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 			<Text size="medium" color="gray6" weight="bold">
 				{contentLabel}
 			</Text>
-			<ContainerWithGap orientation="horizontal" height="fit" gap="8px">
+			<Container orientation="horizontal" height="fit" gap="8px">
 				{downloadSrc && (
 					<Button
 						label={downloadLabel}
 						icon="DownloadOutline"
-						size="fill"
+						width="fill"
 						onClick={downloadClick}
 					/>
 				)}
 				{openSrc && (
-					<Button label={openLabel} icon="DiagonalArrowRightUp" size="fill" onClick={openClick} />
+					<Button label={openLabel} icon="DiagonalArrowRightUp" width="fill" onClick={openClick} />
 				)}
-			</ContainerWithGap>
+			</Container>
 			<Text size="small" color="gray6">
 				{noteLabel}
 			</Text>
