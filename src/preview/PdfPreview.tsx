@@ -435,7 +435,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							{/*		/> */}
 							{/*	</Padding> */}
 							{/* </Container> */}
-							<PreviewContainer ref={previewRef}>
+							<PreviewContainer ref={previewRef} data-testid="pdf-preview-container">
 								{$customContent || (
 									<Document
 										file={file}

@@ -5,60 +5,58 @@
  */
 import React from 'react';
 
-import { faker } from '@faker-js/faker';
 import { screen } from '@testing-library/react';
 
-import { ImagePreview, ImagePreviewProps } from './ImagePreview';
+import { PdfPreview, PdfPreviewProps } from './PdfPreview';
 import { setup } from 'test-utils';
 
-describe('Image Preview', () => {
-	test('Render an image', () => {
-		const img = faker.image.image();
+const PDF_SRC = '../test/test.pdf';
+
+describe('Pdf Preview', () => {
+	test('Render a pdf document', async () => {
 		const onClose = jest.fn();
-		setup(<ImagePreview show src={img} onClose={onClose} />);
-		expect(screen.getByRole('img')).toBeVisible();
+		setup(<PdfPreview show src={PDF_SRC} onClose={onClose} />);
+		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/failed to load pdf file/i);
+		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
 	});
 
-	test('If show is false does not render an image', () => {
-		const img = faker.image.image();
+	test('If show is false does not render the pdf', async () => {
 		const onClose = jest.fn();
-		setup(<ImagePreview show={false} src={img} onClose={onClose} />);
-		expect(screen.queryByRole('img')).not.toBeInTheDocument();
+		setup(<PdfPreview show={false} src={PDF_SRC} onClose={onClose} />);
+		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
 	});
 
-	test('Additional data are visible', () => {
-		const img = faker.image.image();
+	test('Additional data are visible', async () => {
 		const onClose = jest.fn();
 		setup(
-			<ImagePreview
+			<PdfPreview
 				show
-				src={img}
+				src={PDF_SRC}
 				onClose={onClose}
-				filename="image file name"
-				alt="this is an image"
-				extension="png"
+				filename="file name"
+				extension="pdf"
 				size="18KB"
 			/>
 		);
-		expect(screen.getByText(/image file name/i)).toBeVisible();
-		expect(screen.queryByText(/this is an image/i)).not.toBeInTheDocument();
-		expect(screen.getByAltText(/this is an image/i)).toBeVisible();
-		expect(screen.getByText(/png/i)).toBeVisible();
-		expect(screen.getByText(/18KB/i)).toBeVisible();
+		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/failed to load pdf file/i);
+		expect(screen.getByText(/file name/i)).toBeVisible();
+		expect(screen.getByText(/pdf.*18KB/i)).toBeVisible();
 	});
 
 	test('Escape key close the preview', async () => {
-		const img = faker.image.image();
 		const onClose = jest.fn();
-		const { user } = setup(<ImagePreview show src={img} onClose={onClose} />);
+		const { user } = setup(<PdfPreview show src={PDF_SRC} onClose={onClose} />);
+		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/failed to load pdf file/i);
 		await user.keyboard('{Escape}');
 		expect(onClose).toHaveBeenCalled();
 	});
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
-		const img = faker.image.image();
 		const onClose = jest.fn();
-		const actions: ImagePreviewProps['actions'] = [
+		const actions: PdfPreviewProps['actions'] = [
 			{
 				id: 'action1',
 				icon: 'Activity',
@@ -74,7 +72,7 @@ describe('Image Preview', () => {
 			}
 		];
 
-		const closeAction: ImagePreviewProps['closeAction'] = {
+		const closeAction: PdfPreviewProps['closeAction'] = {
 			id: 'closeAction',
 			icon: 'Close',
 			onClick: jest.fn((e: React.SyntheticEvent) => {
@@ -82,15 +80,17 @@ describe('Image Preview', () => {
 			})
 		};
 		const { user } = setup(
-			<ImagePreview
+			<PdfPreview
 				show
-				src={img}
+				src={PDF_SRC}
 				onClose={onClose}
 				actions={actions}
-				filename="image name"
+				filename="pdf name"
 				closeAction={closeAction}
 			/>
 		);
+		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/failed to load pdf file/i);
 		const action1Item = screen.getByTestId('icon: Activity');
 		const action2Item = screen.getByTestId('icon: People');
 		const closeActionItem = screen.getByTestId('icon: Close');
@@ -112,7 +112,7 @@ describe('Image Preview', () => {
 		expect(closeAction.onClick).toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledTimes(2);
 		// click on filename is equivalent to a click on the overlay, so onClose is called
-		await user.click(screen.getByText(/image name/i));
+		await user.click(screen.getByText(/pdf name/i));
 		expect(onClose).toHaveBeenCalledTimes(3);
 	});
 });
