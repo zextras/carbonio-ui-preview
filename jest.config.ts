@@ -30,9 +30,7 @@ export default {
 	coverageDirectory: 'coverage',
 
 	// An array of regexp pattern strings used to skip coverage collection
-	// coveragePathIgnorePatterns: [
-	//   "/node_modules/"
-	// ],
+	coveragePathIgnorePatterns: ['/node_modules/', 'src/utils/test-utils.*'],
 
 	// Indicates which provider should be used to instrument code for coverage
 	coverageProvider: 'babel',
@@ -92,7 +90,9 @@ export default {
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
 	moduleNameMapper: {
-		'react-pdf/dist/esm/entry.webpack': 'react-pdf'
+		// mocked react-pdf entirely with jest
+		// 'react-pdf/dist/esm/entry.webpack': 'react-pdf/dist/umd/entry.jest'
+		'^react-pdf': 'react-pdf/dist/umd/entry.jest'
 	},
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],
@@ -136,7 +136,7 @@ export default {
 	// runner: "jest-runner",
 
 	// The paths to modules that run some code to configure or set up the testing environment before each test
-	// setupFiles: [],
+	setupFiles: ['jest-canvas-mock'],
 
 	// A list of paths to modules that run some code to configure or set up the testing framework before each test
 	setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],

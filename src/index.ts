@@ -10,3 +10,4 @@ export * from './preview/PdfPreview';
 /** Utils */
 export * from './preview/PreviewManager';
 export * from './preview/PreviewWrapper';
+export { ZOOM_STEPS } from './preview/constants';

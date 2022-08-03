@@ -87,20 +87,15 @@ describe('Header', () => {
 		// register listeners
 		jest.runOnlyPendingTimers();
 		expect(screen.queryByText(/activity one/i)).not.toBeInTheDocument();
-		// [@testing-library/user-event@14.3.0] hover is not triggered on parents anymore. See https://github.com/testing-library/user-event/issues/957
-		// eslint-disable-next-line testing-library/no-node-access
-		await user.hover(action1.parentElement as Element);
+		await user.hover(action1);
 		await screen.findByText(/activity one/i);
 		expect(screen.getByText(/activity one/i)).toBeVisible();
-		// eslint-disable-next-line testing-library/no-node-access
-		await user.hover(action2.parentElement as Element);
+		await user.hover(action2);
 		expect(screen.queryByText(/activity one/i)).not.toBeInTheDocument();
-		// eslint-disable-next-line testing-library/no-node-access
-		await user.hover(action3.parentElement as Element);
+		await user.hover(action3);
 		await screen.findByText(/airplane tooltip action/i);
 		expect(screen.getByText(/airplane tooltip action/i)).toBeVisible();
-		// eslint-disable-next-line testing-library/no-node-access
-		await user.hover(actionClose.parentElement as Element);
+		await user.hover(actionClose);
 		await screen.findByText(/close/i);
 		expect(screen.queryByText(/airplane tooltip action/i)).not.toBeInTheDocument();
 		expect(screen.getByText(/close/i)).toBeVisible();
