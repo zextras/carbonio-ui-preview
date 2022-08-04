@@ -18,9 +18,11 @@ type CreatePreviewArgType = (
 	previewType: 'pdf' | 'image';
 };
 
-const PreviewsManagerContext = createContext<{
+export type PreviewManagerContextType = {
 	createPreview: (args: CreatePreviewArgType) => void;
-}>({
+};
+
+const PreviewsManagerContext = createContext<PreviewManagerContextType>({
 	createPreview: () => undefined
 });
 
