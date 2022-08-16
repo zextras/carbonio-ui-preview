@@ -6,10 +6,10 @@
 
 import React, { useCallback, createContext, useReducer } from 'react';
 
+import { MakeOptional } from '../utils/utils';
 import { ImagePreviewProps } from './ImagePreview';
 import { PdfPreviewProps } from './PdfPreview';
 import { PreviewWrapper, PreviewWrapperProps } from './PreviewWrapper';
-import { MakeOptional } from '../utils';
 
 type CreatePreviewArgType = (
 	| MakeOptional<Omit<ImagePreviewProps, 'show'>, 'onClose'>
@@ -18,9 +18,11 @@ type CreatePreviewArgType = (
 	previewType: 'pdf' | 'image';
 };
 
-const PreviewsManagerContext = createContext<{
+export type PreviewManagerContextType = {
 	createPreview: (args: CreatePreviewArgType) => void;
-}>({
+};
+
+const PreviewsManagerContext = createContext<PreviewManagerContextType>({
 	createPreview: () => undefined
 });
 
