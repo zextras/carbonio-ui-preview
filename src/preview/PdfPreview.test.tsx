@@ -214,7 +214,7 @@ describe('Pdf Preview', () => {
 		await user.click(action1Item);
 		expect(actions[0].onClick).toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledTimes(1);
-		// click on action 2 skips the handler of the action since it is disabled and do not calls onClose
+		// click on action 2 skips the handler of the action since it is disabled and does not call onClose
 		await user.click(action2Item);
 		expect(actions[1].onClick).not.toHaveBeenCalled();
 		expect(onClose).toHaveBeenCalledTimes(1);
@@ -230,7 +230,7 @@ describe('Pdf Preview', () => {
 
 	test('Zoom starts at lowest step', async () => {
 		const onClose = jest.fn();
-		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+		setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
 		await screen.findByText(/loading pdf/i);

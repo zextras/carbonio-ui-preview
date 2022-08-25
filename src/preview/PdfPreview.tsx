@@ -5,43 +5,22 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-	Container,
-	IconButton,
-	Portal,
-	Tooltip,
-	useCombinedRefs
-} from '@zextras/carbonio-design-system';
-import findIndex from 'lodash/findIndex';
-import findLastIndex from 'lodash/findLastIndex';
+import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import map from 'lodash/map';
 import type { DocumentProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
-import styled, { css, SimpleInterpolation } from 'styled-components';
+import styled from 'styled-components';
 
 import { MakeOptional } from '../utils/utils';
-import { ZOOM_STEPS } from './constants';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
+import { Navigator } from './Navigator';
 import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
-
-const CustomIconButton = styled(IconButton)`
-	${({ disabled }): SimpleInterpolation =>
-		disabled &&
-		css`
-			background: rgba(204, 204, 204, 0.2);
-			& > svg {
-				background: unset;
-			}
-		`};
-	& > svg {
-		width: 20px;
-		height: 20px;
-	}
-`;
+import { useZoom } from './useZoom';
+import { ZoomController } from './ZoomController';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -70,18 +49,6 @@ const ExternalContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	position: relative;
-`;
-
-const Navigator = styled.div`
-	display: flex;
-	position: absolute;
-	z-index: 1;
-	bottom: 16px;
-	background-color: ${({ theme }): string => theme.palette.gray0.regular};
-	align-self: center;
-	border-radius: 4px;
-	gap: 8px;
-	padding: 8px 16px;
 `;
 
 const PreviewContainer = styled.div`
@@ -174,12 +141,12 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		downloadLabel,
 		openLabel,
 		noteLabel,
-		zoomOutLabel = 'Zoom out',
-		fitToWidthLabel = 'Fit to width',
-		lowerLimitReachedLabel = 'Minimum zoom level reached',
-		resetZoomLabel = 'Reset zoom',
-		upperLimitReachedLabel = 'Maximum zoom level reached',
-		zoomInLabel = 'Zoom in'
+		zoomOutLabel,
+		fitToWidthLabel,
+		lowerLimitReachedLabel,
+		resetZoomLabel,
+		upperLimitReachedLabel,
+		zoomInLabel
 	},
 	ref
 ) {
@@ -187,6 +154,16 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const documentLoaded = useRef(useFallback);
 
 	const [numPages, setNumPages] = useState<number | null>(null);
+	const {
+		currentZoom,
+		incrementable,
+		decrementable,
+		increaseOfOneStep,
+		decreaseOfOneStep,
+		fitToWidth,
+		fitToWidthActive,
+		reset
+	} = useZoom(previewRef);
 
 	const $closeAction = useMemo(() => {
 		if (closeAction) {
@@ -231,89 +208,19 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[onClose, previewRef]
 	);
 
-	const [currentZoom, setCurrentZoom] = useState(ZOOM_STEPS[0]);
-	const [incrementable, setIncrementable] = useState(true);
-	const [decrementable, setDecrementable] = useState(false);
-	const [fitToWidthActive, setFitToWidthActive] = useState(false);
-
 	useEffect(() => {
 		if (!show) {
-			setCurrentZoom(ZOOM_STEPS[0]);
-			setIncrementable(true);
-			setDecrementable(false);
-			setFitToWidthActive(false);
+			reset();
 		}
-	}, [show]);
+	}, [reset, show]);
 
-	const increaseOfOneStep = useCallback(
+	const resetWidth = useCallback(
 		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
-			if (incrementable) {
-				const targetIndex = findIndex(ZOOM_STEPS, (step) => step > currentZoom);
-				if (targetIndex >= 0) {
-					setCurrentZoom(ZOOM_STEPS[targetIndex]);
-					if (targetIndex === ZOOM_STEPS.length - 1) {
-						setIncrementable(false);
-					}
-					if (targetIndex > 0) {
-						setDecrementable(true);
-					}
-				}
-			}
-			setFitToWidthActive(false);
+			reset();
 		},
-		[currentZoom, incrementable]
+		[reset]
 	);
-
-	const decreaseOfOneStep = useCallback(
-		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
-			ev.stopPropagation();
-			if (decrementable) {
-				const targetIndex = findLastIndex(ZOOM_STEPS, (step) => step < currentZoom);
-				if (targetIndex >= 0) {
-					setCurrentZoom(ZOOM_STEPS[targetIndex]);
-					if (targetIndex === 0) {
-						setDecrementable(false);
-					}
-					if (targetIndex < ZOOM_STEPS.length - 1) {
-						setIncrementable(true);
-					}
-				}
-			}
-			setFitToWidthActive(false);
-		},
-		[currentZoom, decrementable]
-	);
-
-	const fitToWidth = useCallback(
-		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent | Event) => {
-			ev.stopPropagation();
-			if (previewRef.current) {
-				setCurrentZoom(previewRef.current?.clientWidth);
-				setIncrementable(previewRef.current?.clientWidth < ZOOM_STEPS[ZOOM_STEPS.length - 1]);
-				setDecrementable(previewRef.current?.clientWidth > ZOOM_STEPS[0]);
-				setFitToWidthActive(true);
-			}
-		},
-		[previewRef]
-	);
-
-	useEffect(() => {
-		if (show && fitToWidthActive) {
-			window.addEventListener('resize', fitToWidth);
-		}
-		return (): void => {
-			window.removeEventListener('resize', fitToWidth);
-		};
-	}, [fitToWidth, previewRef, show, fitToWidthActive]);
-
-	const resetWidth = useCallback((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
-		ev.stopPropagation();
-		setCurrentZoom(ZOOM_STEPS[0]);
-		setIncrementable(true);
-		setDecrementable(false);
-		setFitToWidthActive(false);
-	}, []);
 
 	// could be useful for future implementations
 	// const onPageLoadSuccess = useCallback(({ originalHeight, originalWidth, width, height }) => {
@@ -388,36 +295,22 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 				<FocusWithin>
 					<ExternalContainer>
 						{!$customContent && (
-							<Navigator onClick={(ev): void => ev.stopPropagation()}>
-								<Tooltip label={decrementable ? zoomOutLabel : lowerLimitReachedLabel}>
-									<CustomIconButton
-										disabled={!decrementable}
-										icon="Minus"
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={decreaseOfOneStep}
-									/>
-								</Tooltip>
-								<Tooltip label={fitToWidthActive ? resetZoomLabel : fitToWidthLabel}>
-									<CustomIconButton
-										icon={fitToWidthActive ? 'MinimizeOutline' : 'MaximizeOutline'}
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={fitToWidthActive ? resetWidth : fitToWidth}
-									/>
-								</Tooltip>
-								<Tooltip label={incrementable ? zoomInLabel : upperLimitReachedLabel}>
-									<CustomIconButton
-										icon="Plus"
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={increaseOfOneStep}
-										disabled={!incrementable}
-									/>
-								</Tooltip>
+							<Navigator>
+								<ZoomController
+									decrementable={decrementable}
+									zoomOutLabel={zoomOutLabel}
+									lowerLimitReachedLabel={lowerLimitReachedLabel}
+									decreaseByStep={decreaseOfOneStep}
+									fitToWidthActive={fitToWidthActive}
+									resetZoomLabel={resetZoomLabel}
+									fitToWidthLabel={fitToWidthLabel}
+									resetWidth={resetWidth}
+									fitToWidth={fitToWidth}
+									incrementable={incrementable}
+									zoomInLabel={zoomInLabel}
+									upperLimitReachedLabel={upperLimitReachedLabel}
+									increaseByStep={increaseOfOneStep}
+								/>
 							</Navigator>
 						)}
 						<Header
