@@ -5,9 +5,10 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
+import { Container, Portal, useCombinedRefs, getColor } from '@zextras/carbonio-design-system';
 import map from 'lodash/map';
 import type { DocumentProps } from 'react-pdf';
+import { PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import styled from 'styled-components';
 
@@ -15,10 +16,12 @@ import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import { Navigator } from './Navigator';
+import { PageController } from './PageController';
 import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
+import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
 
@@ -90,6 +93,13 @@ const PreviewContainer = styled.div`
 	}
 `;
 
+const VerticalDivider = styled.div<{ $color: string }>`
+	width: 1px;
+	height: 24px;
+	background-color: ${({ $color, theme }): string => getColor($color, theme)};
+	flex: 0 0 1px;
+`;
+
 type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	/** Left Action for the preview */
 	closeAction?: MakeOptional<HeaderAction, 'onClick'>;
@@ -118,6 +128,7 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	fitToWidthLabel?: string;
 	zoomInLabel?: string;
 	upperLimitReachedLabel?: string;
+	pageLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -146,14 +157,17 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		lowerLimitReachedLabel,
 		resetZoomLabel,
 		upperLimitReachedLabel,
-		zoomInLabel
+		zoomInLabel,
+		pageLabel
 	},
 	ref
 ) {
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
 	const documentLoaded = useRef(useFallback);
+	const pageRefs = useRef<React.RefObject<HTMLElement>[]>([]);
 
 	const [numPages, setNumPages] = useState<number | null>(null);
+	const [currentPage, setCurrentPage] = useState<number>(0);
 	const {
 		currentZoom,
 		incrementable,
@@ -164,6 +178,19 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		fitToWidthActive,
 		reset
 	} = useZoom(previewRef);
+
+	const updatePageOnScroll = useCallback((pageElement: Element | undefined) => {
+		if (pageElement) {
+			const currentPageIndex = pageRefs.current?.findIndex(
+				(pageRef) => pageRef.current === pageElement
+			);
+			if (currentPageIndex > -1) {
+				setCurrentPage(currentPageIndex + 1);
+			}
+		}
+	}, []);
+
+	const { observePage } = usePageScrollController(previewRef, updatePageOnScroll);
 
 	const $closeAction = useMemo(() => {
 		if (closeAction) {
@@ -222,29 +249,41 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[reset]
 	);
 
-	// could be useful for future implementations
-	// const onPageLoadSuccess = useCallback(({ originalHeight, originalWidth, width, height }) => {
-	// 	console.log(originalHeight, originalWidth, width, height);
-	// }, []);
+	const registerPageObserver = useCallback<NonNullable<PageProps['onRenderSuccess']>>(
+		({ pageNumber }): void => {
+			const pageRef = pageRefs.current[pageNumber - 1];
+			if (pageRef.current) {
+				observePage(pageRef.current);
+			}
+		},
+		[observePage]
+	);
 
 	const pageElements = useMemo(() => {
 		if (numPages) {
-			return map(new Array(numPages), (el, index) => (
-				<Page
-					key={`page_${index + 1}`}
-					pageNumber={index + 1}
-					// onLoadSuccess={index === 0 ? onPageLoadSuccess : undefined}
-					width={currentZoom}
-					renderTextLayer={renderTextLayer}
-				/>
-			));
+			pageRefs.current = [];
+			return map(new Array(numPages), (el, index) => {
+				const pageRef = React.createRef<HTMLDivElement>();
+				pageRefs.current.push(pageRef);
+				return (
+					<Page
+						key={`page_${index + 1}`}
+						pageNumber={index + 1}
+						onRenderSuccess={registerPageObserver}
+						width={currentZoom}
+						renderTextLayer={renderTextLayer}
+						inputRef={pageRef}
+					/>
+				);
+			});
 		}
 		return [];
-	}, [currentZoom, numPages, renderTextLayer]);
+	}, [currentZoom, numPages, registerPageObserver, renderTextLayer]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
 		(document) => {
 			setNumPages(document.numPages);
+			setCurrentPage(1);
 			documentLoaded.current = true;
 		},
 		[]
@@ -289,6 +328,11 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		titleLabel
 	]);
 
+	const onPageChange = useCallback((newPage: number) => {
+		setCurrentPage(newPage);
+		pageRefs.current[newPage - 1].current?.scrollIntoView();
+	}, []);
+
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
 			<Overlay onClick={onOverlayClick}>
@@ -296,6 +340,13 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 					<ExternalContainer>
 						{!$customContent && (
 							<Navigator>
+								<PageController
+									pageLabel={pageLabel}
+									pagesNumber={numPages || 0}
+									currentPage={currentPage}
+									onPageChange={onPageChange}
+								/>
+								<VerticalDivider $color="gray6" />
 								<ZoomController
 									decrementable={decrementable}
 									zoomOutLabel={zoomOutLabel}
