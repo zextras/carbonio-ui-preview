@@ -8,9 +8,9 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
+import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
-import { MakeOptional } from '../utils';
 
 const Overlay = styled.div`
 	height: 100vh;

@@ -19,13 +19,14 @@ import type { DocumentProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import styled, { css, SimpleInterpolation } from 'styled-components';
 
+import { MakeOptional } from '../utils/utils';
+import { ZOOM_STEPS } from './constants';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
-import { MakeOptional } from '../utils';
 
 const CustomIconButton = styled(IconButton)`
 	${({ disabled }): SimpleInterpolation =>
@@ -152,8 +153,6 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	upperLimitReachedLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
-const zoomStep = [800, 1000, 1200, 1400, 1600, 2000, 2400, 3200];
-
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
 	{
 		src,
@@ -232,14 +231,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[onClose, previewRef]
 	);
 
-	const [currentZoom, setCurrentZoom] = useState(zoomStep[0]);
+	const [currentZoom, setCurrentZoom] = useState(ZOOM_STEPS[0]);
 	const [incrementable, setIncrementable] = useState(true);
 	const [decrementable, setDecrementable] = useState(false);
 	const [fitToWidthActive, setFitToWidthActive] = useState(false);
 
 	useEffect(() => {
 		if (!show) {
-			setCurrentZoom(zoomStep[0]);
+			setCurrentZoom(ZOOM_STEPS[0]);
 			setIncrementable(true);
 			setDecrementable(false);
 			setFitToWidthActive(false);
@@ -250,10 +249,10 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
 			if (incrementable) {
-				const targetIndex = findIndex(zoomStep, (step) => step > currentZoom);
+				const targetIndex = findIndex(ZOOM_STEPS, (step) => step > currentZoom);
 				if (targetIndex >= 0) {
-					setCurrentZoom(zoomStep[targetIndex]);
-					if (targetIndex === zoomStep.length - 1) {
+					setCurrentZoom(ZOOM_STEPS[targetIndex]);
+					if (targetIndex === ZOOM_STEPS.length - 1) {
 						setIncrementable(false);
 					}
 					if (targetIndex > 0) {
@@ -270,13 +269,13 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
 			if (decrementable) {
-				const targetIndex = findLastIndex(zoomStep, (step) => step < currentZoom);
+				const targetIndex = findLastIndex(ZOOM_STEPS, (step) => step < currentZoom);
 				if (targetIndex >= 0) {
-					setCurrentZoom(zoomStep[targetIndex]);
+					setCurrentZoom(ZOOM_STEPS[targetIndex]);
 					if (targetIndex === 0) {
 						setDecrementable(false);
 					}
-					if (targetIndex < zoomStep.length - 1) {
+					if (targetIndex < ZOOM_STEPS.length - 1) {
 						setIncrementable(true);
 					}
 				}
@@ -291,8 +290,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 			ev.stopPropagation();
 			if (previewRef.current) {
 				setCurrentZoom(previewRef.current?.clientWidth);
-				setIncrementable(previewRef.current?.clientWidth < zoomStep[zoomStep.length - 1]);
-				setDecrementable(previewRef.current?.clientWidth > zoomStep[0]);
+				setIncrementable(previewRef.current?.clientWidth < ZOOM_STEPS[ZOOM_STEPS.length - 1]);
+				setDecrementable(previewRef.current?.clientWidth > ZOOM_STEPS[0]);
 				setFitToWidthActive(true);
 			}
 		},
@@ -310,7 +309,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 
 	const resetWidth = useCallback((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 		ev.stopPropagation();
-		setCurrentZoom(zoomStep[0]);
+		setCurrentZoom(ZOOM_STEPS[0]);
 		setIncrementable(true);
 		setDecrementable(false);
 		setFitToWidthActive(false);
@@ -336,16 +335,19 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		return [];
 	}, [currentZoom, numPages, renderTextLayer]);
 
-	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>((args) => {
-		setNumPages(args.numPages);
+	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
+		(document) => {
+			setNumPages(document.numPages);
+			documentLoaded.current = true;
+		},
+		[]
+	);
+
+	const onDocumentLoadError = useCallback<NonNullable<DocumentProps['onLoadError']>>(() => {
 		documentLoaded.current = true;
 	}, []);
 
-	const onDocumentLoadError = useCallback(() => {
-		documentLoaded.current = true;
-	}, []);
-
-	const onDocumentLoadProgress = useCallback(() => {
+	const onDocumentLoadProgress = useCallback<NonNullable<DocumentProps['onLoadProgress']>>(() => {
 		documentLoaded.current = false;
 	}, []);
 
@@ -438,7 +440,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							{/*		/> */}
 							{/*	</Padding> */}
 							{/* </Container> */}
-							<PreviewContainer ref={previewRef}>
+							<PreviewContainer ref={previewRef} data-testid="pdf-preview-container">
 								{$customContent || (
 									<Document
 										file={file}

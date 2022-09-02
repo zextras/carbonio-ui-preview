@@ -11,6 +11,7 @@
 /.idea
 /e2e/output/
 /junit.xml
-/coverage/cobertura-coverage.xml
+/coverage/
 .DS_Store
 /.reuse/
+zextras-carbonio-ui-preview-*.*.*.tgz
