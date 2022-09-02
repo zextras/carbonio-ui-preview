@@ -19,9 +19,9 @@
 		"type-check": "tsc --noEmit",
 		"type-check:watch": "npm run type-check -- --watch",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to node_modules/@zextras/carbonio-ui-configs src",
-		"test": "jest",
 		"packTo": "npm pack --pack-destination $PKG_PATH && cd $PKG_PATH && npm i zextras-carbonio-ui-preview-$npm_package_version.tgz",
-      	"deploy": "npm pack && rm -rf $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/* && tar -xf zextras-carbonio-ui-preview-$npm_package_version.tgz -C $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/ --strip-components 1"
+		"deploy": "npm pack && rm -rf $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/* && tar -xf zextras-carbonio-ui-preview-$npm_package_version.tgz -C $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/ --strip-components 1",
+		"test": "jest"
 	},
 	"keywords": [],
 	"author": "Zextras SF Team <https://www.zextras.com/carbonio/>",
@@ -67,7 +67,7 @@
 		"react-pdf": "^5.7.2"
 	},
 	"peerDependencies": {
-		"@zextras/carbonio-design-system": "^0.3.0",
+		"@zextras/carbonio-design-system": "^0.4.0",
 		"lodash": "^4.17.21",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",

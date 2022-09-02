@@ -3,13 +3,14 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
+import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
-import Header, { HeaderProps } from './Header';
+import Header, { HeaderAction, HeaderProps } from './Header';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -69,12 +70,14 @@ const PreviewContainer = styled.div.attrs({
 	flex-grow: 1;
 `;
 
-type ImagePreviewProps = Partial<HeaderProps> & {
+type ImagePreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
+	/** Left Action for the preview */
+	closeAction?: MakeOptional<HeaderAction, 'onClick'>;
 	/**
 	 * HTML node where to insert the Portal's children.
 	 * The default value is 'window.top.document'.
 	 * */
-	container?: React.RefObject<HTMLElement>;
+	container?: Element;
 	/** Flag to disable the Portal implementation */
 	disablePortal?: boolean;
 	/** Flag to show or hide Portal's content */
@@ -103,8 +106,18 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 	},
 	ref
 ) {
-	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
-	const imageRef = useRef<HTMLImageElement | null>(null);
+	const previewRef = useCombinedRefs<HTMLDivElement>(ref);
+	const imageRef = useRef<HTMLImageElement>(null);
+
+	const $closeAction = useMemo(() => {
+		if (closeAction) {
+			return {
+				onClick: onClose,
+				...closeAction
+			};
+		}
+		return closeAction;
+	}, [closeAction, onClose]);
 
 	const escapeEvent = useCallback<(e: KeyboardEvent) => void>(
 		(event) => {
@@ -148,7 +161,7 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 							filename={filename}
 							extension={extension}
 							size={size}
-							closeAction={closeAction}
+							closeAction={$closeAction}
 						/>
 						<MiddleContainer orientation="horizontal" crossAlignment="unset" minHeight={0}>
 							{/* TODO: uncomment when navigation between items will be implemented */}

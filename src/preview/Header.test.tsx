@@ -7,8 +7,8 @@ import React from 'react';
 
 import { screen } from '@testing-library/react';
 
+import { setup } from '../utils/test-utils';
 import Header, { HeaderProps } from './Header';
-import { setup } from 'test-utils';
 
 describe('Header', () => {
 	test('Render a header with all information', () => {

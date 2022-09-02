@@ -19,9 +19,10 @@ import type { DocumentProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import styled, { css, SimpleInterpolation } from 'styled-components';
 
+import { MakeOptional } from '../utils/utils';
 import { ZOOM_STEPS } from './constants';
 import FocusWithin from './FocusWithin';
-import Header, { HeaderProps } from './Header';
+import Header, { HeaderAction, HeaderProps } from './Header';
 import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
@@ -122,12 +123,14 @@ const PreviewContainer = styled.div`
 	}
 `;
 
-type PdfPreviewProps = Partial<HeaderProps> & {
+type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
+	/** Left Action for the preview */
+	closeAction?: MakeOptional<HeaderAction, 'onClick'>;
 	/**
 	 * HTML node where to insert the Portal's children.
 	 * The default value is 'window.top.document'.
 	 * */
-	container?: React.RefObject<HTMLElement>;
+	container?: Element;
 	/** Flag to disable the Portal implementation */
 	disablePortal?: boolean;
 	/** Flag to show or hide Portal's content */
@@ -188,8 +191,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const $closeAction = useMemo(() => {
 		if (closeAction) {
 			return {
-				onClick: onClose,
-				...closeAction
+				...closeAction,
+				onClick: onClose
 			};
 		}
 		return closeAction;
@@ -242,8 +245,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		}
 	}, [show]);
 
-	const increaseOfOneStep = useCallback<React.ReactEventHandler>(
-		(ev) => {
+	const increaseOfOneStep = useCallback(
+		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
 			if (incrementable) {
 				const targetIndex = findIndex(ZOOM_STEPS, (step) => step > currentZoom);
@@ -262,8 +265,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[currentZoom, incrementable]
 	);
 
-	const decreaseOfOneStep = useCallback<React.ReactEventHandler>(
-		(ev) => {
+	const decreaseOfOneStep = useCallback(
+		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
 			if (decrementable) {
 				const targetIndex = findLastIndex(ZOOM_STEPS, (step) => step < currentZoom);
@@ -283,7 +286,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	);
 
 	const fitToWidth = useCallback(
-		(ev: Event) => {
+		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent | Event) => {
 			ev.stopPropagation();
 			if (previewRef.current) {
 				setCurrentZoom(previewRef.current?.clientWidth);
@@ -304,7 +307,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		};
 	}, [fitToWidth, previewRef, show, fitToWidthActive]);
 
-	const resetWidth = useCallback<React.ReactEventHandler>((ev) => {
+	const resetWidth = useCallback((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 		ev.stopPropagation();
 		setCurrentZoom(ZOOM_STEPS[0]);
 		setIncrementable(true);
