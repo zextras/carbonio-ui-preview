@@ -55,7 +55,7 @@ describe('Image Preview', () => {
 		expect(onClose).toHaveBeenCalled();
 	});
 
-	test.skip('Click on actions calls onClose if event is not stopped by the action itself', async () => {
+	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
 		const img = faker.image.image();
 		const onClose = jest.fn();
 		const actions: ImagePreviewProps['actions'] = [
@@ -106,13 +106,13 @@ describe('Image Preview', () => {
 		// click on action 2 skips the handler of the action since it is disabled and calls onClose
 		await user.click(action2Item);
 		expect(actions[1].onClick).not.toHaveBeenCalled();
-		expect(onClose).toHaveBeenCalledTimes(2);
+		expect(onClose).toHaveBeenCalledTimes(1);
 		// click on close action is stopped by the action, event is not propagated and onClose is not called
 		await user.click(closeActionItem);
 		expect(closeAction.onClick).toHaveBeenCalled();
-		expect(onClose).toHaveBeenCalledTimes(2);
+		expect(onClose).toHaveBeenCalledTimes(1);
 		// click on filename is equivalent to a click on the overlay, so onClose is called
 		await user.click(screen.getByText(/image name/i));
-		expect(onClose).toHaveBeenCalledTimes(3);
+		expect(onClose).toHaveBeenCalledTimes(2);
 	});
 });
