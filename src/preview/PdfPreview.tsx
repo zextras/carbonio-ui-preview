@@ -10,6 +10,7 @@ import {
 	IconButton,
 	Portal,
 	Tooltip,
+	Padding,
 	useCombinedRefs
 } from '@zextras/carbonio-design-system';
 import findIndex from 'lodash/findIndex';
@@ -27,6 +28,7 @@ import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
+import { AbsoluteLeftContainer, AbsoluteRightContainer } from './StyledComponents';
 
 const CustomIconButton = styled(IconButton)`
 	${({ disabled }): SimpleInterpolation =>
@@ -151,6 +153,10 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	fitToWidthLabel?: string;
 	zoomInLabel?: string;
 	upperLimitReachedLabel?: string;
+	/** Callback  */
+	onNextPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
+	/** Callback  */
+	onPreviousPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -179,7 +185,9 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		lowerLimitReachedLabel = 'Minimum zoom level reached',
 		resetZoomLabel = 'Reset zoom',
 		upperLimitReachedLabel = 'Maximum zoom level reached',
-		zoomInLabel = 'Zoom in'
+		zoomInLabel = 'Zoom in',
+		onNextPreview,
+		onPreviousPreview
 	},
 	ref
 ) {
@@ -428,18 +436,20 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							closeAction={$closeAction}
 						/>
 						<MiddleContainer orientation="horizontal" crossAlignment="unset" minHeight={0}>
-							{/* TODO: uncomment when navigation between items will be implemented */}
-							{/* <Container width="fit"> */}
-							{/*	<Padding left="small" right="small"> */}
-							{/*		<IconButton */}
-							{/*			icon="ArrowBackOutline" */}
-							{/*			size="medium" */}
-							{/*			backgroundColor="gray0" */}
-							{/*			iconColor="gray6" */}
-							{/*			borderRadius="round" */}
-							{/*		/> */}
-							{/*	</Padding> */}
-							{/* </Container> */}
+							{onPreviousPreview && (
+								<AbsoluteLeftContainer width="fit">
+									<Padding left="small" right="small">
+										<IconButton
+											icon="ArrowBackOutline"
+											size="medium"
+											backgroundColor="gray0"
+											iconColor="gray6"
+											borderRadius="round"
+											onClick={onPreviousPreview}
+										/>
+									</Padding>
+								</AbsoluteLeftContainer>
+							)}
 							<PreviewContainer ref={previewRef} data-testid="pdf-preview-container">
 								{$customContent || (
 									<Document
@@ -452,18 +462,20 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 									</Document>
 								)}
 							</PreviewContainer>
-							{/* TODO: uncomment when navigation between items will be implemented */}
-							{/* <Container width="fit"> */}
-							{/*	<Padding left="small" right="small"> */}
-							{/*		<IconButton */}
-							{/*			icon="ArrowForwardOutline" */}
-							{/*			size="medium" */}
-							{/*			backgroundColor="gray0" */}
-							{/*			iconColor="gray6" */}
-							{/*			borderRadius="round" */}
-							{/*		/> */}
-							{/*	</Padding> */}
-							{/* </Container> */}
+							{onNextPreview && (
+								<AbsoluteRightContainer width="fit">
+									<Padding left="small" right="small">
+										<IconButton
+											icon="ArrowForwardOutline"
+											size="medium"
+											backgroundColor="gray0"
+											iconColor="gray6"
+											borderRadius="round"
+											onClick={onNextPreview}
+										/>
+									</Padding>
+								</AbsoluteRightContainer>
+							)}
 						</MiddleContainer>
 					</ExternalContainer>
 				</FocusWithin>
