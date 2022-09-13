@@ -4,37 +4,46 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useCallback, createContext, useReducer } from 'react';
+import React, { useCallback, createContext, useReducer, useState, useMemo } from 'react';
+
+import findIndex from 'lodash/findIndex';
 
 import { MakeOptional } from '../utils/utils';
 import { ImagePreviewProps } from './ImagePreview';
 import { PdfPreviewProps } from './PdfPreview';
 import { PreviewWrapper, PreviewWrapperProps } from './PreviewWrapper';
 
-type CreatePreviewArgType = (
+type PreviewArgType = (
 	| MakeOptional<Omit<ImagePreviewProps, 'show'>, 'onClose'>
 	| MakeOptional<Omit<PdfPreviewProps, 'show'>, 'onClose'>
 ) & {
 	previewType: 'pdf' | 'image';
+	id?: string;
 };
 
 export type PreviewManagerContextType = {
-	createPreview: (args: CreatePreviewArgType) => void;
+	createPreview: (args: PreviewArgType) => void;
+	initPreview: (args: Array<PreviewArgType & { id: string }>) => void;
+	openPreview: (id: string) => void;
+	emptyPreview: () => void;
 };
 
 const PreviewsManagerContext = createContext<PreviewManagerContextType>({
-	createPreview: () => undefined
+	createPreview: () => undefined,
+	initPreview: () => undefined,
+	openPreview: () => undefined,
+	emptyPreview: () => undefined
 });
 
 const PreviewManager: React.FC = ({ children }) => {
 	const [previews, dispatchPreviews] = useReducer(
 		(
-			state: Array<React.ReactElement>,
-			action: { type: 'set'; value: React.ReactElement } | { type: 'empty' }
+			state: Array<PreviewArgType>,
+			action: { type: 'empty' } | { type: 'init'; value: Array<PreviewArgType> }
 		) => {
 			switch (action.type) {
-				case 'set': {
-					return [...state, action.value];
+				case 'init': {
+					return action.value;
 				}
 				case 'empty': {
 					return [];
@@ -47,29 +56,90 @@ const PreviewManager: React.FC = ({ children }) => {
 		[]
 	);
 
-	const createPreview = useCallback<(args: CreatePreviewArgType) => void>(
-		({ onClose, ...props }) => {
+	const [openArrayIndex, setOpenArrayIndex] = useState(-1);
+
+	const previewElement: React.ReactElement | undefined = useMemo(() => {
+		if (openArrayIndex >= 0) {
+			const { onClose, ...props } = previews[openArrayIndex];
 			const closePreview: PreviewWrapperProps['onClose'] = (ev) => {
 				if (onClose) onClose(ev);
-				dispatchPreviews({ type: 'empty' });
+				setOpenArrayIndex(-1);
 			};
+			const onPreviousPreviewCallback: PreviewWrapperProps['onPreviousPreview'] =
+				openArrayIndex === 0
+					? undefined
+					: (e): void => {
+							e.stopPropagation();
+							setOpenArrayIndex(openArrayIndex - 1);
+					  };
+			const onNextPreviewCallback: PreviewWrapperProps['onNextPreview'] =
+				openArrayIndex === previews.length - 1
+					? undefined
+					: (e): void => {
+							e.stopPropagation();
+							setOpenArrayIndex(openArrayIndex + 1);
+					  };
+			return (
+				<PreviewWrapper
+					key={props.src}
+					{...props}
+					show
+					onClose={closePreview}
+					onPreviousPreview={onPreviousPreviewCallback}
+					onNextPreview={onNextPreviewCallback}
+				/>
+			);
+		}
+		return undefined;
+	}, [openArrayIndex, previews]);
 
-			const preview = <PreviewWrapper key={props.src} {...props} show onClose={closePreview} />;
-
+	const createPreview = useCallback<(args: PreviewArgType) => void>(
+		(args) => {
 			dispatchPreviews({
-				type: 'set',
-				value: preview
+				type: 'init',
+				value: [args]
+			});
+			setOpenArrayIndex(0);
+		},
+		[dispatchPreviews]
+	);
+
+	const emptyPreview = useCallback<() => void>(
+		() => {
+			dispatchPreviews({
+				type: 'empty'
+			});
+			setOpenArrayIndex(-1);
+		},
+		[dispatchPreviews]
+	);
+
+	const initPreview = useCallback<(args: Array<PreviewArgType>) => void>(
+		(args) => {
+			dispatchPreviews({
+				type: 'init',
+				value: args
 			});
 		},
 		[dispatchPreviews]
 	);
 
+	const openPreview = useCallback<(id: string) => void>(
+		(id) => {
+			const index = findIndex(previews, (preview: PreviewArgType) => preview.id === id);
+			if (index >= 0) {
+				setOpenArrayIndex(index);
+			}
+		},
+		[previews, setOpenArrayIndex]
+	);
+
 	return (
 		<>
-			<PreviewsManagerContext.Provider value={{ createPreview }}>
+			<PreviewsManagerContext.Provider value={{ createPreview, initPreview, openPreview, emptyPreview }}>
 				{children}
 			</PreviewsManagerContext.Provider>
-			{previews}
+			{previewElement && previewElement}
 		</>
 	);
 };

@@ -5,12 +5,19 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
+import {
+	Container,
+	IconButton,
+	Padding,
+	Portal,
+	useCombinedRefs
+} from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
 import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
+import { AbsoluteLeftContainer, AbsoluteRightContainer } from './StyledComponents';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -88,6 +95,10 @@ type ImagePreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	onClose: (e: React.SyntheticEvent | KeyboardEvent) => void;
 	/** Alternative text for image */
 	alt?: string;
+	/** Callback  */
+	onNextPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
+	/** Callback  */
+	onPreviousPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
 };
 
 const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(function PreviewFn(
@@ -102,7 +113,9 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 		actions = [],
 		closeAction,
 		onClose,
-		alt
+		alt,
+		onNextPreview,
+		onPreviousPreview
 	},
 	ref
 ) {
@@ -164,18 +177,20 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 							closeAction={$closeAction}
 						/>
 						<MiddleContainer orientation="horizontal" crossAlignment="unset" minHeight={0}>
-							{/* TODO: uncomment when navigation between items will be implemented */}
-							{/* <Container width="fit"> */}
-							{/*	<Padding left="small" right="small"> */}
-							{/*		<IconButton */}
-							{/*			icon="ArrowBackOutline" */}
-							{/*			size="medium" */}
-							{/*			backgroundColor="gray0" */}
-							{/*			iconColor="gray6" */}
-							{/*			borderRadius="round" */}
-							{/*		/> */}
-							{/*	</Padding> */}
-							{/* </Container> */}
+							{onPreviousPreview && (
+								<AbsoluteLeftContainer width="fit">
+									<Padding left="small" right="small">
+										<IconButton
+											icon="ArrowBackOutline"
+											size="medium"
+											backgroundColor="gray0"
+											iconColor="gray6"
+											borderRadius="round"
+											onClick={onPreviousPreview}
+										/>
+									</Padding>
+								</AbsoluteLeftContainer>
+							)}
 							<PreviewContainer ref={previewRef}>
 								<Image
 									alt={alt ?? filename}
@@ -184,18 +199,20 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 									ref={imageRef}
 								/>
 							</PreviewContainer>
-							{/* TODO: uncomment when navigation between items will be implemented */}
-							{/* <Container width="fit"> */}
-							{/*	<Padding left="small" right="small"> */}
-							{/*		<IconButton */}
-							{/*			icon="ArrowForwardOutline" */}
-							{/*			size="medium" */}
-							{/*			backgroundColor="gray0" */}
-							{/*			iconColor="gray6" */}
-							{/*			borderRadius="round" */}
-							{/*		/> */}
-							{/*	</Padding> */}
-							{/* </Container> */}
+							{onNextPreview && (
+								<AbsoluteRightContainer width="fit">
+									<Padding left="small" right="small">
+										<IconButton
+											icon="ArrowForwardOutline"
+											size="medium"
+											backgroundColor="gray0"
+											iconColor="gray6"
+											borderRadius="round"
+											onClick={onNextPreview}
+										/>
+									</Padding>
+								</AbsoluteRightContainer>
+							)}
 						</MiddleContainer>
 					</ExternalContainer>
 				</FocusWithin>

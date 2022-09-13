@@ -61,9 +61,7 @@ describe('Preview Manager', () => {
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
 
-	// FIXME: with current implementation, manager is opening more than 1 preview, stacking them
-	//   Fix to make only 1 preview visible per time
-	test.failing('Multiple calls to createPreview replace the previewer', async () => {
+	test('Multiple calls to createPreview replace the previewer', async () => {
 		const onClose = jest.fn();
 		const { user } = setup(
 			<PreviewManager>
