@@ -104,15 +104,12 @@ const PreviewManager: React.FC = ({ children }) => {
 		[dispatchPreviews]
 	);
 
-	const emptyPreview = useCallback<() => void>(
-		() => {
-			dispatchPreviews({
-				type: 'empty'
-			});
-			setOpenArrayIndex(-1);
-		},
-		[dispatchPreviews]
-	);
+	const emptyPreview = useCallback<() => void>(() => {
+		dispatchPreviews({
+			type: 'empty'
+		});
+		setOpenArrayIndex(-1);
+	}, [dispatchPreviews]);
 
 	const initPreview = useCallback<(args: Array<PreviewArgType>) => void>(
 		(args) => {
@@ -136,7 +133,9 @@ const PreviewManager: React.FC = ({ children }) => {
 
 	return (
 		<>
-			<PreviewsManagerContext.Provider value={{ createPreview, initPreview, openPreview, emptyPreview }}>
+			<PreviewsManagerContext.Provider
+				value={{ createPreview, initPreview, openPreview, emptyPreview }}
+			>
 				{children}
 			</PreviewsManagerContext.Provider>
 			{previewElement && previewElement}
