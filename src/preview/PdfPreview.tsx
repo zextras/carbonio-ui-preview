@@ -5,14 +5,7 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-	Container,
-	IconButton,
-	Portal,
-	Padding,
-	useCombinedRefs,
-	getColor
-} from '@zextras/carbonio-design-system';
+import { Container, Portal, useCombinedRefs, getColor } from '@zextras/carbonio-design-system';
 import map from 'lodash/map';
 import type { DocumentProps } from 'react-pdf';
 import { PageProps } from 'react-pdf';
@@ -28,7 +21,7 @@ import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
-import { AbsoluteLeftContainer, AbsoluteRightContainer } from './StyledComponents';
+import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledComponents';
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
@@ -387,18 +380,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 						/>
 						<MiddleContainer orientation="horizontal" crossAlignment="unset" minHeight={0}>
 							{onPreviousPreview && (
-								<AbsoluteLeftContainer width="fit">
-									<Padding left="small" right="small">
-										<IconButton
-											icon="ArrowBackOutline"
-											size="medium"
-											backgroundColor="gray0"
-											iconColor="gray6"
-											borderRadius="round"
-											onClick={onPreviousPreview}
-										/>
-									</Padding>
-								</AbsoluteLeftContainer>
+								<AbsoluteLeftIconButton
+									icon="ArrowBackOutline"
+									size="medium"
+									backgroundColor="gray0"
+									iconColor="gray6"
+									borderRadius="round"
+									onClick={onPreviousPreview}
+								/>
 							)}
 							<PreviewContainer ref={previewRef} data-testid="pdf-preview-container">
 								{$customContent || (
@@ -413,18 +402,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 								)}
 							</PreviewContainer>
 							{onNextPreview && (
-								<AbsoluteRightContainer width="fit">
-									<Padding left="small" right="small">
-										<IconButton
-											icon="ArrowForwardOutline"
-											size="medium"
-											backgroundColor="gray0"
-											iconColor="gray6"
-											borderRadius="round"
-											onClick={onNextPreview}
-										/>
-									</Padding>
-								</AbsoluteRightContainer>
+								<AbsoluteRightIconButton
+									icon="ArrowForwardOutline"
+									size="medium"
+									backgroundColor="gray0"
+									iconColor="gray6"
+									borderRadius="round"
+									onClick={onNextPreview}
+								/>
 							)}
 						</MiddleContainer>
 					</ExternalContainer>

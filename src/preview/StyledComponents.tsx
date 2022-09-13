@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Container } from '@zextras/carbonio-design-system';
+import { IconButton } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
-export const AbsoluteLeftContainer = styled(Container)`
+export const AbsoluteLeftIconButton = styled(IconButton)`
 	position: absolute;
-	left: 0;
-	top: 0;
+	left: 8px;
+	top: 50%;
 `;
 
-export const AbsoluteRightContainer = styled(Container)`
+export const AbsoluteRightIconButton = styled(IconButton)`
 	position: absolute;
-	right: 0;
-	top: 0;
+	right: 8px;
+	top: 50%;
 `;

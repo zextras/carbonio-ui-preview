@@ -5,19 +5,13 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import {
-	Container,
-	IconButton,
-	Padding,
-	Portal,
-	useCombinedRefs
-} from '@zextras/carbonio-design-system';
+import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
 import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
-import { AbsoluteLeftContainer, AbsoluteRightContainer } from './StyledComponents';
+import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledComponents';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -178,18 +172,14 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 						/>
 						<MiddleContainer orientation="horizontal" crossAlignment="unset" minHeight={0}>
 							{onPreviousPreview && (
-								<AbsoluteLeftContainer width="fit">
-									<Padding left="small" right="small">
-										<IconButton
-											icon="ArrowBackOutline"
-											size="medium"
-											backgroundColor="gray0"
-											iconColor="gray6"
-											borderRadius="round"
-											onClick={onPreviousPreview}
-										/>
-									</Padding>
-								</AbsoluteLeftContainer>
+								<AbsoluteLeftIconButton
+									icon="ArrowBackOutline"
+									size="medium"
+									backgroundColor="gray0"
+									iconColor="gray6"
+									borderRadius="round"
+									onClick={onPreviousPreview}
+								/>
 							)}
 							<PreviewContainer ref={previewRef}>
 								<Image
@@ -200,18 +190,14 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 								/>
 							</PreviewContainer>
 							{onNextPreview && (
-								<AbsoluteRightContainer width="fit">
-									<Padding left="small" right="small">
-										<IconButton
-											icon="ArrowForwardOutline"
-											size="medium"
-											backgroundColor="gray0"
-											iconColor="gray6"
-											borderRadius="round"
-											onClick={onNextPreview}
-										/>
-									</Padding>
-								</AbsoluteRightContainer>
+								<AbsoluteRightIconButton
+									icon="ArrowForwardOutline"
+									size="medium"
+									backgroundColor="gray0"
+									iconColor="gray6"
+									borderRadius="round"
+									onClick={onNextPreview}
+								/>
 							)}
 						</MiddleContainer>
 					</ExternalContainer>
