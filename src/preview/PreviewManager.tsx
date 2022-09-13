@@ -138,7 +138,7 @@ const PreviewManager: React.FC = ({ children }) => {
 			>
 				{children}
 			</PreviewsManagerContext.Provider>
-			{previewElement && previewElement}
+			{previewElement}
 		</>
 	);
 };
