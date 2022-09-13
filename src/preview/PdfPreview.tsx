@@ -9,41 +9,29 @@ import {
 	Container,
 	IconButton,
 	Portal,
-	Tooltip,
 	Padding,
-	useCombinedRefs
+	useCombinedRefs,
+	getColor
 } from '@zextras/carbonio-design-system';
-import findIndex from 'lodash/findIndex';
-import findLastIndex from 'lodash/findLastIndex';
 import map from 'lodash/map';
 import type { DocumentProps } from 'react-pdf';
+import { PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
-import styled, { css, SimpleInterpolation } from 'styled-components';
+import styled from 'styled-components';
 
 import { MakeOptional } from '../utils/utils';
-import { ZOOM_STEPS } from './constants';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
+import { Navigator } from './Navigator';
+import { PageController } from './PageController';
 import {
 	PreviewCriteriaAlternativeContent,
 	PreviewCriteriaAlternativeContentProps
 } from './PreviewCriteriaAlternativeContent';
 import { AbsoluteLeftContainer, AbsoluteRightContainer } from './StyledComponents';
-
-const CustomIconButton = styled(IconButton)`
-	${({ disabled }): SimpleInterpolation =>
-		disabled &&
-		css`
-			background: rgba(204, 204, 204, 0.2);
-			& > svg {
-				background: unset;
-			}
-		`};
-	& > svg {
-		width: 20px;
-		height: 20px;
-	}
-`;
+import { usePageScrollController } from './usePageScrollController';
+import { useZoom } from './useZoom';
+import { ZoomController } from './ZoomController';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -72,18 +60,6 @@ const ExternalContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	position: relative;
-`;
-
-const Navigator = styled.div`
-	display: flex;
-	position: absolute;
-	z-index: 1;
-	bottom: 16px;
-	background-color: ${({ theme }): string => theme.palette.gray0.regular};
-	align-self: center;
-	border-radius: 4px;
-	gap: 8px;
-	padding: 8px 16px;
 `;
 
 const PreviewContainer = styled.div`
@@ -125,6 +101,13 @@ const PreviewContainer = styled.div`
 	}
 `;
 
+const VerticalDivider = styled.div<{ $color: string }>`
+	width: 1px;
+	height: 24px;
+	background-color: ${({ $color, theme }): string => getColor($color, theme)};
+	flex: 0 0 1px;
+`;
+
 type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	/** Left Action for the preview */
 	closeAction?: MakeOptional<HeaderAction, 'onClick'>;
@@ -157,6 +140,7 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	onNextPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
 	/** Callback  */
 	onPreviousPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
+	pageLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -180,21 +164,47 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		downloadLabel,
 		openLabel,
 		noteLabel,
-		zoomOutLabel = 'Zoom out',
-		fitToWidthLabel = 'Fit to width',
-		lowerLimitReachedLabel = 'Minimum zoom level reached',
-		resetZoomLabel = 'Reset zoom',
-		upperLimitReachedLabel = 'Maximum zoom level reached',
-		zoomInLabel = 'Zoom in',
+		zoomOutLabel,
+		fitToWidthLabel,
+		lowerLimitReachedLabel,
+		resetZoomLabel,
+		upperLimitReachedLabel,
+		zoomInLabel,
 		onNextPreview,
-		onPreviousPreview
+		onPreviousPreview,
+		pageLabel
 	},
 	ref
 ) {
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
 	const documentLoaded = useRef(useFallback);
+	const pageRefs = useRef<React.RefObject<HTMLElement>[]>([]);
 
 	const [numPages, setNumPages] = useState<number | null>(null);
+	const [currentPage, setCurrentPage] = useState<number>(0);
+	const {
+		currentZoom,
+		incrementable,
+		decrementable,
+		increaseOfOneStep,
+		decreaseOfOneStep,
+		fitToWidth,
+		fitToWidthActive,
+		reset
+	} = useZoom(previewRef);
+
+	const updatePageOnScroll = useCallback((pageElement: Element | undefined) => {
+		if (pageElement) {
+			const currentPageIndex = pageRefs.current?.findIndex(
+				(pageRef) => pageRef.current === pageElement
+			);
+			if (currentPageIndex > -1) {
+				setCurrentPage(currentPageIndex + 1);
+			}
+		}
+	}, []);
+
+	const { observePage } = usePageScrollController(previewRef, updatePageOnScroll);
 
 	const $closeAction = useMemo(() => {
 		if (closeAction) {
@@ -239,113 +249,55 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[onClose, previewRef]
 	);
 
-	const [currentZoom, setCurrentZoom] = useState(ZOOM_STEPS[0]);
-	const [incrementable, setIncrementable] = useState(true);
-	const [decrementable, setDecrementable] = useState(false);
-	const [fitToWidthActive, setFitToWidthActive] = useState(false);
-
 	useEffect(() => {
 		if (!show) {
-			setCurrentZoom(ZOOM_STEPS[0]);
-			setIncrementable(true);
-			setDecrementable(false);
-			setFitToWidthActive(false);
+			reset();
 		}
-	}, [show]);
+	}, [reset, show]);
 
-	const increaseOfOneStep = useCallback(
+	const resetWidth = useCallback(
 		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 			ev.stopPropagation();
-			if (incrementable) {
-				const targetIndex = findIndex(ZOOM_STEPS, (step) => step > currentZoom);
-				if (targetIndex >= 0) {
-					setCurrentZoom(ZOOM_STEPS[targetIndex]);
-					if (targetIndex === ZOOM_STEPS.length - 1) {
-						setIncrementable(false);
-					}
-					if (targetIndex > 0) {
-						setDecrementable(true);
-					}
-				}
-			}
-			setFitToWidthActive(false);
+			reset();
 		},
-		[currentZoom, incrementable]
+		[reset]
 	);
 
-	const decreaseOfOneStep = useCallback(
-		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
-			ev.stopPropagation();
-			if (decrementable) {
-				const targetIndex = findLastIndex(ZOOM_STEPS, (step) => step < currentZoom);
-				if (targetIndex >= 0) {
-					setCurrentZoom(ZOOM_STEPS[targetIndex]);
-					if (targetIndex === 0) {
-						setDecrementable(false);
-					}
-					if (targetIndex < ZOOM_STEPS.length - 1) {
-						setIncrementable(true);
-					}
-				}
-			}
-			setFitToWidthActive(false);
-		},
-		[currentZoom, decrementable]
-	);
-
-	const fitToWidth = useCallback(
-		(ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent | Event) => {
-			ev.stopPropagation();
-			if (previewRef.current) {
-				setCurrentZoom(previewRef.current?.clientWidth);
-				setIncrementable(previewRef.current?.clientWidth < ZOOM_STEPS[ZOOM_STEPS.length - 1]);
-				setDecrementable(previewRef.current?.clientWidth > ZOOM_STEPS[0]);
-				setFitToWidthActive(true);
+	const registerPageObserver = useCallback<NonNullable<PageProps['onRenderSuccess']>>(
+		({ pageNumber }): void => {
+			const pageRef = pageRefs.current[pageNumber - 1];
+			if (pageRef.current) {
+				observePage(pageRef.current);
 			}
 		},
-		[previewRef]
+		[observePage]
 	);
-
-	useEffect(() => {
-		if (show && fitToWidthActive) {
-			window.addEventListener('resize', fitToWidth);
-		}
-		return (): void => {
-			window.removeEventListener('resize', fitToWidth);
-		};
-	}, [fitToWidth, previewRef, show, fitToWidthActive]);
-
-	const resetWidth = useCallback((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
-		ev.stopPropagation();
-		setCurrentZoom(ZOOM_STEPS[0]);
-		setIncrementable(true);
-		setDecrementable(false);
-		setFitToWidthActive(false);
-	}, []);
-
-	// could be useful for future implementations
-	// const onPageLoadSuccess = useCallback(({ originalHeight, originalWidth, width, height }) => {
-	// 	console.log(originalHeight, originalWidth, width, height);
-	// }, []);
 
 	const pageElements = useMemo(() => {
 		if (numPages) {
-			return map(new Array(numPages), (el, index) => (
-				<Page
-					key={`page_${index + 1}`}
-					pageNumber={index + 1}
-					// onLoadSuccess={index === 0 ? onPageLoadSuccess : undefined}
-					width={currentZoom}
-					renderTextLayer={renderTextLayer}
-				/>
-			));
+			pageRefs.current = [];
+			return map(new Array(numPages), (el, index) => {
+				const pageRef = React.createRef<HTMLDivElement>();
+				pageRefs.current.push(pageRef);
+				return (
+					<Page
+						key={`page_${index + 1}`}
+						pageNumber={index + 1}
+						onRenderSuccess={registerPageObserver}
+						width={currentZoom}
+						renderTextLayer={renderTextLayer}
+						inputRef={pageRef}
+					/>
+				);
+			});
 		}
 		return [];
-	}, [currentZoom, numPages, renderTextLayer]);
+	}, [currentZoom, numPages, registerPageObserver, renderTextLayer]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
 		(document) => {
 			setNumPages(document.numPages);
+			setCurrentPage(1);
 			documentLoaded.current = true;
 		},
 		[]
@@ -390,42 +342,40 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		titleLabel
 	]);
 
+	const onPageChange = useCallback((newPage: number) => {
+		setCurrentPage(newPage);
+		pageRefs.current[newPage - 1].current?.scrollIntoView();
+	}, []);
+
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
 			<Overlay onClick={onOverlayClick}>
 				<FocusWithin>
 					<ExternalContainer>
 						{!$customContent && (
-							<Navigator onClick={(ev): void => ev.stopPropagation()}>
-								<Tooltip label={decrementable ? zoomOutLabel : lowerLimitReachedLabel}>
-									<CustomIconButton
-										disabled={!decrementable}
-										icon="Minus"
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={decreaseOfOneStep}
-									/>
-								</Tooltip>
-								<Tooltip label={fitToWidthActive ? resetZoomLabel : fitToWidthLabel}>
-									<CustomIconButton
-										icon={fitToWidthActive ? 'MinimizeOutline' : 'MaximizeOutline'}
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={fitToWidthActive ? resetWidth : fitToWidth}
-									/>
-								</Tooltip>
-								<Tooltip label={incrementable ? zoomInLabel : upperLimitReachedLabel}>
-									<CustomIconButton
-										icon="Plus"
-										size="small"
-										backgroundColor="gray0"
-										iconColor="gray6"
-										onClick={increaseOfOneStep}
-										disabled={!incrementable}
-									/>
-								</Tooltip>
+							<Navigator>
+								<PageController
+									pageLabel={pageLabel}
+									pagesNumber={numPages || 0}
+									currentPage={currentPage}
+									onPageChange={onPageChange}
+								/>
+								<VerticalDivider $color="gray6" />
+								<ZoomController
+									decrementable={decrementable}
+									zoomOutLabel={zoomOutLabel}
+									lowerLimitReachedLabel={lowerLimitReachedLabel}
+									decreaseByStep={decreaseOfOneStep}
+									fitToWidthActive={fitToWidthActive}
+									resetZoomLabel={resetZoomLabel}
+									fitToWidthLabel={fitToWidthLabel}
+									resetWidth={resetWidth}
+									fitToWidth={fitToWidth}
+									incrementable={incrementable}
+									zoomInLabel={zoomInLabel}
+									upperLimitReachedLabel={upperLimitReachedLabel}
+									increaseByStep={increaseOfOneStep}
+								/>
 							</Navigator>
 						)}
 						<Header

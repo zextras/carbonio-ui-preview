@@ -5,7 +5,7 @@
  */
 import React from 'react';
 
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
+import { render, RenderOptions, RenderResult, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '@zextras/carbonio-design-system';
 import * as fs from 'fs';
@@ -74,3 +74,17 @@ export const loadPDF = (
 		}
 	};
 };
+
+export async function triggerObserver(observedElement: HTMLElement): Promise<void> {
+	const { calls } = (window.IntersectionObserver as jest.Mock<IntersectionObserver>).mock;
+	const [onChange] = calls[calls.length - 1];
+	// trigger the intersection on the observed element
+	await waitFor(() =>
+		onChange([
+			{
+				target: observedElement,
+				isIntersecting: true
+			}
+		])
+	);
+}

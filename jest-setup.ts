@@ -36,6 +36,23 @@ beforeAll(() => {
 			outerHeight: height
 		}).dispatchEvent(new this.Event('resize'));
 	};
+
+	Object.defineProperty(window, 'IntersectionObserver', {
+		writable: true,
+		value: jest.fn().mockImplementation((callback, options) => ({
+			thresholds: options.threshold,
+			root: options.root,
+			rootMargin: options.rootMargin,
+			observe: jest.fn(),
+			unobserve: jest.fn(),
+			disconnect: jest.fn()
+		}))
+	});
+
+	Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', {
+		writable: true,
+		value: jest.fn()
+	});
 });
 
 beforeEach(() => {

@@ -9,7 +9,11 @@
 		"sourceMap": true,
 		"declaration": true,
 		"jsx": "react",
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"baseUrl": "src",
+		"paths": {
+			"test-utils": ["./utils/test-utils"]
+		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.tsx"],
 	"exclude": ["./node_modules/*"]
