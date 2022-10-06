@@ -126,24 +126,28 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 		return closeAction;
 	}, [closeAction, onClose]);
 
-	const escapeEvent = useCallback<(e: KeyboardEvent) => void>(
+	const eventListener = useCallback<(e: KeyboardEvent) => void>(
 		(event) => {
 			if (event.key === 'Escape') {
 				onClose(event);
+			} else if (event.key === 'ArrowRight' && onNextPreview) {
+				onNextPreview(event);
+			} else if (event.key === 'ArrowLeft' && onPreviousPreview) {
+				onPreviousPreview(event);
 			}
 		},
-		[onClose]
+		[onClose, onNextPreview, onPreviousPreview]
 	);
 
 	useEffect(() => {
 		if (show) {
-			document.addEventListener('keyup', escapeEvent);
+			document.addEventListener('keyup', eventListener);
 		}
 
 		return (): void => {
-			document.removeEventListener('keyup', escapeEvent);
+			document.removeEventListener('keyup', eventListener);
 		};
-	}, [escapeEvent, show]);
+	}, [eventListener, show]);
 
 	const onOverlayClick = useCallback<React.ReactEventHandler>(
 		(event) => {

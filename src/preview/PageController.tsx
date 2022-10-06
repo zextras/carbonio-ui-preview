@@ -87,7 +87,20 @@ export const PageController = ({
 
 	const onKeyUp = useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
 		(e) => {
-			if (e.key === 'Enter') {
+			if (
+				e.key === 'Escape' ||
+				e.key === 'ArrowRight' ||
+				e.key === 'ArrowLeft' ||
+				e.key === 'Home' ||
+				e.key === 'End' ||
+				e.key === 'PageUp' ||
+				e.key === 'PageDown' ||
+				e.key === 'ArrowUp' ||
+				e.key === 'ArrowDown'
+			) {
+				e.stopPropagation();
+			}
+			if (e.key === 'Enter' || e.key === 'Escape') {
 				onConfirm(e);
 				e.currentTarget.blur();
 			}

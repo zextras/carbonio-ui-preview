@@ -505,8 +505,7 @@ describe('Pdf Preview', () => {
 	describe('Page selector', () => {
 		test('shows page controller', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
+			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			});
 			await screen.findByText(/loading pdf/i);
@@ -520,13 +519,9 @@ describe('Pdf Preview', () => {
 
 		test('blur is a confirmation event on page input', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -542,13 +537,9 @@ describe('Pdf Preview', () => {
 
 		test('enter key is a confirmation event on page input', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -564,15 +555,11 @@ describe('Pdf Preview', () => {
 
 		test('when input is confirmed, input loses focus and the document is scrolled to typed page', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
 			const scrollIntoViewFn = jest.fn();
 			window.HTMLElement.prototype.scrollIntoView = scrollIntoViewFn;
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -590,15 +577,11 @@ describe('Pdf Preview', () => {
 
 		test('when input is confirmed with an invalid value, input loses focus and the input value is reset to previous valid page', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
 			const scrollIntoViewFn = jest.fn();
 			window.HTMLElement.prototype.scrollIntoView = scrollIntoViewFn;
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -615,8 +598,7 @@ describe('Pdf Preview', () => {
 
 		test('on scroll, if focus is not on input, value is updated with current page', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
+			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			});
 			await screen.findByText(/loading pdf/i);
@@ -634,13 +616,9 @@ describe('Pdf Preview', () => {
 
 		test('on scroll, if focus is on input, value is updated with current page', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -658,15 +636,11 @@ describe('Pdf Preview', () => {
 			expect(pageInput).toHaveFocus();
 		});
 
-		test('esc key makes user exit from the preview, even when focus is on input', async () => {
+		test('must press esc key 2 times to make user exit from the preview, when focus is on input', async () => {
 			const onClose = jest.fn();
-			const ref = React.createRef<HTMLDivElement>();
-			const { user } = setup(
-				<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />,
-				{
-					setupOptions: { advanceTimers: () => Promise.resolve() }
-				}
-			);
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
 			await screen.findByText(/loading pdf/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
@@ -677,7 +651,162 @@ describe('Pdf Preview', () => {
 			await user.type(pageInput, '4');
 			expect(pageInput).toHaveFocus();
 			await user.keyboard('{Escape}');
-			expect(onClose).toHaveBeenCalled();
+			expect(onClose).not.toHaveBeenCalled();
+			await user.keyboard('{Escape}');
+			expect(onClose).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('keyboard shortcuts', () => {
+		describe('Home and End', () => {
+			test('click End go to last page and Home return to the first page', async () => {
+				const onClose = jest.fn();
+				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+					setupOptions: { advanceTimers: () => Promise.resolve() }
+				});
+				await screen.findByText(/loading pdf/i);
+				// eslint-disable-next-line testing-library/no-node-access
+				expect(document.querySelector('canvas')).toBeVisible();
+				expect(screen.getByText(/page/i)).toBeVisible();
+				const pageInput = screen.getByRole('textbox', { name: /current page/i });
+				expect(pageInput).toHaveDisplayValue('1');
+				await user.keyboard('{End}');
+				expect(pageInput).toHaveDisplayValue('4');
+				await user.keyboard('{Home}');
+				expect(pageInput).toHaveDisplayValue('1');
+			});
+			test('click End go to last page and Home return to the first page, but they do not work if the page input is focussed ', async () => {
+				const onClose = jest.fn();
+				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+					setupOptions: { advanceTimers: () => Promise.resolve() }
+				});
+				await screen.findByText(/loading pdf/i);
+				// eslint-disable-next-line testing-library/no-node-access
+				expect(document.querySelector('canvas')).toBeVisible();
+				expect(screen.getByText(/page/i)).toBeVisible();
+				const pageInput = screen.getByRole('textbox', { name: /current page/i });
+				expect(pageInput).toHaveDisplayValue('1');
+				await user.click(pageInput);
+				expect(pageInput).toHaveFocus();
+				await user.keyboard('{End}');
+				expect(pageInput).not.toHaveDisplayValue('4');
+				expect(pageInput).toHaveDisplayValue('1');
+				// remove focus
+				await user.keyboard('{Escape}');
+				expect(pageInput).not.toHaveFocus();
+				await user.keyboard('{End}');
+				expect(pageInput).toHaveDisplayValue('4');
+				// focus input again
+				await user.click(pageInput);
+				expect(pageInput).toHaveFocus();
+				await user.keyboard('{Home}');
+				expect(pageInput).not.toHaveDisplayValue('1');
+				expect(pageInput).toHaveDisplayValue('4');
+				// remove focus
+				await user.keyboard('{Escape}');
+				expect(pageInput).not.toHaveFocus();
+				await user.keyboard('{Home}');
+				expect(pageInput).toHaveDisplayValue('1');
+			});
+		});
+
+		describe('PageUp and PageDown', () => {
+			test('click PageDown go to the next page and PageUp go to the previous page', async () => {
+				const onClose = jest.fn();
+				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+					setupOptions: { advanceTimers: () => Promise.resolve() }
+				});
+				await screen.findByText(/loading pdf/i);
+				// eslint-disable-next-line testing-library/no-node-access
+				expect(document.querySelector('canvas')).toBeVisible();
+				expect(screen.getByText(/page/i)).toBeVisible();
+				const pageInput = screen.getByRole('textbox', { name: /current page/i });
+				expect(pageInput).toHaveDisplayValue('1');
+				await user.keyboard('{PageDown}');
+				expect(pageInput).toHaveDisplayValue('2');
+				await user.keyboard('{PageDown}');
+				expect(pageInput).toHaveDisplayValue('3');
+				await user.keyboard('{PageDown}');
+				expect(pageInput).toHaveDisplayValue('4');
+				await user.keyboard('{PageDown}');
+				expect(pageInput).toHaveDisplayValue('4');
+				await user.keyboard('{PageUp}');
+				expect(pageInput).toHaveDisplayValue('3');
+				await user.keyboard('{PageUp}');
+				expect(pageInput).toHaveDisplayValue('2');
+				await user.keyboard('{PageUp}');
+				expect(pageInput).toHaveDisplayValue('1');
+				await user.keyboard('{PageUp}');
+				expect(pageInput).toHaveDisplayValue('1');
+			});
+			test('click PageDown go to the next page and PageUp go to the previous page, but they do not work if the page input is focussed ', async () => {
+				const onClose = jest.fn();
+				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+					setupOptions: { advanceTimers: () => Promise.resolve() }
+				});
+				await screen.findByText(/loading pdf/i);
+				// eslint-disable-next-line testing-library/no-node-access
+				expect(document.querySelector('canvas')).toBeVisible();
+				expect(screen.getByText(/page/i)).toBeVisible();
+				const pageInput = screen.getByRole('textbox', { name: /current page/i });
+				expect(pageInput).toHaveDisplayValue('1');
+				await user.click(pageInput);
+				expect(pageInput).toHaveFocus();
+				await user.keyboard('{PageDown}');
+				expect(pageInput).not.toHaveDisplayValue('2');
+				expect(pageInput).toHaveDisplayValue('1');
+				// remove focus
+				await user.keyboard('{Escape}');
+				expect(pageInput).not.toHaveFocus();
+				await user.keyboard('{PageDown}');
+				expect(pageInput).toHaveDisplayValue('2');
+				// focus input again
+				await user.click(pageInput);
+				expect(pageInput).toHaveFocus();
+				await user.keyboard('{PageUp}');
+				expect(pageInput).not.toHaveDisplayValue('1');
+				expect(pageInput).toHaveDisplayValue('2');
+				// remove focus
+				await user.keyboard('{Escape}');
+				expect(pageInput).not.toHaveFocus();
+				await user.keyboard('{PageUp}');
+				expect(pageInput).toHaveDisplayValue('1');
+			});
+		});
+
+		test('ArrowUp and ArrowDown', async () => {
+			const onClose = jest.fn();
+			const scrollByFn = jest.fn();
+			window.HTMLElement.prototype.scrollBy = scrollByFn;
+			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
+				setupOptions: { advanceTimers: () => Promise.resolve() }
+			});
+			await screen.findByText(/loading pdf/i);
+			// eslint-disable-next-line testing-library/no-node-access
+			expect(document.querySelector('canvas')).toBeVisible();
+			expect(screen.getByText(/page/i)).toBeVisible();
+			const pageInput = screen.getByRole('textbox', { name: /current page/i });
+			expect(pageInput).toHaveDisplayValue('1');
+			await user.click(pageInput);
+			expect(pageInput).toHaveFocus();
+			await user.keyboard('{ArrowDown}');
+			expect(scrollByFn).not.toHaveBeenCalled();
+			// remove focus
+			await user.keyboard('{Escape}');
+			expect(pageInput).not.toHaveFocus();
+			await user.keyboard('{ArrowDown}');
+			expect(scrollByFn).toHaveBeenCalledTimes(1);
+			expect(scrollByFn).toHaveBeenCalledWith(0, 40);
+			await user.click(pageInput);
+			expect(pageInput).toHaveFocus();
+			await user.keyboard('{ArrowUp}');
+			expect(scrollByFn).toHaveBeenCalledTimes(1);
+			// remove focus
+			await user.keyboard('{Escape}');
+			expect(pageInput).not.toHaveFocus();
+			await user.keyboard('{ArrowUp}');
+			expect(scrollByFn).toHaveBeenCalledTimes(2);
+			expect(scrollByFn).toHaveBeenCalledWith(0, -40);
 		});
 	});
 });
