@@ -27,8 +27,8 @@ describe('Pdf Preview', () => {
 		setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		await screen.findByText(/Loading document preview…/i);
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
 		// eslint-disable-next-line testing-library/no-node-access
 		const pageElement = document.querySelector('[data-page-number="1"]');
@@ -42,7 +42,7 @@ describe('Pdf Preview', () => {
 		setup(<PdfPreview show={false} src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
 	});
 
@@ -51,9 +51,9 @@ describe('Pdf Preview', () => {
 		setup(<PdfPreview show src="invalid-pdf.pdf" onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
-		await screen.findByText(/Failed to load PDF file/i);
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		await screen.findByText(/Loading document preview…/i);
+		await screen.findByText(/Failed to load document preview./i);
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
 	});
 
@@ -117,8 +117,8 @@ describe('Pdf Preview', () => {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			}
 		);
-		await screen.findByText(/loading pdf/i);
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		await screen.findByText(/Loading document preview…/i);
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		expect(screen.getByText(/file name/i)).toBeVisible();
 		expect(screen.getByText(/pdf.*18KB/i)).toBeVisible();
 	});
@@ -128,8 +128,8 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		await screen.findByText(/Loading document preview…/i);
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		await user.keyboard('{Escape}');
 		expect(onClose).toHaveBeenCalled();
 	});
@@ -149,8 +149,8 @@ describe('Pdf Preview', () => {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			}
 		);
-		await screen.findByText(/loading pdf/i);
-		expect(screen.queryByText(/loading pdf/i)).not.toBeInTheDocument();
+		await screen.findByText(/Loading document preview…/i);
+		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		const closeActionElement = screen.getByTestId('icon: Activity');
 		expect(closeActionElement).toBeVisible();
 		await user.hover(closeActionElement);
@@ -197,7 +197,7 @@ describe('Pdf Preview', () => {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			}
 		);
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		await waitFor(() =>
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('[data-page-number="1"]')).toBeInTheDocument()
@@ -233,7 +233,7 @@ describe('Pdf Preview', () => {
 		setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		const canvas = document.querySelector('canvas');
 		expect(canvas).toBeVisible();
@@ -245,7 +245,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		const canvas = document.querySelector('canvas');
 		expect(canvas).toBeVisible();
@@ -267,7 +267,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomOutIcon)).toBeVisible();
@@ -293,7 +293,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomInIcon)).toBeVisible();
@@ -314,7 +314,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -335,7 +335,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -361,7 +361,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -380,7 +380,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -401,7 +401,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -423,7 +423,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -443,7 +443,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
@@ -473,7 +473,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
-		await screen.findByText(/loading pdf/i);
+		await screen.findByText(/Loading document preview…/i);
 		// eslint-disable-next-line testing-library/no-node-access
 		expect(document.querySelector('canvas')).toBeVisible();
 		// eslint-disable-next-line jest-dom/prefer-enabled-disabled,testing-library/no-node-access
@@ -509,7 +509,7 @@ describe('Pdf Preview', () => {
 			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			});
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -527,7 +527,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -549,7 +549,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -573,7 +573,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -599,7 +599,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -619,7 +619,7 @@ describe('Pdf Preview', () => {
 			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />, {
 				setupOptions: { advanceTimers: () => Promise.resolve() }
 			});
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -641,7 +641,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -667,7 +667,7 @@ describe('Pdf Preview', () => {
 					setupOptions: { advanceTimers: () => Promise.resolve() }
 				}
 			);
-			await screen.findByText(/loading pdf/i);
+			await screen.findByText(/Loading document preview…/i);
 			// eslint-disable-next-line testing-library/no-node-access
 			expect(document.querySelector('canvas')).toBeVisible();
 			expect(screen.getByText(/page/i)).toBeVisible();
