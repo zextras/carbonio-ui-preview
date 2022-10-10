@@ -134,6 +134,8 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	/** Callback  */
 	onPreviousPreview?: (e: React.SyntheticEvent | KeyboardEvent) => void;
 	pageLabel?: string;
+	errorLabel?: string;
+	loadingLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -165,7 +167,9 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		zoomInLabel,
 		onNextPreview,
 		onPreviousPreview,
-		pageLabel
+		pageLabel,
+		errorLabel = 'Failed to load document preview.',
+		loadingLabel = 'Loading document preview…'
 	},
 	ref
 ) {
@@ -396,6 +400,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 										onLoadSuccess={onDocumentLoadSuccess}
 										onLoadError={onDocumentLoadError}
 										onLoadProgress={onDocumentLoadProgress}
+										error={errorLabel}
+										loading={loadingLabel}
 									>
 										{pageElements}
 									</Document>
