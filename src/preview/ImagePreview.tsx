@@ -141,11 +141,11 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 
 	useEffect(() => {
 		if (show) {
-			document.addEventListener('keyup', eventListener);
+			document.addEventListener('keydown', eventListener);
 		}
 
 		return (): void => {
-			document.removeEventListener('keyup', eventListener);
+			document.removeEventListener('keydown', eventListener);
 		};
 	}, [eventListener, show]);
 

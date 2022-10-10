@@ -85,7 +85,7 @@ export const PageController = ({
 		[onConfirm]
 	);
 
-	const onKeyUp = useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
+	const onKeyDown = useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
 		(e) => {
 			if (
 				e.key === 'Escape' ||
@@ -117,7 +117,7 @@ export const PageController = ({
 				$color="gray6"
 				$size="small"
 				onBlur={onBlur}
-				onKeyUp={onKeyUp}
+				onKeyDown={onKeyDown}
 				onInput={resizeInput}
 				ref={inputRef}
 				aria-label="current page"
