@@ -102,7 +102,7 @@ describe('Preview Manager', () => {
 					<PreviewManagerInitTester
 						initPar={[
 							{ id: 'id1', previewType: 'pdf', filename: 'alpha', src: '', onClose },
-							{ id: 'id2', previewType: 'pdf', filename: 'beta', src: '', onClose },
+							{ id: 'id2', previewType: 'image', filename: 'beta', src: '', onClose },
 							{ id: 'id3', previewType: 'pdf', filename: 'gamma', src: '', onClose }
 						]}
 						idToOpen={'id1'}
@@ -118,7 +118,7 @@ describe('Preview Manager', () => {
 
 			expect(screen.getByText(/alpha/i)).toBeVisible();
 
-			const pageInput = screen.getByRole('textbox', { name: /current page/i });
+			let pageInput = screen.getByRole('textbox', { name: /current page/i });
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
 			await user.keyboard('{ArrowRight}');
@@ -132,6 +132,7 @@ describe('Preview Manager', () => {
 			expect(screen.getByText(/gamma/i)).toBeVisible();
 			await user.keyboard('{ArrowRight}');
 			expect(screen.getByText(/gamma/i)).toBeVisible();
+			pageInput = screen.getByRole('textbox', { name: /current page/i });
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
 			await user.keyboard('{ArrowLeft}');
