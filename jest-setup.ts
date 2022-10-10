@@ -53,6 +53,11 @@ beforeAll(() => {
 		writable: true,
 		value: jest.fn()
 	});
+
+	Object.defineProperty(window.HTMLElement.prototype, 'scrollBy', {
+		writable: true,
+		value: jest.fn()
+	});
 });
 
 beforeEach(() => {

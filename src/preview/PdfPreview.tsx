@@ -213,25 +213,6 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		return closeAction;
 	}, [closeAction, onClose]);
 
-	const escapeEvent = useCallback<(e: KeyboardEvent) => void>(
-		(event) => {
-			if (event.key === 'Escape') {
-				onClose(event);
-			}
-		},
-		[onClose]
-	);
-
-	useEffect(() => {
-		if (show) {
-			document.addEventListener('keyup', escapeEvent);
-		}
-
-		return (): void => {
-			document.removeEventListener('keyup', escapeEvent);
-		};
-	}, [escapeEvent, show]);
-
 	const onOverlayClick = useCallback<React.ReactEventHandler>(
 		(event) => {
 			event.stopPropagation();
@@ -343,6 +324,49 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		setCurrentPage(newPage);
 		pageRefs.current[newPage - 1].current?.scrollIntoView();
 	}, []);
+
+	const eventListener = useCallback<(e: KeyboardEvent) => void>(
+		(event) => {
+			if (event.key === 'Escape') {
+				onClose(event);
+			} else if (event.key === 'ArrowRight' && onNextPreview) {
+				onNextPreview(event);
+			} else if (event.key === 'ArrowLeft' && onPreviousPreview) {
+				onPreviousPreview(event);
+			} else if (event.key === 'Home') {
+				if (currentPage > 1) {
+					onPageChange(1);
+				}
+			} else if (event.key === 'End') {
+				if (numPages && currentPage < numPages) {
+					onPageChange(numPages);
+				}
+			} else if (event.key === 'PageUp') {
+				if (currentPage > 1) {
+					onPageChange(currentPage - 1);
+				}
+			} else if (event.key === 'PageDown') {
+				if (numPages && currentPage < numPages) {
+					onPageChange(currentPage + 1);
+				}
+			} else if (event.key === 'ArrowUp') {
+				previewRef.current?.scrollBy(0, -40);
+			} else if (event.key === 'ArrowDown') {
+				previewRef.current?.scrollBy(0, 40);
+			}
+		},
+		[currentPage, numPages, onClose, onNextPreview, onPageChange, onPreviousPreview, previewRef]
+	);
+
+	useEffect(() => {
+		if (show) {
+			document.addEventListener('keydown', eventListener);
+		}
+
+		return (): void => {
+			document.removeEventListener('keydown', eventListener);
+		};
+	}, [eventListener, show]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
