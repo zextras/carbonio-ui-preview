@@ -49,13 +49,13 @@ const Image = styled.img`
 	min-width: 0;
 	align-self: center;
 	filter: drop-shadow(0px 5px 14px rgba(0, 0, 0, 0.35));
-	border-radius: 4px;
+	border-radius: 0.25rem;
 `;
 
 const PreviewContainer = styled.div.attrs({
-	$paddingVertical: '32px',
-	$paddingHorizontal: '16px',
-	$gap: '8px'
+	$paddingVertical: '2rem',
+	$paddingHorizontal: '1rem',
+	$gap: '0.5rem'
 })`
 	display: flex;
 	max-width: 100%;

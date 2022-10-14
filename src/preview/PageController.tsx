@@ -12,7 +12,7 @@ const StyledInput = styled.input<{ $color: string; $size: string }>`
 	background-color: inherit;
 	border: none;
 	outline: none;
-	min-width: 8px;
+	min-width: 0.5rem;
 	font-family: inherit;
 	font-size: ${({ theme, $size }): string => theme.sizes.font[$size]};
 	color: ${({ $color, theme }): string => getColor($color, theme)};
@@ -109,7 +109,7 @@ export const PageController = ({
 	);
 
 	return (
-		<Container orientation="horizontal" gap="8px" crossAlignment="baseline">
+		<Container orientation="horizontal" gap="0.5rem" crossAlignment="baseline">
 			<Text size="small" color="gray6">
 				{pageLabel}
 			</Text>

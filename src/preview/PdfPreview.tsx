@@ -77,15 +77,14 @@ const PreviewContainer = styled.div`
 
 	&::-webkit-scrollbar-thumb {
 		background-color: ${({ theme }): string => theme.palette.gray3.regular};
-		border-radius: 4px;
+		border-radius: 0.25rem;
 	}
 
 	& > .react-pdf__Document {
-		//padding-right: 17px;
-		padding-bottom: 16px;
+		padding-bottom: 1rem;
 		margin: auto;
 		display: flex;
-		gap: 16px;
+		gap: 1rem;
 		flex-direction: column;
 	}
 
@@ -95,10 +94,10 @@ const PreviewContainer = styled.div`
 `;
 
 const VerticalDivider = styled.div<{ $color: string }>`
-	width: 1px;
-	height: 24px;
+	width: 0.0625rem;
+	height: 2.25rem;
 	background-color: ${({ $color, theme }): string => getColor($color, theme)};
-	flex: 0 0 1px;
+	flex: 0 0 0.0625rem;
 `;
 
 type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {

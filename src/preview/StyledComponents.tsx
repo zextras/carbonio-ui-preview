@@ -9,12 +9,12 @@ import styled from 'styled-components';
 
 export const AbsoluteLeftIconButton = styled(IconButton)`
 	position: absolute;
-	left: 8px;
+	left: 0.5rem;
 	top: 50%;
 `;
 
 export const AbsoluteRightIconButton = styled(IconButton)`
 	position: absolute;
-	right: 8px;
+	right: 0.5rem;
 	top: 50%;
 `;

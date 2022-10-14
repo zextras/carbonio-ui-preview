@@ -12,21 +12,21 @@ import styled from 'styled-components';
 const HeaderContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
-	padding: 16px;
+	padding: 1rem;
 `;
 
 const LeftContainer = styled.div`
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
-	gap: 8px;
+	gap: 0.5rem;
 `;
 
 const RightContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
-	gap: 8px;
+	gap: 0.5rem;
 `;
 
 const InfoContainer = styled.div`
