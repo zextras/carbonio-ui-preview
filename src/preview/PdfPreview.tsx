@@ -95,7 +95,7 @@ const PreviewContainer = styled.div`
 
 const VerticalDivider = styled.div<{ $color: string }>`
 	width: 0.0625rem;
-	height: 2.25rem;
+	height: 1.5rem;
 	background-color: ${({ $color, theme }): string => getColor($color, theme)};
 	flex: 0 0 0.0625rem;
 `;
