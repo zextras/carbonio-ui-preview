@@ -6,6 +6,9 @@
 import '@testing-library/jest-dom';
 import { act } from '@testing-library/react';
 import failOnConsole from 'jest-fail-on-console';
+import fetchMock from 'jest-fetch-mock';
+
+fetchMock.enableMocks();
 
 failOnConsole({
 	shouldFailOnError: false,

@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
@@ -84,7 +84,7 @@ type ImagePreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	/** Flag to show or hide Portal's content */
 	show: boolean;
 	/** preview img source */
-	src: string;
+	src: string | File | Blob;
 	/** Callback to hide the preview */
 	onClose: (e: React.SyntheticEvent | KeyboardEvent) => void;
 	/** Alternative text for image */
@@ -113,6 +113,17 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 	},
 	ref
 ) {
+	const [computedSrc, setComputedSrc] = useState<string | undefined>(undefined);
+
+	useEffect(() => {
+		if (typeof src === 'string') {
+			setComputedSrc(src);
+		}
+		if (src instanceof File || src instanceof Blob) {
+			setComputedSrc(URL.createObjectURL(src));
+		}
+	}, [src, setComputedSrc]);
+
 	const previewRef = useCombinedRefs<HTMLDivElement>(ref);
 	const imageRef = useRef<HTMLImageElement>(null);
 
@@ -188,7 +199,7 @@ const ImagePreview = React.forwardRef<HTMLDivElement, ImagePreviewProps>(functio
 							<PreviewContainer ref={previewRef}>
 								<Image
 									alt={alt ?? filename}
-									src={src}
+									src={computedSrc}
 									onError={(error): void => console.error('TODO handle error', error)}
 									ref={imageRef}
 								/>

@@ -28,6 +28,7 @@ export interface PreviewCriteriaAlternativeContentProps {
 	downloadLabel?: string;
 	openLabel?: string;
 	noteLabel?: string;
+	filename?: string;
 }
 
 export const PreviewCriteriaAlternativeContent: React.VFC<
@@ -39,7 +40,8 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 	contentLabel = 'The file size exceeds the limit allowed and cannot be displayed',
 	downloadLabel = 'DOWNLOAD FILE',
 	openLabel = 'OPEN IN A SEPARATE TAB',
-	noteLabel = 'Please, download it or open it in a separate tab'
+	noteLabel = 'Please, download it or open it in a separate tab',
+	filename = ''
 }) => {
 	const ancRef = useRef<HTMLAnchorElement>(null);
 	const ancRef2 = useRef<HTMLAnchorElement>(null);
@@ -94,7 +96,9 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 			<Text size="small" color="gray6">
 				{noteLabel}
 			</Text>
-			{downloadSrc && <AttachmentLink rel="noopener" ref={ancRef} href={downloadSrc} />}
+			{downloadSrc && (
+				<AttachmentLink download={filename} rel="noopener" ref={ancRef} href={downloadSrc} />
+			)}
 			{openSrc && <AttachmentLink rel="noopener" ref={ancRef2} href={openSrc} />}
 		</FakeModalContainer>
 	);

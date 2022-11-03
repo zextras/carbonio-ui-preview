@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Container, Portal, useCombinedRefs, getColor } from '@zextras/carbonio-design-system';
 import map from 'lodash/map';
+import noop from 'lodash/noop';
 import type { DocumentProps } from 'react-pdf';
 import { PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
@@ -113,8 +114,10 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	disablePortal?: boolean;
 	/** Flag to show or hide Portal's content */
 	show: boolean;
-	/** preview img source */
-	src: string;
+	/** preview source */
+	src: string | File | Blob | ArrayBuffer;
+	/** Whether force cache */
+	forceCache?: boolean;
 	/** Callback to hide the preview */
 	onClose: (e: React.SyntheticEvent | KeyboardEvent) => void;
 	/** use fallback content if you don't want to view the pdf for some reason; content can be customizable with customContent */
@@ -141,6 +144,7 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
 	{
 		src,
+		forceCache = true,
 		show,
 		container,
 		disablePortal,
@@ -173,6 +177,37 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	},
 	ref
 ) {
+	const [documentFile, setDocumentFile] = useState<ArrayBuffer | Blob | string | null>(null);
+	const [fetchFailed, setFetchFailed] = useState(false);
+
+	useEffect(() => {
+		if (typeof src === 'string') {
+			if (/^data:/.test(src)) {
+				setDocumentFile(src);
+				return noop;
+			}
+			const controller = new AbortController();
+			fetch(src, { signal: controller.signal, cache: forceCache ? 'force-cache' : undefined })
+				.then((res) => res.blob())
+				.then((file) => setDocumentFile(file))
+				.catch((e) => {
+					setFetchFailed(true);
+					if (e.name !== 'AbortError') {
+						/* handle error */
+					}
+				});
+
+			return (): void => controller.abort();
+		}
+		if (src instanceof File || src instanceof Blob) {
+			setDocumentFile(src);
+			return noop;
+		}
+		// src instanceof ArrayBuffer
+		setDocumentFile(src);
+		return noop;
+	}, [src, setDocumentFile, forceCache]);
+
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
 	const documentLoaded = useRef(useFallback);
 	const pageRefs = useRef<React.RefObject<HTMLElement>[]>([]);
@@ -289,35 +324,39 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		documentLoaded.current = false;
 	}, []);
 
-	const file = useMemo(() => ({ url: src }), [src]);
-
 	const $customContent = useMemo(() => {
 		if (useFallback) {
 			return (
 				customContent || (
 					<PreviewCriteriaAlternativeContent
-						downloadSrc={src}
+						downloadSrc={
+							(typeof src === 'string' && src) ||
+							((src instanceof File || src instanceof Blob) && URL.createObjectURL(src)) ||
+							URL.createObjectURL(new Blob([src], { type: 'application/pdf' }))
+						}
 						openSrc={openSrc}
 						contentLabel={contentLabel}
 						downloadLabel={downloadLabel}
 						noteLabel={noteLabel}
 						openLabel={openLabel}
 						titleLabel={titleLabel}
+						filename={filename}
 					/>
 				)
 			);
 		}
 		return undefined;
 	}, [
-		customContent,
-		openSrc,
-		src,
 		useFallback,
+		customContent,
+		src,
+		openSrc,
 		contentLabel,
 		downloadLabel,
 		noteLabel,
 		openLabel,
-		titleLabel
+		titleLabel,
+		filename
 	]);
 
 	const onPageChange = useCallback((newPage: number) => {
@@ -418,18 +457,20 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 								/>
 							)}
 							<PreviewContainer ref={previewRef} data-testid="pdf-preview-container">
-								{$customContent || (
-									<Document
-										file={file}
-										onLoadSuccess={onDocumentLoadSuccess}
-										onLoadError={onDocumentLoadError}
-										onLoadProgress={onDocumentLoadProgress}
-										error={errorLabel}
-										loading={loadingLabel}
-									>
-										{pageElements}
-									</Document>
-								)}
+								{$customContent ||
+									(src && (
+										<Document
+											file={documentFile}
+											onLoadSuccess={onDocumentLoadSuccess}
+											onLoadError={onDocumentLoadError}
+											onLoadProgress={onDocumentLoadProgress}
+											error={errorLabel}
+											loading={loadingLabel}
+											noData={(fetchFailed && errorLabel) || loadingLabel}
+										>
+											{pageElements}
+										</Document>
+									))}
 							</PreviewContainer>
 							{onNextPreview && (
 								<AbsoluteRightIconButton
