@@ -181,29 +181,19 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const [fetchFailed, setFetchFailed] = useState(false);
 
 	useEffect(() => {
-		if (typeof src === 'string') {
-			if (/^data:/.test(src)) {
-				setDocumentFile(src);
-				return noop;
-			}
+		// Checks whether is a string but not a data URI.
+		if (typeof src === 'string' && !/^data:/.test(src)) {
 			const controller = new AbortController();
 			fetch(src, { signal: controller.signal, cache: forceCache ? 'force-cache' : undefined })
 				.then((res) => res.blob())
 				.then((file) => setDocumentFile(file))
-				.catch((e) => {
+				.catch(() => {
 					setFetchFailed(true);
-					if (e.name !== 'AbortError') {
-						/* handle error */
-					}
 				});
 
 			return (): void => controller.abort();
 		}
-		if (src instanceof File || src instanceof Blob) {
-			setDocumentFile(src);
-			return noop;
-		}
-		// src instanceof ArrayBuffer
+		// ArrayBuffer - File - Blob - data URI string
 		setDocumentFile(src);
 		return noop;
 	}, [src, setDocumentFile, forceCache]);
