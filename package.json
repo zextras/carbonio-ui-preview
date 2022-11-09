@@ -1,6 +1,6 @@
 {
 	"name": "@zextras/carbonio-ui-preview",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"description": "Preview ui utility for Zextras Carbonio",
 	"main": "lib/index.js",
 	"module": "lib-esm/index.js",
