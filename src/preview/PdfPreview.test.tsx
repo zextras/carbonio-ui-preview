@@ -5,8 +5,9 @@
  */
 import React from 'react';
 
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import fetch from 'jest-fetch-mock';
 
 import { ZOOM_STEPS } from './constants';
 import { PdfPreview, PdfPreviewProps } from './PdfPreview';
@@ -37,6 +38,40 @@ describe('Pdf Preview', () => {
 		expect(pageElement).toBeInTheDocument();
 	});
 
+	test('Render a pdf document from File', async () => {
+		const onClose = jest.fn();
+		setup(<PdfPreview show src={pdfFile.file} onClose={onClose} />, {
+			setupOptions: { advanceTimers: () => Promise.resolve() }
+		});
+		const loadingElement = await screen.findByText(/Loading document preview…/i);
+		expect(loadingElement).toBeInTheDocument();
+		await waitForElementToBeRemoved(loadingElement);
+
+		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-node-access
+		const pageElement = document.querySelector('[data-page-number="1"]');
+		expect(pageElement).toBeDefined();
+		expect(pageElement).not.toBeNull();
+		expect(pageElement).toBeInTheDocument();
+	});
+
+	test('Render a pdf document from Blob', async () => {
+		const onClose = jest.fn();
+		setup(<PdfPreview show src={pdfFile.blob} onClose={onClose} />, {
+			setupOptions: { advanceTimers: () => Promise.resolve() }
+		});
+		const loadingElement = await screen.findByText(/Loading document preview…/i);
+		expect(loadingElement).toBeInTheDocument();
+		await waitForElementToBeRemoved(loadingElement);
+
+		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-node-access
+		const pageElement = document.querySelector('[data-page-number="1"]');
+		expect(pageElement).toBeDefined();
+		expect(pageElement).not.toBeNull();
+		expect(pageElement).toBeInTheDocument();
+	});
+
 	test('If show is false does not render the pdf', async () => {
 		const onClose = jest.fn();
 		setup(<PdfPreview show={false} src={pdfFile.dataURI} onClose={onClose} />, {
@@ -47,6 +82,8 @@ describe('Pdf Preview', () => {
 	});
 
 	test('If pdf is not valid render an error message', async () => {
+		fetch.mockReject(() => Promise.reject(new Error('API is down')));
+
 		const onClose = jest.fn();
 		setup(<PdfPreview show src="invalid-pdf.pdf" onClose={onClose} />, {
 			setupOptions: { advanceTimers: () => Promise.resolve() }

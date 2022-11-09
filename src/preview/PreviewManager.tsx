@@ -81,7 +81,7 @@ const PreviewManager: React.FC = ({ children }) => {
 					  };
 			return (
 				<PreviewWrapper
-					key={props.src}
+					key={Date.now().toString()}
 					{...props}
 					show
 					onClose={closePreview}

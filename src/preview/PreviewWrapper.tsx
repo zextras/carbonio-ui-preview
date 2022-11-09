@@ -15,6 +15,10 @@ type PreviewWrapperProps = PreviewsProps & {
 };
 
 const PreviewWrapper: React.VFC<PreviewWrapperProps> = ({ previewType, ...props }) =>
-	previewType === 'pdf' ? <PdfPreview {...props} /> : <ImagePreview {...props} />;
+	previewType === 'pdf' ? (
+		<PdfPreview {...(props as PdfPreviewProps)} />
+	) : (
+		<ImagePreview {...(props as ImagePreviewProps)} />
+	);
 
 export { PreviewWrapper, PreviewWrapperProps };
