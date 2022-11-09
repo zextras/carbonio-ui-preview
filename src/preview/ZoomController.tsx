@@ -18,8 +18,8 @@ const CustomIconButton = styled(IconButton)`
 			}
 		`};
 	& > svg {
-		width: 20px;
-		height: 20px;
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 `;
 
@@ -54,7 +54,7 @@ export const ZoomController = ({
 	zoomInLabel = 'Zoom in',
 	zoomOutLabel = 'Zoom out'
 }: ZoomControllerProps): JSX.Element => (
-	<Container orientation="horizontal" gap="8px" width="fit">
+	<Container orientation="horizontal" gap="0.5rem" width="fit">
 		<Tooltip label={decrementable ? zoomOutLabel : lowerLimitReachedLabel}>
 			<CustomIconButton
 				disabled={!decrementable}

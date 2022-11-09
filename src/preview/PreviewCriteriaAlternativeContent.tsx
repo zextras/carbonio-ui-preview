@@ -9,8 +9,8 @@ import { Button, Container, Text } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
 const FakeModalContainer = styled(Container)`
-	border-radius: 16px;
-	padding: 32px 64px 32px 64px;
+	border-radius: 1rem;
+	padding: 2rem 4rem 2rem 4rem;
 	margin: auto;
 `;
 
@@ -72,7 +72,7 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 			crossAlignment="center"
 			height="fit"
 			width="fit"
-			gap="16px"
+			gap="1rem"
 		>
 			<Text size="large" color="gray6">
 				{titleLabel}
@@ -80,7 +80,7 @@ export const PreviewCriteriaAlternativeContent: React.VFC<
 			<Text size="medium" color="gray6" weight="bold">
 				{contentLabel}
 			</Text>
-			<Container orientation="horizontal" height="fit" gap="8px">
+			<Container orientation="horizontal" height="fit" gap="0.5rem">
 				{downloadSrc && (
 					<Button
 						label={downloadLabel}

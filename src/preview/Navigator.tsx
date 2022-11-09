@@ -13,12 +13,12 @@ const StyledContainer = styled.div`
 	align-items: center;
 	position: absolute;
 	z-index: 1;
-	bottom: 16px;
+	bottom: 1rem;
 	background-color: ${({ theme }): string => theme.palette.gray0.regular};
 	align-self: center;
-	border-radius: 4px;
-	gap: 16px;
-	padding: 8px 16px;
+	border-radius: 0.25rem;
+	gap: 1rem;
+	padding: 0.5rem 1rem;
 `;
 
 export interface NavigatorProps {
