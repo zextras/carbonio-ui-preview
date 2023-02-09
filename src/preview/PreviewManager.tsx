@@ -8,10 +8,10 @@ import React, { useCallback, createContext, useReducer, useState, useMemo } from
 
 import findIndex from 'lodash/findIndex';
 
-import { MakeOptional } from '../utils/utils';
 import { ImagePreviewProps } from './ImagePreview';
 import { PdfPreviewProps } from './PdfPreview';
 import { PreviewWrapper, PreviewWrapperProps } from './PreviewWrapper';
+import { MakeOptional } from '../utils/utils';
 
 type PreviewArgType = (
 	| MakeOptional<Omit<ImagePreviewProps, 'show'>, 'onClose'>

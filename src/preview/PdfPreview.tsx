@@ -13,7 +13,6 @@ import { PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import styled from 'styled-components';
 
-import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import { Navigator } from './Navigator';
@@ -26,6 +25,7 @@ import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledCompone
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
+import { MakeOptional } from '../utils/utils';
 
 const Overlay = styled.div`
 	height: 100vh;

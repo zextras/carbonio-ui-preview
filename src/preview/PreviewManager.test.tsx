@@ -7,12 +7,12 @@ import React, { useContext, useEffect } from 'react';
 
 import { screen } from '@testing-library/react';
 
-import { setup } from '../utils/test-utils';
 import {
 	PreviewManager,
 	PreviewManagerContextType,
 	PreviewsManagerContext
 } from './PreviewManager';
+import { setup } from '../utils/test-utils';
 
 const PreviewManagerTester = (
 	props: Parameters<PreviewManagerContextType['createPreview']>[0]

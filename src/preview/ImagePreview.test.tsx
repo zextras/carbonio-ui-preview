@@ -8,8 +8,8 @@ import React from 'react';
 import { faker } from '@faker-js/faker';
 import { screen } from '@testing-library/react';
 
-import { setup } from '../utils/test-utils';
 import { ImagePreview, ImagePreviewProps } from './ImagePreview';
+import { setup } from '../utils/test-utils';
 
 describe('Image Preview', () => {
 	test('Render an image', () => {
