@@ -109,7 +109,7 @@ export const PageController = ({
 	);
 
 	return (
-		<Container orientation="horizontal" gap="0.5rem" crossAlignment="baseline">
+		<Container orientation="horizontal" gap="0.5rem" crossAlignment="baseline" width={'fit'}>
 			<Text size="small" color="gray6">
 				{pageLabel}
 			</Text>
