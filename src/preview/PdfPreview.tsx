@@ -10,7 +10,7 @@ import map from 'lodash/map';
 import noop from 'lodash/noop';
 import type { DocumentProps } from 'react-pdf';
 import { PageProps } from 'react-pdf';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import styled from 'styled-components';
 
 import FocusWithin from './FocusWithin';

@@ -43,7 +43,7 @@
 		"@types/lodash": "^4.14.191",
 		"@types/react": "^17.0.53",
 		"@types/react-dom": "^17.0.19",
-		"@types/react-pdf": "^5.7.4",
+		"@types/react-pdf": "^6.2.0",
 		"@types/styled-components": "^5.1.26",
 		"@zextras/carbonio-ui-configs": "^0.1.11",
 		"babel-jest": "^29.4.3",
@@ -62,11 +62,12 @@
 		"jest-environment-jsdom": "^29.4.3",
 		"jest-fail-on-console": "^3.0.2",
 		"jest-fetch-mock": "^3.0.3",
-		"jest-junit": "^15.0.0"
+		"jest-junit": "^15.0.0",
+		"web-streams-polyfill": "^3.2.1"
 	},
 	"dependencies": {
 		"core-js": "^3.28.0",
-		"react-pdf": "^5.7.2"
+		"react-pdf": "^6.2.2"
 	},
 	"peerDependencies": {
 		"@zextras/carbonio-design-system": ">=1.0.0",

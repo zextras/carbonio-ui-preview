@@ -7,6 +7,8 @@ import '@testing-library/jest-dom';
 import { act } from '@testing-library/react';
 import failOnConsole from 'jest-fail-on-console';
 import fetchMock from 'jest-fetch-mock';
+import { cloneDeep } from 'lodash';
+import 'web-streams-polyfill/es6';
 
 fetchMock.enableMocks();
 
@@ -61,6 +63,9 @@ beforeAll(() => {
 		writable: true,
 		value: jest.fn()
 	});
+
+	// available since node 17, used by pdf-js
+	global.structuredClone = cloneDeep;
 });
 
 beforeEach(() => {
