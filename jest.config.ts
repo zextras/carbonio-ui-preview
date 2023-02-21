@@ -92,7 +92,8 @@ export default {
 	moduleNameMapper: {
 		// mocked react-pdf entirely with jest
 		// 'react-pdf/dist/esm/entry.webpack': 'react-pdf/dist/umd/entry.jest'
-		'^react-pdf': 'react-pdf/dist/cjs/entry.jest'
+		'^react-pdf': 'react-pdf/dist/cjs/entry.jest',
+		'\\.(css|less)$': './__mocks__/styleMock.js'
 	},
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],
