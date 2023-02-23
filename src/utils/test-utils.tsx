@@ -32,9 +32,9 @@ export function setup(
 	ui: Parameters<typeof customRender>[0],
 	options?: {
 		renderOptions?: Parameters<typeof customRender>[1];
-		setupOptions?: Parameters<typeof userEvent['setup']>[0];
+		setupOptions?: Parameters<(typeof userEvent)['setup']>[0];
 	}
-): { user: ReturnType<typeof userEvent['setup']> } & ReturnType<typeof render> {
+): { user: ReturnType<(typeof userEvent)['setup']> } & ReturnType<typeof render> {
 	return {
 		user: userEvent.setup({ advanceTimers: jest.advanceTimersByTime, ...options?.setupOptions }),
 		...customRender(ui, options?.renderOptions)

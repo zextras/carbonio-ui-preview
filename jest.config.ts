@@ -18,7 +18,7 @@ export default {
 	// cacheDirectory: "/tmp/jest_rs",
 
 	// Automatically clear mock calls, instances, contexts and results before every test
-	// clearMocks: true,
+	clearMocks: true,
 
 	// Indicates whether the coverage information should be collected while executing the test
 	collectCoverage: true,
@@ -92,7 +92,8 @@ export default {
 	moduleNameMapper: {
 		// mocked react-pdf entirely with jest
 		// 'react-pdf/dist/esm/entry.webpack': 'react-pdf/dist/umd/entry.jest'
-		'^react-pdf': 'react-pdf/dist/umd/entry.jest'
+		'^react-pdf': 'react-pdf/dist/cjs/entry.jest',
+		'\\.(css|less)$': './__mocks__/styleMock.js'
 	},
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],
@@ -122,7 +123,7 @@ export default {
 	// resolver: undefined,
 
 	// Automatically restore mock state and implementation before every test
-	restoreMocks: true,
+	// restoreMocks: true,
 
 	// The root directory that Jest should scan for tests and modules within
 	// rootDir: undefined,

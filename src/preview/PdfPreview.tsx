@@ -10,10 +10,11 @@ import map from 'lodash/map';
 import noop from 'lodash/noop';
 import type { DocumentProps } from 'react-pdf';
 import { PageProps } from 'react-pdf';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import styled from 'styled-components';
 
-import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import { Navigator } from './Navigator';
@@ -26,6 +27,7 @@ import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledCompone
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
+import { MakeOptional } from '../utils/utils';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -125,6 +127,8 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	customContent?: React.ReactElement;
 	/** Whether a text layer should be rendered */
 	renderTextLayer?: boolean;
+	/** Whether the annotation layer should be rendered */
+	renderAnnotationLayer?: boolean;
 	zoomOutLabel?: string;
 	lowerLimitReachedLabel?: string;
 	resetZoomLabel?: string;
@@ -156,6 +160,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		useFallback = false,
 		customContent,
 		renderTextLayer = false,
+		renderAnnotationLayer = false,
 		openSrc,
 		titleLabel,
 		contentLabel,
@@ -288,13 +293,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 						onRenderSuccess={registerPageObserver}
 						width={currentZoom}
 						renderTextLayer={renderTextLayer}
+						renderAnnotationLayer={renderAnnotationLayer}
 						inputRef={pageRef}
 					/>
 				);
 			});
 		}
 		return [];
-	}, [currentZoom, numPages, registerPageObserver, renderTextLayer]);
+	}, [currentZoom, numPages, registerPageObserver, renderAnnotationLayer, renderTextLayer]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
 		(document) => {
@@ -305,7 +311,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[]
 	);
 
-	const onDocumentLoadError = useCallback<NonNullable<DocumentProps['onLoadError']>>(() => {
+	const onDocumentLoadError = useCallback<NonNullable<DocumentProps['onLoadError']>>((error) => {
+		console.error(error);
 		documentLoaded.current = true;
 	}, []);
 

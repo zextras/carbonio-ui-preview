@@ -8,10 +8,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Container, Portal, useCombinedRefs } from '@zextras/carbonio-design-system';
 import styled from 'styled-components';
 
-import { MakeOptional } from '../utils/utils';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledComponents';
+import { MakeOptional } from '../utils/utils';
 
 const Overlay = styled.div`
 	height: 100vh;
