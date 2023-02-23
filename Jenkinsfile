@@ -199,6 +199,9 @@ def call() {
                 label "nodejs-agent-v2"
             }
         }
+        parameters {
+            booleanParam defaultValue: false, description: 'Run with test', name: 'TEST'
+        }
         options {
             timeout(time: 20, unit: "MINUTES")
             buildDiscarder(logRotator(numToKeepStr: "50"))
@@ -332,6 +335,7 @@ def call() {
                 when {
                     anyOf {
                         expression { isPullRequest == true }
+                        expression { params.TEST == true }
                     }
                 }
                 parallel {
