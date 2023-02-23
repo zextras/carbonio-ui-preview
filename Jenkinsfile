@@ -267,17 +267,6 @@ def call() {
                 }
                 steps {
                     gitSetup()
-                    def commitVersion = getCommitVersion();
-                    if (commitVersion) {
-                        echo "Force bump to version ${commitVersion}"
-                        npxCmd(
-                            script: "standard-version --no-verify --release-as ${commitVersion}"
-                        )
-                    } else {
-                        npxCmd(
-                            script: "standard-version --no-verify"
-                        )
-                    }
                     script {
                         def commitVersion = getCommitVersion();
                         if (commitVersion) {
@@ -292,8 +281,6 @@ def call() {
                         }
                     }
                     pkgVersionFull = getPackageVersion()
-                    pkgVersionParts = pkgVersionFull.split('-')
-                    pkgVersion = pkgVersionParts[0]
                     echo("Package version: ${pkgVersionFull}")
 
                     script {
