@@ -279,11 +279,8 @@ def call() {
                                 script: "npm run release -- --no-verify"
                             )
                         }
-                    }
-                    pkgVersionFull = getPackageVersion()
-                    echo("Package version: ${pkgVersionFull}")
-
-                    script {
+                        pkgVersionFull = getPackageVersion()
+                        echo("Package version: ${pkgVersionFull}")
                         gitPush(
                             branch: "${BRANCH_NAME}",
                             followTags: true
