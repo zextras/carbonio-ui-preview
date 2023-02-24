@@ -90,10 +90,10 @@ String getOriginUrl() {
 
 void openGithubPr(Map args = [:]) {
     def ownerAndRepo = getOriginUrl().replaceAll("git@github.com:", "").replaceAll(".git", "")
-    echo "Opening PR with https://api.github.com/repos/${ownerAndRepo()}/pulls"
+    echo "Opening PR with https://api.github.com/repos/${ownerAndRepo}/pulls"
     sh(
         script: """#!/usr/bin/env bash
-            curl --location https://api.github.com/repos/${ownerAndRepo()}/pulls \
+            curl --location https://api.github.com/repos/${ownerAndRepo}/pulls \
             -X POST \
             -H 'Accept: application/vnd.github+json' \
             -H 'Authorization: Bearer ${args.TOKEN}' \
@@ -445,28 +445,30 @@ pipeline {
                         name: 'release_updated_files_packagelockjson'
                     )
 
-                    post {
-                        success {
-                            withCredentials([
-                                usernamePassword(
-                                    credentialsId: 'tarsier-bot-pr-token-github',
-                                    passwordVariable: 'ZXBOT_TOKEN',
-                                    usernameVariable: 'ZXBOT_NAME'
-                                )
-                            ]) {
-                                script {
-                                        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-                                        openGithubPr(
-                                            TOKEN: ZXBOT_TOKEN,
-                                            title: "Bumped version ${pkgVersionFull}",
-                                            head: versionBumperBranch,
-                                            base: 'devel'
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
+//                     post {
+                    // at the moment the bot might not have the permissions to create pull requests
+                    // returned response is: { "message": "Not Found" }
+//                         success {
+//                             withCredentials([
+//                                 usernamePassword(
+//                                     credentialsId: 'tarsier-bot-pr-token-github',
+//                                     passwordVariable: 'ZXBOT_TOKEN',
+//                                     usernameVariable: 'ZXBOT_NAME'
+//                                 )
+//                             ]) {
+//                                 script {
+//                                         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+//                                         openGithubPr(
+//                                             TOKEN: ZXBOT_TOKEN,
+//                                             title: "Bumped version ${pkgVersionFull}",
+//                                             head: versionBumperBranch,
+//                                             base: 'devel'
+//                                         )
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                     }
                 }
             }
         }
