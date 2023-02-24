@@ -6,7 +6,7 @@
 @Library('zextras-library@0.5.0') _
 
 // git utils
-def getCommitParentsCount() {
+int getCommitParentsCount() {
     return Integer.parseInt(
         sh(
             script: """#!/usr/bin/env bash
@@ -17,11 +17,11 @@ def getCommitParentsCount() {
     )
 }
 
-def isMergeCommit() {
+boolean isMergeCommit() {
     return 2 <= getCommitParentsCount()
 }
 
-def gitFixConfigAndRemote() {
+void gitFixConfigAndRemote() {
     sh(
         script: """#!/usr/bin/env bash
             git config user.email "bot@zextras.com"
@@ -42,7 +42,7 @@ def gitFixConfigAndRemote() {
     )
 }
 
-def gitUnshallow() {
+void gitUnshallow() {
     sh(
       script: """#!/usr/bin/env bash
         git fetch --unshallow
@@ -50,12 +50,12 @@ def gitUnshallow() {
     )
 }
 
-def gitSetup() {
+void gitSetup() {
     gitFixConfigAndRemote()
     gitUnshallow()
 }
 
-def getCommitVersion() {
+String getCommitVersion() {
     return this.script.sh(
         script: """#!/usr/bin/env bash
             git log -1 | grep \'version:\' | sed -n \'s/.*version:\\s*//p\'
@@ -64,7 +64,7 @@ def getCommitVersion() {
     ).trim()
 }
 
-def gitPush(Map opts = [:]) {
+void gitPush(Map opts = [:]) {
     def gitOptions = [' ']
     if (opts.followTags == true) {
         gitOptions << '--follow-tags'
@@ -80,7 +80,7 @@ def gitPush(Map opts = [:]) {
     )
 }
 
-def getOriginUrl() {
+String getOriginUrl() {
     return sh(
       script: """#!/usr/bin/env bash
         git remote -v | head -n1 | cut -d\$'\t' -f2 | cut -d\" \" -f1
@@ -89,7 +89,7 @@ def getOriginUrl() {
     ).trim()
 }
 
-def openGithubPr(Map args = [:]) {
+void openGithubPr(Map args = [:]) {
     sh(
         script: """
             curl https://api.github.com/repos/${getOriginUrl()}/pulls \
@@ -107,7 +107,7 @@ def openGithubPr(Map args = [:]) {
 }
 
 // Package utils
-def getPackageName() {
+String getPackageName() {
     return sh(
         script: """#!/usr/bin/env bash
             cat package.json \
@@ -117,7 +117,7 @@ def getPackageName() {
     ).trim()
 }
 
-def getPackageDescription() {
+String getPackageDescription() {
     return sh(
         script: """#!/usr/bin/env bash
             cat package.json \
@@ -127,7 +127,7 @@ def getPackageDescription() {
     ).trim()
 }
 
-def getPackageVersion() {
+String getPackageVersion() {
     return sh(
         script: """#!/usr/bin/env bash
             cat package.json \
@@ -138,7 +138,7 @@ def getPackageVersion() {
 }
 
 // node utils
-def nodeCmd(Map args = [:]) {
+void nodeCmd(Map args = [:]) {
     final boolean install = (args.install != null) ? args.install : false
     def varEnv = []
     ((args.varEnv != null) ? args.varEnv : []).each { k, v -> varEnv.push("$k=$v") }
@@ -157,7 +157,7 @@ def nodeCmd(Map args = [:]) {
     )
 }
 
-def npxCmd(Map args = [:]) {
+void npxCmd(Map args = [:]) {
     nodeCmd(
         version: args.nodeVersion,
         install: args.install,
@@ -168,7 +168,7 @@ def npxCmd(Map args = [:]) {
     )
 }
 
-def npmLogin(String npmAuthToken) {
+void npmLogin(String npmAuthToken) {
     if (!this.script.fileExists(file: '.npmrc')) {
         sh(
             script: """
@@ -210,14 +210,16 @@ pipeline {
         always {
             script {
                 def commitEmail = sh(
-                    script: "git --no-pager show -s --format='%ae'",
+                    script: """#!/usr/bin/env bash
+                        git --no-pager show -s --format='%ae'
+                    """,
                     returnStdout: true
                 ).trim()
                 emailext(
                     attachLog: true,
-                    body: "${$DEFAULT_CONTENT}",
+                    body: "${DEFAULT_CONTENT}",
                     recipientProviders: [requestor()],
-                    subject: "${$DEFAULT_SUBJECT}",
+                    subject: "${DEFAULT_SUBJECT}",
                     to: "${commitEmail}"
                 )
             }
