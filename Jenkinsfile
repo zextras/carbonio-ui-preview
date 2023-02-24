@@ -89,16 +89,18 @@ String getOriginUrl() {
 }
 
 void openGithubPr(Map args = [:]) {
+    def ownerAndRepo = getOriginUrl().replaceAll("git@github.com:", "").replaceAll(".git", "")
+    echo "Opening PR with https://api.github.com/repos/${ownerAndRepo()}/pulls"
     sh(
-        script: """
-            curl https://api.github.com/repos/${getOriginUrl()}/pulls \
+        script: """#!/usr/bin/env bash
+            curl --location https://api.github.com/repos/${ownerAndRepo()}/pulls \
             -X POST \
             -H 'Accept: application/vnd.github+json' \
             -H 'Authorization: Bearer ${args.TOKEN}' \
             -d '{
-                \"title\": ${args.title},
-                \"head\": ${args.head},
-                \"base\": ${args.base},
+                \"title\": \"${args.title}\",
+                \"head\": \"${args.head}\",
+                \"base\": \"${args.base}\",
                 \"maintainer_can_modify\": true
             }'
         """
@@ -425,8 +427,9 @@ pipeline {
                         branch: "${BRANCH_NAME}",
                         followTags: true
                     )
+                    def versionBumperBranch = "version-bumper/v${pkgVersionFull}"
                     gitPush(
-                        branch: "refs/heads/version-bumper/v${pkgVersionFull}"
+                        branch: "refs/heads/${versionBumperBranch}"
                     )
 
                     stash(
@@ -456,7 +459,7 @@ pipeline {
                                         openGithubPr(
                                             TOKEN: ZXBOT_TOKEN,
                                             title: "Bumped version ${pkgVersionFull}",
-                                            head: "version-bumper/v${pkgVersionFull}",
+                                            head: versionBumperBranch,
                                             base: 'devel'
                                         )
                                     }
