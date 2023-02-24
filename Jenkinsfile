@@ -270,6 +270,7 @@ pipeline {
                 }
             }
             when {
+                beforeAgent(true)
                 expression { isBumpBuild == true }
             }
             steps {
@@ -336,7 +337,13 @@ pipeline {
         }
 
         stage("Tests") {
+            agent {
+                node {
+                    label "nodejs-agent-v2"
+                }
+            }
             when {
+                beforeAgent(true)
                 anyOf {
                     expression { isPullRequest == true }
                     expression { params.TEST == true }
@@ -440,13 +447,18 @@ pipeline {
         }
 
         stage("Build") {
+            agent {
+                node {
+                    label "nodejs-agent-v2"
+                }
+            }
             when {
+                beforeAgent(true)
                 allOf {
                     expression { isReleaseBranch == false }
                     expression { isMergeCommit == false }
                 }
             }
-
             steps {
                 script {
                     unstash(name: '.npmrc')
@@ -462,7 +474,13 @@ pipeline {
 
         //============================================ Deploy ==================================================================
         stage("Release in NPM") {
+            agent {
+                node {
+                    label "nodejs-agent-v2"
+                }
+            }
             when {
+                beforeAgent(true)
                 allOf {
                     expression { isReleaseBranch == true }
                     expression { isBumpBuild == false }
