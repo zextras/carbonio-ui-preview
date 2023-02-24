@@ -508,9 +508,7 @@ pipeline {
                     unstash(name: ".npmrc")
                     catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
                         nodeCmd(
-                            install: true
-                        )
-                        nodeCmd(
+                            install: true,
                             script: "npm publish",
                             varEnv: [
                                 NODE_ENV: 'production'
