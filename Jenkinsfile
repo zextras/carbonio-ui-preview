@@ -427,12 +427,12 @@ pipeline {
                         script {
                             // remove @zextras/ prefix to make pkgName a valid sonarqube project key
                             def sonarQubeProjectKey = pkgName.replaceAll("@zextras/", "")
-                        }
-                        withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
-                            script {
-                                npxCmd(
-                                    script: "sonarqube-scanner -Dsonar.projectKey=${sonarQubeProjectKey}"
-                                )
+                            withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
+                                script {
+                                    npxCmd(
+                                        script: "sonarqube-scanner -Dsonar.projectKey=${sonarQubeProjectKey}"
+                                    )
+                                }
                             }
                         }
                     }
