@@ -10,7 +10,7 @@ int getCommitParentsCount() {
     return Integer.parseInt(
         sh(
             script: """#!/usr/bin/env bash
-            git cat-file -p HEAD | grep -w "parent" | wc -l
+                git cat-file -p HEAD | grep -w "parent" | wc -l
             """,
             returnStdout: true
         ).trim()
@@ -35,7 +35,7 @@ void gitFixConfigAndRemote() {
         returnStdout: true
     ).trim()
     String newOriginUrl = repoOriginUrl.replaceFirst("https://github.com/Zextras", "git@github.com:Zextras")
-    this.script.sh(
+    sh(
         script: """#!/usr/bin/env bash
             git remote set-url origin ${newOriginUrl}
         """
@@ -56,7 +56,7 @@ void gitSetup() {
 }
 
 String getCommitVersion() {
-    return this.script.sh(
+    return sh(
         script: """#!/usr/bin/env bash
             git log -1 | grep \'version:\' | sed -n \'s/.*version:\\s*//p\'
         """,
@@ -169,7 +169,7 @@ void npxCmd(Map args = [:]) {
 }
 
 void npmLogin(String npmAuthToken) {
-    if (!this.script.fileExists(file: '.npmrc')) {
+    if (!fileExists(file: '.npmrc')) {
         sh(
             script: """
                 touch .npmrc;
@@ -210,14 +210,12 @@ pipeline {
         always {
             script {
                 def commitEmail = sh(
-                    script: """#!/usr/bin/env bash
-                        git --no-pager show -s --format='%ae'
-                    """,
+                    script: "git --no-pager show -s --format='%ae'",
                     returnStdout: true
                 ).trim()
                 emailext(
                     attachLog: true,
-                    body: "${DEFAULT_CONTENT}",
+                    body: "\$DEFAULT_CONTENT",
                     recipientProviders: [requestor()],
                     subject: "${DEFAULT_SUBJECT}",
                     to: "${commitEmail}"
@@ -229,19 +227,24 @@ pipeline {
         stage("Read settings") {
             steps {
                 script {
-                    isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
-                    isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
-                    isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
-                    isMergeCommit =  isMergeCommit()
-                    isBumpBuild = isReleaseBranch && isMergeCommit
-                    isDevBuild = !isReleaseBranch
-                    echo "Dev Mode: ${isDevBuild}"
-                    pkgName = getPackageName()
-                    pkgDescription = getPackageDescription()
-                    echo "Name: ${pkgName}"
-                    echo "Description: ${pkgDescription}"
-                    pkgFullVersion = getPackageVersion()
-                    echo "Full Version: ${pkgFullVersion}"
+                   isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
+                   echo "isReleaseBranch: ${isReleaseBranch}"
+                   isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
+                   echo "isDevelBranch: ${isDevelBranch}"
+                   isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
+                   echo "isPullRequest: ${isPullRequest}"
+                   isMergeCommit = isMergeCommit()
+                   echo "isMergeCommit: ${isMergeCommit}"
+                   isBumpBuild = isReleaseBranch && isMergeCommit
+                   echo "isBumpBuild: ${isBumpBuild}"
+                   isDevBuild = !isReleaseBranch
+                   echo "isDevBuild: ${isDevBuild}"
+                   pkgName = getPackageName()
+                   echo "pkgName: ${pkgName}"
+                   pkgDescription = getPackageDescription()
+                   echo "pkgDescription: ${pkgDescription}"
+                   pkgFullVersion = getPackageVersion()
+                   echo "pkgFullVersion: ${pkgFullVersion}"
                 }
                 withCredentials([
                     usernamePassword(
@@ -457,7 +460,6 @@ pipeline {
         //============================================ Deploy ==================================================================
         stage("Release in NPM") {
             when {
-                beforeAgent(true)
                 allOf {
                     expression { isReleaseBranch == true }
                     expression { isBumpBuild == false }
