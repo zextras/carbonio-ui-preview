@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-@Library('zextras-library@0.5.0') _
 
 // git utils
 int getCommitParentsCount() {
