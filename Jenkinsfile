@@ -16,7 +16,7 @@ int getCommitParentsCount() {
     )
 }
 
-boolean isMergeCommit() {
+boolean gitIsMergeCommit() {
     return 2 <= getCommitParentsCount()
 }
 
@@ -232,7 +232,7 @@ pipeline {
                    echo "isDevelBranch: ${isDevelBranch}"
                    isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
                    echo "isPullRequest: ${isPullRequest}"
-                   isMergeCommit = isMergeCommit()
+                   isMergeCommit = gitIsMergeCommit()
                    echo "isMergeCommit: ${isMergeCommit}"
                    isBumpBuild = isReleaseBranch && isMergeCommit
                    echo "isBumpBuild: ${isBumpBuild}"
