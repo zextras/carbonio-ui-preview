@@ -454,9 +454,9 @@ pipeline {
                         name: 'release_updated_files_packagelockjson'
                     )
 
-//                     post {
                     // at the moment the bot might not have the permissions to create pull requests
                     // returned response is: { "message": "Not Found" }
+//                     post {
 //                         success {
 //                             withCredentials([
 //                                 usernamePassword(
