@@ -262,80 +262,7 @@ pipeline {
                 )
             }
         }
-        //============================================ Release Automation ======================================================
-        stage("Bump Version") {
-            agent {
-                node {
-                    label "nodejs-agent-v2"
-                }
-            }
-            when {
-                beforeAgent(true)
-                expression { isBumpBuild == true }
-            }
-            steps {
-                gitSetup()
-                script {
-                    def commitVersion = getCommitVersion();
-                    if (commitVersion) {
-                        echo "Force bump to version ${commitVersion}"
-                        nodeCmd(
-                            script: "npm run release -- --no-verify --release-as ${commitVersion}"
-                        )
-                    } else {
-                        nodeCmd(
-                            script: "npm run release -- --no-verify"
-                        )
-                    }
-                    pkgVersionFull = getPackageVersion()
-                    echo("Package version: ${pkgVersionFull}")
-                    gitPush(
-                        branch: "${BRANCH_NAME}",
-                        followTags: true
-                    )
-                    gitPush(
-                        branch: "refs/heads/version-bumper/v${pkgVersionFull}"
-                    )
-
-                    stash(
-                        includes: 'CHANGELOG.md',
-                        name: 'release_updated_files_changelogmd'
-                    )
-                    stash(
-                        includes: 'package.json',
-                        name: 'release_updated_files_packagejson'
-                    )
-                    stash(
-                        includes: 'package-lock.json',
-                        name: 'release_updated_files_packagelockjson'
-                    )
-
-                    post {
-                        success {
-                            withCredentials([
-                                usernamePassword(
-                                    credentialsId: 'tarsier-bot-pr-token-github',
-                                    passwordVariable: 'ZXBOT_TOKEN',
-                                    usernameVariable: 'ZXBOT_NAME'
-                                )
-                            ]) {
-                                script {
-                                        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-                                        openGithubPr(
-                                            TOKEN: ZXBOT_TOKEN,
-                                            title: "Bumped version ${pkgVersionFull}",
-                                            head: "version-bumper/v${pkgVersionFull}",
-                                            base: 'devel'
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        //============================================ Test ====================================================================
         stage("Tests") {
             when {
                 anyOf {
@@ -440,6 +367,7 @@ pipeline {
             }
         }
 
+        // ===================================== Build ==============================================================
         stage("Build") {
             agent {
                 node {
@@ -466,7 +394,80 @@ pipeline {
             }
         }
 
-        //============================================ Deploy ==================================================================
+        // ============================================ Release Automation ==============================================
+        stage("Bump Version") {
+            agent {
+                node {
+                    label "nodejs-agent-v2"
+                }
+            }
+            when {
+                beforeAgent(true)
+                expression { isBumpBuild == true }
+            }
+            steps {
+                gitSetup()
+                script {
+                    def commitVersion = getCommitVersion();
+                    if (commitVersion) {
+                        echo "Force bump to version ${commitVersion}"
+                        npxCmd(
+                            script: "standard-version --no-verify --release-as ${commitVersion}"
+                        )
+                    } else {
+                        npxCmd(
+                            script: "standard-version --no-verify"
+                        )
+                    }
+                    pkgVersionFull = getPackageVersion()
+                    echo("Package version: ${pkgVersionFull}")
+                    gitPush(
+                        branch: "${BRANCH_NAME}",
+                        followTags: true
+                    )
+                    gitPush(
+                        branch: "refs/heads/version-bumper/v${pkgVersionFull}"
+                    )
+
+                    stash(
+                        includes: 'CHANGELOG.md',
+                        name: 'release_updated_files_changelogmd'
+                    )
+                    stash(
+                        includes: 'package.json',
+                        name: 'release_updated_files_packagejson'
+                    )
+                    stash(
+                        includes: 'package-lock.json',
+                        name: 'release_updated_files_packagelockjson'
+                    )
+
+                    post {
+                        success {
+                            withCredentials([
+                                usernamePassword(
+                                    credentialsId: 'tarsier-bot-pr-token-github',
+                                    passwordVariable: 'ZXBOT_TOKEN',
+                                    usernameVariable: 'ZXBOT_NAME'
+                                )
+                            ]) {
+                                script {
+                                        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+                                        openGithubPr(
+                                            TOKEN: ZXBOT_TOKEN,
+                                            title: "Bumped version ${pkgVersionFull}",
+                                            head: "version-bumper/v${pkgVersionFull}",
+                                            base: 'devel'
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         stage("Release in NPM") {
             agent {
                 node {
