@@ -13,5 +13,4 @@
 /junit.xml
 /coverage/
 .DS_Store
-/.reuse/
-zextras-carbonio-ui-preview-*.*.*.tgz
+zextras-carbonio-*.tgz
