@@ -63,6 +63,15 @@ String getCommitVersion() {
     ).trim()
 }
 
+String getCommitId() {
+    return sh(
+        script: """#!/usr/bin/env bash
+            git rev-parse HEAD
+        """,
+        returnStdout: true
+    ).trim()
+}
+
 void gitPush(Map opts = [:]) {
     def gitOptions = [' ']
     if (opts.followTags == true) {
@@ -487,15 +496,16 @@ pipeline {
                 }
             }
             steps {
-                checkout(scm: [
-                    $class: "GitSCM",
-                    branches: [[
-                        name: commitId
-                    ]],
-                    userRemoteConfigs: scm.userRemoteConfigs
-                ])
-                unstash(name: ".npmrc")
                 script {
+                    def commitId = getCommitId()
+                    checkout(scm: [
+                        $class: "GitSCM",
+                        branches: [[
+                            name: commitId
+                        ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ])
+                    unstash(name: ".npmrc")
                     catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
                         nodeCmd(
                             install: true
