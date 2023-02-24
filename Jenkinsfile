@@ -180,315 +180,311 @@ def npmLogin(String npmAuthToken) {
     }
 }
 
-def call() {
-    // FLAGS
-    Boolean isReleaseBranch
-    Boolean isDevelBranch
-    Boolean isPullRequest
-    Boolean isMergeCommit
-    Boolean isBumpBuild
-    // PROJECT DETAILS
-    String pkgName
-    String pkgVersion
-    String pkgVersionFull
-    String[] pkgVersionParts
 
-    pipeline {
-        agent {
-            node {
-                label "nodejs-agent-v2"
+// FLAGS
+Boolean isReleaseBranch
+Boolean isDevelBranch
+Boolean isPullRequest
+Boolean isMergeCommit
+Boolean isBumpBuild
+// PROJECT DETAILS
+String pkgName
+String pkgVersion
+String pkgVersionFull
+String[] pkgVersionParts
+
+pipeline {
+    agent {
+        node {
+            label "nodejs-agent-v2"
+        }
+    }
+    parameters {
+        booleanParam defaultValue: false, description: 'Run with test', name: 'TEST'
+    }
+    options {
+        timeout(time: 20, unit: "MINUTES")
+        buildDiscarder(logRotator(numToKeepStr: "50"))
+    }
+    post {
+        always {
+            script {
+                def commitEmail = sh(
+                    script: "git --no-pager show -s --format='%ae'",
+                    returnStdout: true
+                ).trim()
+                emailext(
+                    attachLog: true,
+                    body: "${$DEFAULT_CONTENT}",
+                    recipientProviders: [requestor()],
+                    subject: "${$DEFAULT_SUBJECT}",
+                    to: "${commitEmail}"
+                )
             }
         }
-        parameters {
-            booleanParam defaultValue: false, description: 'Run with test', name: 'TEST'
-        }
-        options {
-            timeout(time: 20, unit: "MINUTES")
-            buildDiscarder(logRotator(numToKeepStr: "50"))
-        }
-        post {
-            always {
+    }
+    stages {
+        stage("Read settings") {
+            steps {
                 script {
-                    def commitEmail = sh(
-                        script: "git --no-pager show -s --format='%ae'",
-                        returnStdout: true
-                    ).trim()
-                    emailext(
-                        attachLog: true,
-                        body: "$DEFAULT_CONTENT",
-                        recipientProviders: [requestor()],
-                        subject: "$DEFAULT_SUBJECT",
-                        to: "${commitEmail}"
+                    isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
+                    isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
+                    isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
+                    isMergeCommit =  isMergeCommit()
+                    isBumpBuild = isReleaseBranch && isMergeCommit
+                    isDevBuild = !isReleaseBranch
+                    echo "Dev Mode: ${isDevBuild}"
+                    pkgName = getPackageName()
+                    pkgDescription = getPackageDescription()
+                    echo "Name: ${pkgName}"
+                    echo "Description: ${pkgDescription}"
+                    pkgFullVersion = getPackageVersion()
+                    echo "Full Version: ${pkgFullVersion}"
+                }
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: "npm-zextras-bot-auth-token",
+                        usernameVariable: "NPM_USERNAME",
+                        passwordVariable: "NPM_PASSWORD"
                     )
+                ]) {
+                    script {
+                        npmLogin(NPM_PASSWORD)
+                    }
+                }
+                stash(
+                    includes: ".npmrc",
+                    name: ".npmrc"
+                )
+            }
+        }
+        //============================================ Release Automation ======================================================
+        stage("Bump Version") {
+            agent {
+                node {
+                    label "nodejs-agent-v2"
+                }
+            }
+            when {
+                expression { isBumpBuild == true }
+            }
+            steps {
+                gitSetup()
+                script {
+                    def commitVersion = getCommitVersion();
+                    if (commitVersion) {
+                        echo "Force bump to version ${commitVersion}"
+                        nodeCmd(
+                            script: "npm run release -- --no-verify --release-as ${commitVersion}"
+                        )
+                    } else {
+                        nodeCmd(
+                            script: "npm run release -- --no-verify"
+                        )
+                    }
+                    pkgVersionFull = getPackageVersion()
+                    echo("Package version: ${pkgVersionFull}")
+                    gitPush(
+                        branch: "${BRANCH_NAME}",
+                        followTags: true
+                    )
+                    gitPush(
+                        branch: "refs/heads/version-bumper/v${pkgVersionFull}"
+                    )
+
+                    stash(
+                        includes: 'CHANGELOG.md',
+                        name: 'release_updated_files_changelogmd'
+                    )
+                    stash(
+                        includes: 'package.json',
+                        name: 'release_updated_files_packagejson'
+                    )
+                    stash(
+                        includes: 'package-lock.json',
+                        name: 'release_updated_files_packagelockjson'
+                    )
+
+                    post {
+                        success {
+                            withCredentials([
+                                usernamePassword(
+                                    credentialsId: 'tarsier-bot-pr-token-github',
+                                    passwordVariable: 'ZXBOT_TOKEN',
+                                    usernameVariable: 'ZXBOT_NAME'
+                                )
+                            ]) {
+                                script {
+                                        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+                                        openGithubPr(
+                                            TOKEN: ZXBOT_TOKEN,
+                                            title: "Bumped version ${pkgVersionFull}",
+                                            head: "version-bumper/v${pkgVersionFull}",
+                                            base: 'devel'
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        stages {
-            stage("Read settings") {
-                steps {
-                    script {
-                        isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
-                        isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
-                        isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
-                        isMergeCommit =  isMergeCommit()
-                        isBumpBuild = isReleaseBranch && isMergeCommit
-                        isDevBuild = !isReleaseBranch
-                        echo "Dev Mode: ${isDevBuild}"
-                        pkgName = getPackageName()
-                        pkgDescription = getPackageDescription()
-                        echo "Name: ${pkgName}"
-                        echo "Description: ${pkgDescription}"
-                        pkgFullVersion = getPackageVersion()
-                        echo "Full Version: ${pkgFullVersion}"
+
+        stage("Tests") {
+            when {
+                anyOf {
+                    expression { isPullRequest == true }
+                    expression { params.TEST == true }
+                }
+            }
+            parallel {
+                stage("Lint") {
+                    agent {
+                        node {
+                            label "nodejs-agent-v2"
+                        }
                     }
-                    withCredentials([
-                        usernamePassword(
-                            credentialsId: "npm-zextras-bot-auth-token",
-                            usernameVariable: "NPM_USERNAME",
-                            passwordVariable: "NPM_PASSWORD"
-                        )
-                    ]) {
+                    steps {
                         script {
-                            npmLogin(NPM_PASSWORD)
-                        }
-                    }
-                    stash(
-                        includes: ".npmrc",
-                        name: ".npmrc"
-                    )
-                }
-            }
-            //============================================ Release Automation ======================================================
-            stage("Bump Version") {
-                agent {
-                    node {
-                        label "nodejs-agent-v2"
-                    }
-                }
-                when {
-                    expression { isBumpBuild == true }
-                }
-                steps {
-                    gitSetup()
-                    script {
-                        def commitVersion = getCommitVersion();
-                        if (commitVersion) {
-                            echo "Force bump to version ${commitVersion}"
-                            nodeCmd(
-                                script: "npm run release -- --no-verify --release-as ${commitVersion}"
-                            )
-                        } else {
-                            nodeCmd(
-                                script: "npm run release -- --no-verify"
-                            )
-                        }
-                        pkgVersionFull = getPackageVersion()
-                        echo("Package version: ${pkgVersionFull}")
-                        gitPush(
-                            branch: "${BRANCH_NAME}",
-                            followTags: true
-                        )
-                        gitPush(
-                            branch: "refs/heads/version-bumper/v${pkgVersionFull}"
-                        )
-
-                        stash(
-                            includes: 'CHANGELOG.md',
-                            name: 'release_updated_files_changelogmd'
-                        )
-                        stash(
-                            includes: 'package.json',
-                            name: 'release_updated_files_packagejson'
-                        )
-                        stash(
-                            includes: 'package-lock.json',
-                            name: 'release_updated_files_packagelockjson'
-                        )
-
-                        post {
-                            success {
-                                withCredentials([
-                                    usernamePassword(
-                                        credentialsId: 'tarsier-bot-pr-token-github',
-                                        passwordVariable: 'ZXBOT_TOKEN',
-                                        usernameVariable: 'ZXBOT_NAME'
-                                    )
-                                ]) {
-                                    script {
-                                            catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-                                            openGithubPr(
-                                                TOKEN: ZXBOT_TOKEN,
-                                                title: "Bumped version ${pkgVersionFull}",
-                                                head: "version-bumper/v${pkgVersionFull}",
-                                                base: 'devel'
-                                            )
-                                        }
-                                    }
-                                }
+                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                unstash(name: ".npmrc")
+                                nodeCmd(
+                                    install: true,
+                                    script: "npm run lint"
+                                )
                             }
                         }
                     }
                 }
-            }
-
-            stage("Tests") {
-                when {
-                    anyOf {
-                        expression { isPullRequest == true }
-                        expression { params.TEST == true }
-                    }
-                }
-                parallel {
-                    stage("Lint") {
-                        agent {
-                            node {
-                                label "nodejs-agent-v2"
-                            }
-                        }
-                        steps {
-                            script {
-                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                    unstash(name: ".npmrc")
-                                    nodeCmd(
-                                        install: true,
-                                        script: "npm run lint"
-                                    )
-                                }
-                            }
+                stage("TypeCheck") {
+                    agent {
+                        node {
+                            label "nodejs-agent-v2"
                         }
                     }
-                    stage("TypeCheck") {
-                        agent {
-                            node {
-                                label "nodejs-agent-v2"
-                            }
-                        }
-                        steps {
-                            script {
-                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                    unstash(name: ".npmrc")
-                                    nodeCmd(
-                                        install: true,
-                                        script: "npm run type-check"
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    stage("Unit Tests") {
-                        agent {
-                            node {
-                                label "nodejs-agent-v2"
-                            }
-                        }
-                        steps {
-                            script {
-                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                    unstash(name: ".npmrc")
-                                    nodeCmd(
-                                        install: true,
-                                        script: "npm run test"
-                                    )
-                                }
-                            }
-                        }
-                        post {
-                            success {
-                                script {
-                                    if (fileExists('junit.xml')) {
-                                        junit(
-                                            allowEmptyResults: true,
-                                            testResults: 'junit.xml'
-                                        )
-                                        publishCoverage(
-                                            adapters: [
-                                                istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
-                                            ],
-                                            calculateDiffForChangeRequests: true,
-                                            failNoReports: false
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    stage("SonarQube Check") {
-                        agent {
-                            node {
-                                label 'nodejs-agent-v2'
-                            }
-                        }
-                        steps {
-                            withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
-                                script {
-                                    npxCmd(
-                                        script: "sonarqube-scanner -Dsonar.projectKey=${pkgName}"
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            stage("Build") {
-                when {
-                    allOf {
-                        expression { isReleaseBranch == false }
-                        expression { isMergeCommit == false }
-                    }
-                }
-
-                steps {
-                    script {
-                        unstash(name: '.npmrc')
+                    steps {
                         script {
-                            nodeCmd(
-                                install: true,
-                                script: 'npm run build'
-                            )
+                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                unstash(name: ".npmrc")
+                                nodeCmd(
+                                    install: true,
+                                    script: "npm run type-check"
+                                )
+                            }
                         }
                     }
                 }
-            }
-
-            //============================================ Deploy ==================================================================
-            stage("NPM") {
-                parallel {
-                    stage("Release") {
-                        when {
-                            beforeAgent(true)
-                            allOf {
-                                expression { isReleaseBranch == true }
-                                expression { isBumpBuild == false }
+                stage("Unit Tests") {
+                    agent {
+                        node {
+                            label "nodejs-agent-v2"
+                        }
+                    }
+                    steps {
+                        script {
+                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                unstash(name: ".npmrc")
+                                nodeCmd(
+                                    install: true,
+                                    script: "npm run test"
+                                )
                             }
                         }
-                        steps {
-                            checkout(scm: [
-                                $class: "GitSCM",
-                                branches: [[
-                                    name: commitId
-                                ]],
-                                userRemoteConfigs: scm.userRemoteConfigs
-                            ])
-                            unstash(name: ".npmrc")
+                    }
+                    post {
+                        success {
                             script {
-                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                    nodeCmd(
-                                        install: true
+                                if (fileExists('junit.xml')) {
+                                    junit(
+                                        allowEmptyResults: true,
+                                        testResults: 'junit.xml'
                                     )
-                                    nodeCmd(
-                                        script: "npm publish",
-                                        varEnv: [
-                                            NODE_ENV: 'production'
-                                        ]
+                                    publishCoverage(
+                                        adapters: [
+                                            istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
+                                        ],
+                                        calculateDiffForChangeRequests: true,
+                                        failNoReports: false
                                     )
                                 }
                             }
                         }
+                    }
+                }
+                stage("SonarQube Check") {
+                    agent {
+                        node {
+                            label 'nodejs-agent-v2'
+                        }
+                    }
+                    steps {
+                        withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
+                            script {
+                                npxCmd(
+                                    script: "sonarqube-scanner -Dsonar.projectKey=${pkgName}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Build") {
+            when {
+                allOf {
+                    expression { isReleaseBranch == false }
+                    expression { isMergeCommit == false }
+                }
+            }
+
+            steps {
+                script {
+                    unstash(name: '.npmrc')
+                    script {
+                        nodeCmd(
+                            install: true,
+                            script: 'npm run build'
+                        )
+                    }
+                }
+            }
+        }
+
+        //============================================ Deploy ==================================================================
+        stage("Release in NPM") {
+            when {
+                beforeAgent(true)
+                allOf {
+                    expression { isReleaseBranch == true }
+                    expression { isBumpBuild == false }
+                }
+            }
+            steps {
+                checkout(scm: [
+                    $class: "GitSCM",
+                    branches: [[
+                        name: commitId
+                    ]],
+                    userRemoteConfigs: scm.userRemoteConfigs
+                ])
+                unstash(name: ".npmrc")
+                script {
+                    catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                        nodeCmd(
+                            install: true
+                        )
+                        nodeCmd(
+                            script: "npm publish",
+                            varEnv: [
+                                NODE_ENV: 'production'
+                            ]
+                        )
                     }
                 }
             }
         }
     }
 }
+
