@@ -216,7 +216,7 @@ pipeline {
                     attachLog: true,
                     body: "\$DEFAULT_CONTENT",
                     recipientProviders: [requestor()],
-                    subject: "${DEFAULT_SUBJECT}",
+                    subject: "\$DEFAULT_SUBJECT",
                     to: "${commitEmail}"
                 )
             }
