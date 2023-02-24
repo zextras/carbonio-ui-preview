@@ -337,13 +337,7 @@ pipeline {
         }
 
         stage("Tests") {
-            agent {
-                node {
-                    label "nodejs-agent-v2"
-                }
-            }
             when {
-                beforeAgent(true)
                 anyOf {
                     expression { isPullRequest == true }
                     expression { params.TEST == true }
