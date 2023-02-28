@@ -3,5 +3,5 @@
 
 npm run type-check
 npm run lint -- --quiet
-# reuse --include-submodules lint
+reuse download --all && reuse lint
 npm test
