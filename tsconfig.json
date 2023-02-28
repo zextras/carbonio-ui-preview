@@ -1,0 +1,20 @@
+{
+	"extends": "@zextras/carbonio-ui-configs/rules/typescript.json",
+	"compilerOptions": {
+		"skipLibCheck": true,
+		"module": "commonjs",
+		"target": "es5",
+		"lib": ["es2015", "dom"],
+		"outDir": "lib",
+		"sourceMap": true,
+		"declaration": true,
+		"jsx": "react",
+		"moduleResolution": "node",
+		"baseUrl": "src",
+		"paths": {
+			"test-utils": ["./utils/test-utils"]
+		}
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"exclude": ["./node_modules/*"]
+}

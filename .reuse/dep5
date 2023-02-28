@@ -1,0 +1,30 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: carbonio-ui-preview
+Upstream-Contact: Zextras s.r.l. <https://www.zextras.com/carbonio/>
+Source: https://github.com/Zextras/carbonio-ui-preview
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
+
+Files: .husky/*
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC0-1.0
+
+Files: __mocks__/_pdf.pdf
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC-BY-NC-SA-4.0
+
+Files: .nvmrc
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC0-1.0
+
+Files: *.json
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: AGPL-3.0-only
+
+Files: THIRDPARTIES
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC0-1.0
