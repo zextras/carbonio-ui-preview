@@ -408,24 +408,6 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[]
 	);
 
-	const printWithEmbed = useCallback(() => {
-		if (documentFile) {
-			const documentUrl =
-				(typeof documentFile === 'string' && documentFile) ||
-				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
-			const embed = `<embed src={${documentUrl}} type={'application/pdf'} />`;
-			const printWin = window.open('', '');
-			if (printWin) {
-				printWin.document.open();
-				printWin.document.write(buildHtmlDocument(embed));
-				printWin.document.close();
-				printWin.focus();
-				printWin.print();
-				printWin.close();
-			}
-		}
-	}, [buildHtmlDocument, documentFile]);
-
 	const printWithIFrame = useCallback(() => {
 		if (documentFile) {
 			const documentUrl =
@@ -444,35 +426,27 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 
 	const printCanvas = useCallback(() => {
 		const allCanvas = document.querySelectorAll('canvas');
-		let windowContent = '<!DOCTYPE html>';
-		windowContent += '<html lang="">';
-		windowContent += '<body>';
+		const windowContent: string[] = [];
 		allCanvas.forEach((canvas) => {
-			windowContent += `<img alt="" src="${canvas.toDataURL()}">`;
+			windowContent.push(`<img alt="" src="${canvas.toDataURL()}">`);
 		});
-		windowContent += '</body>';
-		windowContent += '</html>';
 		const printWin = window.open('', '');
 		if (printWin) {
 			printWin.document.open();
-			printWin.document.write(windowContent);
+			printWin.document.write(buildHtmlDocument(windowContent.join('')));
 			printWin.document.close();
 			printWin.focus();
 			printWin.print();
 			printWin.close();
 		}
-	}, []);
+	}, [buildHtmlDocument]);
 
 	const printWithOpen = useCallback(() => {
 		if (documentFile) {
 			const documentUrl =
 				(typeof documentFile === 'string' && documentFile) ||
 				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
-			const win = window.open(documentUrl, '');
-			if (win) {
-				win.print();
-				win.close();
-			}
+			window.open(documentUrl, '');
 		}
 	}, [documentFile]);
 
@@ -495,15 +469,9 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 				icon: 'PrinterOutline',
 				onClick: printWithOpen,
 				id: 'print-open'
-			},
-			{
-				tooltipLabel: 'Print with embed',
-				icon: 'PrinterOutline',
-				onClick: printWithEmbed,
-				id: 'print-embed'
 			}
 		],
-		[printCanvas, printWithOpen, printWithIFrame, printWithEmbed]
+		[printCanvas, printWithOpen, printWithIFrame]
 	);
 	const actions = useMemo(() => [...actionsProp, ...printActions], [actionsProp, printActions]);
 
