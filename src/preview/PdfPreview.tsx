@@ -154,7 +154,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		extension = '',
 		filename = '',
 		size = '',
-		actions = [],
+		actions: actionsProp = [],
 		closeAction,
 		onClose,
 		useFallback = false,
@@ -185,8 +185,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const [fetchFailed, setFetchFailed] = useState(false);
 
 	useEffect(() => {
-		// Checks whether is a string but not a data URI.
-		if (typeof src === 'string' && !/^data:/.test(src)) {
+		// Check whether is a string but not a data URI.
+		if (typeof src === 'string' && !src.startsWith('data:')) {
 			const controller = new AbortController();
 			fetch(src, { signal: controller.signal, cache: forceCache ? 'force-cache' : undefined })
 				.then((res) => res.blob())
@@ -402,6 +402,110 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 			document.removeEventListener('keydown', eventListener);
 		};
 	}, [eventListener, show]);
+
+	const buildHtmlDocument = useCallback(
+		(content: string) => `<!DOCTYPE html><html lang=""><body>${content}</body></html>`,
+		[]
+	);
+
+	const printWithEmbed = useCallback(() => {
+		if (documentFile) {
+			const documentUrl =
+				(typeof documentFile === 'string' && documentFile) ||
+				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
+			const embed = `<embed src={${documentUrl}} type={'application/pdf'} />`;
+			const printWin = window.open('', '');
+			if (printWin) {
+				printWin.document.open();
+				printWin.document.write(buildHtmlDocument(embed));
+				printWin.document.close();
+				printWin.focus();
+				printWin.print();
+				printWin.close();
+			}
+		}
+	}, [buildHtmlDocument, documentFile]);
+
+	const printWithIFrame = useCallback(() => {
+		if (documentFile) {
+			const documentUrl =
+				(typeof documentFile === 'string' && documentFile) ||
+				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
+			const iframe = document.createElement('iframe');
+			iframe.style.display = 'none';
+			iframe.src = documentUrl;
+			document.body.appendChild(iframe);
+			if (iframe.contentWindow) {
+				iframe.contentWindow.focus();
+				iframe.contentWindow.print();
+			}
+		}
+	}, [documentFile]);
+
+	const printCanvas = useCallback(() => {
+		const allCanvas = document.querySelectorAll('canvas');
+		let windowContent = '<!DOCTYPE html>';
+		windowContent += '<html lang="">';
+		windowContent += '<body>';
+		allCanvas.forEach((canvas) => {
+			windowContent += `<img alt="" src="${canvas.toDataURL()}">`;
+		});
+		windowContent += '</body>';
+		windowContent += '</html>';
+		const printWin = window.open('', '');
+		if (printWin) {
+			printWin.document.open();
+			printWin.document.write(windowContent);
+			printWin.document.close();
+			printWin.focus();
+			printWin.print();
+			printWin.close();
+		}
+	}, []);
+
+	const printWithOpen = useCallback(() => {
+		if (documentFile) {
+			const documentUrl =
+				(typeof documentFile === 'string' && documentFile) ||
+				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
+			const win = window.open(documentUrl, '');
+			if (win) {
+				win.print();
+				win.close();
+			}
+		}
+	}, [documentFile]);
+
+	const printActions = useMemo<HeaderAction[]>(
+		() => [
+			{
+				tooltipLabel: 'Print with iframe',
+				icon: 'PrinterOutline',
+				onClick: printWithIFrame,
+				id: 'print-iframe'
+			},
+			{
+				tooltipLabel: 'Print with canvas',
+				icon: 'PrinterOutline',
+				onClick: printCanvas,
+				id: 'print-canvas'
+			},
+			{
+				tooltipLabel: 'Print with open',
+				icon: 'PrinterOutline',
+				onClick: printWithOpen,
+				id: 'print-open'
+			},
+			{
+				tooltipLabel: 'Print with embed',
+				icon: 'PrinterOutline',
+				onClick: printWithEmbed,
+				id: 'print-embed'
+			}
+		],
+		[printCanvas, printWithOpen, printWithIFrame, printWithEmbed]
+	);
+	const actions = useMemo(() => [...actionsProp, ...printActions], [actionsProp, printActions]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
