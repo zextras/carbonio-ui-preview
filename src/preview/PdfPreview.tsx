@@ -417,14 +417,22 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 			iframe.style.display = 'none';
 			iframe.src = documentUrl;
 			document.body.appendChild(iframe);
-			if (iframe.contentWindow) {
-				try {
-					iframe.contentWindow.focus();
-					iframe.contentWindow.print();
-				} catch (e) {
-					console.error('error while printing from iframe', e);
-				}
-			}
+			iframe.onload = (): void => {
+				setTimeout(() => {
+					try {
+						if (iframe.contentWindow) {
+							iframe.contentWindow.focus();
+							setTimeout(() => {
+								if (iframe.contentWindow) {
+									iframe.contentWindow.print();
+								}
+							}, 1000);
+						}
+					} catch (e) {
+						console.error('error while printing from iframe', e);
+					}
+				}, 1000);
+			};
 		}
 	}, [documentFile]);
 
