@@ -28,3 +28,7 @@ License: AGPL-3.0-only
 Files: THIRDPARTIES
 Copyright: 2023 Zextras <https://www.zextras.com>
 License: CC0-1.0
+
+Files: CHANGELOG.md
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC0-1.0

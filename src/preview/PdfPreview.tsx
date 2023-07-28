@@ -6,10 +6,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Container, Portal, useCombinedRefs, getColor } from '@zextras/carbonio-design-system';
+import { size as lodashSize } from 'lodash';
 import map from 'lodash/map';
 import noop from 'lodash/noop';
-import type { DocumentProps } from 'react-pdf';
-import { PageProps } from 'react-pdf';
+import type { DocumentProps, PDFPageProxy, PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -27,7 +27,8 @@ import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledCompone
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
-import { MakeOptional } from '../utils/utils';
+import { type MakeOptional } from '../utils/type-utils';
+import { print } from '../utils/utils';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -144,6 +145,8 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	loadingLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
+const A4_300DPI_PX_WIDTH = 2480;
+const A4_300DPI_PX_HEIGHT = 3508;
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
 	{
 		src,
@@ -205,6 +208,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
 	const documentLoaded = useRef(useFallback);
 	const pageRefs = useRef<React.RefObject<HTMLElement>[]>([]);
+	const pdfPageProxyListRef = useRef<{ [pageIndex: number]: PDFPageProxy }>({});
 
 	const [numPages, setNumPages] = useState<number | null>(null);
 	const [currentPage, setCurrentPage] = useState<number>(0);
@@ -280,6 +284,20 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[observePage]
 	);
 
+	const [printReady, setPrintReady] = useState(false);
+
+	const pageOnRenderSuccess = useCallback<NonNullable<PageProps['onRenderSuccess']>>(
+		(page): void => {
+			registerPageObserver(page);
+			setPrintReady(lodashSize(pdfPageProxyListRef.current) === numPages);
+		},
+		[numPages, registerPageObserver]
+	);
+
+	const pageOnLoadSuccess = useCallback<NonNullable<PageProps['onLoadSuccess']>>((page) => {
+		pdfPageProxyListRef.current[page._pageIndex] = page;
+	}, []);
+
 	const pageElements = useMemo(() => {
 		if (numPages) {
 			pageRefs.current = [];
@@ -290,7 +308,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 					<Page
 						key={`page_${index + 1}`}
 						pageNumber={index + 1}
-						onRenderSuccess={registerPageObserver}
+						onRenderSuccess={pageOnRenderSuccess}
+						onLoadSuccess={pageOnLoadSuccess}
 						width={currentZoom}
 						renderTextLayer={renderTextLayer}
 						renderAnnotationLayer={renderAnnotationLayer}
@@ -300,7 +319,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 			});
 		}
 		return [];
-	}, [currentZoom, numPages, registerPageObserver, renderAnnotationLayer, renderTextLayer]);
+	}, [
+		currentZoom,
+		numPages,
+		pageOnLoadSuccess,
+		pageOnRenderSuccess,
+		renderAnnotationLayer,
+		renderTextLayer
+	]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
 		(document) => {
@@ -323,7 +349,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const $customContent = useMemo(() => {
 		if (useFallback) {
 			return (
-				customContent || (
+				customContent ?? (
 					<PreviewCriteriaAlternativeContent
 						downloadSrc={
 							(typeof src === 'string' && src) ||
@@ -404,8 +430,39 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	}, [eventListener, show]);
 
 	const buildHtmlDocument = useCallback(
-		(content: string) => `<!DOCTYPE html><html lang=""><body>${content}</body></html>`,
-		[]
+		(content: string) => `
+			<!DOCTYPE html>
+			<html lang="">
+				<head>
+					<title>${filename}</title>
+					<style media="print" type="text/css">
+						@media print {
+							html {
+								margin: 0;
+							}
+							img {
+								page-break-after: always;
+								page-break-inside: avoid;
+							}
+							.page-portrait {
+								width: ${A4_300DPI_PX_WIDTH};
+								height: ${A4_300DPI_PX_HEIGHT};
+							}
+							.page-landscape {
+								width: ${A4_300DPI_PX_HEIGHT};
+								height: ${A4_300DPI_PX_WIDTH};
+							}
+							@page {
+								size: auto;
+								margin: 0;
+							}
+						}
+					</style>
+				</head>
+				<body>${content}</body>
+			</html>
+			`,
+		[filename]
 	);
 
 	const printWithIFrame = useCallback(() => {
@@ -437,30 +494,47 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	}, [documentFile]);
 
 	const printCanvas = useCallback(() => {
-		const allCanvas = document.querySelectorAll('canvas');
-		const windowContent: string[] = [];
-		allCanvas.forEach((canvas) => {
-			windowContent.push(`<img alt="" src="${canvas.toDataURL()}">`);
-		});
+		function isPortraitCanvas(canvas: HTMLCanvasElement): boolean {
+			return canvas.width <= canvas.height;
+		}
 		const printWin = window.open('', '');
 		if (printWin) {
-			printWin.document.open();
-			printWin.document.write(buildHtmlDocument(windowContent.join('')));
-			printWin.document.close();
-			printWin.focus();
-			printWin.print();
-			printWin.close();
+			const canvasElements = document.querySelectorAll<HTMLCanvasElement>('canvas');
+			if (canvasElements.length > 0) {
+				printWin.document.open();
+				printWin.document.write(buildHtmlDocument(''));
+				printWin.document.close();
+
+				const firstPageIsPortrait = isPortraitCanvas(canvasElements[0]);
+				canvasElements.forEach((canvas, index) => {
+					const page = pdfPageProxyListRef.current[index];
+					const isPortrait = isPortraitCanvas(canvas);
+					const rotation =
+						isPortrait === firstPageIsPortrait ? page.rotate : (page.rotate + 90) % 360;
+					const imgContainer = printWin.document.createElement('div');
+					imgContainer.classList.add(isPortrait ? 'page-portrait' : 'page-landscape');
+					imgContainer.classList.add(`rotate-${rotation}`);
+					const imgElement = printWin.document.createElement('img');
+					imgElement.src = canvas.toDataURL();
+					imgContainer.appendChild(imgElement);
+					printWin.document.body.appendChild(imgContainer);
+				});
+				printWin.focus();
+				printWin.print();
+			}
+			// printWin.close();
 		}
 	}, [buildHtmlDocument]);
 
-	const printWithOpen = useCallback(() => {
-		if (documentFile) {
-			const documentUrl =
-				(typeof documentFile === 'string' && documentFile) ||
-				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
-			window.open(documentUrl, '');
-		}
-	}, [documentFile]);
+	const printWithOpen = useCallback<HeaderAction['onClick']>(
+		(e) => {
+			e.stopPropagation();
+			if (documentFile) {
+				print(documentFile);
+			}
+		},
+		[documentFile]
+	);
 
 	const printActions = useMemo<HeaderAction[]>(
 		() => [
@@ -468,22 +542,25 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 				tooltipLabel: 'Print with iframe',
 				icon: 'PrinterOutline',
 				onClick: printWithIFrame,
-				id: 'print-iframe'
+				id: 'print-iframe',
+				disabled: !printReady
 			},
 			{
 				tooltipLabel: 'Print with canvas',
 				icon: 'PrinterOutline',
 				onClick: printCanvas,
-				id: 'print-canvas'
+				id: 'print-canvas',
+				disabled: !printReady
 			},
 			{
 				tooltipLabel: 'Print with open',
 				icon: 'PrinterOutline',
 				onClick: printWithOpen,
-				id: 'print-open'
+				id: 'print-open',
+				disabled: !printReady
 			}
 		],
-		[printCanvas, printWithOpen, printWithIFrame]
+		[printWithIFrame, printReady, printCanvas, printWithOpen]
 	);
 	const actions = useMemo(() => [...actionsProp, ...printActions], [actionsProp, printActions]);
 
@@ -496,7 +573,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							<Navigator>
 								<PageController
 									pageLabel={pageLabel}
-									pagesNumber={numPages || 0}
+									pagesNumber={numPages ?? 0}
 									currentPage={currentPage}
 									onPageChange={onPageChange}
 								/>

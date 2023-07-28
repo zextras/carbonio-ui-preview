@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import FocusWithin from './FocusWithin';
 import Header, { HeaderAction, HeaderProps } from './Header';
 import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledComponents';
-import { MakeOptional } from '../utils/utils';
+import { type MakeOptional } from '../utils/type-utils';
 
 const Overlay = styled.div`
 	height: 100vh;

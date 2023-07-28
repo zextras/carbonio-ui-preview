@@ -10,3 +10,4 @@ export * from './preview/PdfPreview';
 /** Utils */
 export * from './preview/PreviewManager';
 export * from './preview/PreviewWrapper';
+export * from './utils/utils';
