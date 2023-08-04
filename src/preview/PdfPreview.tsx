@@ -447,7 +447,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		}),
 		[printReady, printWithOpen]
 	);
-	const actions = useMemo(() => [...actionsProp, printAction], [actionsProp, printAction]);
+	const actions = useMemo(() => [printAction, ...actionsProp], [actionsProp, printAction]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
