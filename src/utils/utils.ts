@@ -3,10 +3,10 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-export function print(documentFile: string | ArrayBuffer | Blob): void {
-	const documentUrl =
-		(typeof documentFile === 'string' && documentFile) ||
-		URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
+export function print(documentFile: ArrayBuffer | Blob): void {
+	const documentUrl = URL.createObjectURL(
+		(documentFile instanceof Blob && documentFile) || new Blob([documentFile])
+	);
 	const printWin = window.open(documentUrl, '');
 	if (printWin) {
 		printWin.onload = (): void => {

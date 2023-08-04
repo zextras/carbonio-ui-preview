@@ -431,7 +431,13 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		(e) => {
 			e.stopPropagation();
 			if (documentFile) {
-				print(documentFile);
+				if (typeof documentFile === 'string') {
+					fetch(documentFile)
+						.then((res) => res.blob())
+						.then((file) => print(file));
+				} else {
+					print(documentFile);
+				}
 			}
 		},
 		[documentFile]
