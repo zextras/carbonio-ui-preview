@@ -145,8 +145,6 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	loadingLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
-const A4_300DPI_PX_WIDTH = 2480;
-const A4_300DPI_PX_HEIGHT = 3508;
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
 	{
 		src,
@@ -429,103 +427,6 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		};
 	}, [eventListener, show]);
 
-	const buildHtmlDocument = useCallback(
-		(content: string) => `
-			<!DOCTYPE html>
-			<html lang="">
-				<head>
-					<title>${filename}</title>
-					<style media="print" type="text/css">
-						@media print {
-							html {
-								margin: 0;
-							}
-							img {
-								page-break-after: always;
-								page-break-inside: avoid;
-							}
-							.page-portrait {
-								width: ${A4_300DPI_PX_WIDTH};
-								height: ${A4_300DPI_PX_HEIGHT};
-							}
-							.page-landscape {
-								width: ${A4_300DPI_PX_HEIGHT};
-								height: ${A4_300DPI_PX_WIDTH};
-							}
-							@page {
-								size: auto;
-								margin: 0;
-							}
-						}
-					</style>
-				</head>
-				<body>${content}</body>
-			</html>
-			`,
-		[filename]
-	);
-
-	const printWithIFrame = useCallback(() => {
-		if (documentFile) {
-			const documentUrl =
-				(typeof documentFile === 'string' && documentFile) ||
-				URL.createObjectURL((documentFile instanceof Blob && documentFile) || new Blob());
-			const iframe = document.createElement('iframe');
-			iframe.style.display = 'none';
-			iframe.src = documentUrl;
-			document.body.appendChild(iframe);
-			iframe.onload = (): void => {
-				setTimeout(() => {
-					try {
-						if (iframe.contentWindow) {
-							iframe.contentWindow.focus();
-							setTimeout(() => {
-								if (iframe.contentWindow) {
-									iframe.contentWindow.print();
-								}
-							}, 1000);
-						}
-					} catch (e) {
-						console.error('error while printing from iframe', e);
-					}
-				}, 1000);
-			};
-		}
-	}, [documentFile]);
-
-	const printCanvas = useCallback(() => {
-		function isPortraitCanvas(canvas: HTMLCanvasElement): boolean {
-			return canvas.width <= canvas.height;
-		}
-		const printWin = window.open('', '');
-		if (printWin) {
-			const canvasElements = document.querySelectorAll<HTMLCanvasElement>('canvas');
-			if (canvasElements.length > 0) {
-				printWin.document.open();
-				printWin.document.write(buildHtmlDocument(''));
-				printWin.document.close();
-
-				const firstPageIsPortrait = isPortraitCanvas(canvasElements[0]);
-				canvasElements.forEach((canvas, index) => {
-					const page = pdfPageProxyListRef.current[index];
-					const isPortrait = isPortraitCanvas(canvas);
-					const rotation =
-						isPortrait === firstPageIsPortrait ? page.rotate : (page.rotate + 90) % 360;
-					const imgContainer = printWin.document.createElement('div');
-					imgContainer.classList.add(isPortrait ? 'page-portrait' : 'page-landscape');
-					imgContainer.classList.add(`rotate-${rotation}`);
-					const imgElement = printWin.document.createElement('img');
-					imgElement.src = canvas.toDataURL();
-					imgContainer.appendChild(imgElement);
-					printWin.document.body.appendChild(imgContainer);
-				});
-				printWin.focus();
-				printWin.print();
-			}
-			// printWin.close();
-		}
-	}, [buildHtmlDocument]);
-
 	const printWithOpen = useCallback<HeaderAction['onClick']>(
 		(e) => {
 			e.stopPropagation();
@@ -539,20 +440,6 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const printActions = useMemo<HeaderAction[]>(
 		() => [
 			{
-				tooltipLabel: 'Print with iframe',
-				icon: 'PrinterOutline',
-				onClick: printWithIFrame,
-				id: 'print-iframe',
-				disabled: !printReady
-			},
-			{
-				tooltipLabel: 'Print with canvas',
-				icon: 'PrinterOutline',
-				onClick: printCanvas,
-				id: 'print-canvas',
-				disabled: !printReady
-			},
-			{
 				tooltipLabel: 'Print with open',
 				icon: 'PrinterOutline',
 				onClick: printWithOpen,
@@ -560,7 +447,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 				disabled: !printReady
 			}
 		],
-		[printWithIFrame, printReady, printCanvas, printWithOpen]
+		[printReady, printWithOpen]
 	);
 	const actions = useMemo(() => [...actionsProp, ...printActions], [actionsProp, printActions]);
 
