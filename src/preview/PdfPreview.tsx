@@ -437,19 +437,17 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[documentFile]
 	);
 
-	const printActions = useMemo<HeaderAction[]>(
-		() => [
-			{
-				tooltipLabel: 'Print with open',
-				icon: 'PrinterOutline',
-				onClick: printWithOpen,
-				id: 'print-open',
-				disabled: !printReady
-			}
-		],
+	const printAction = useMemo<HeaderAction>(
+		() => ({
+			tooltipLabel: 'Print with open',
+			icon: 'PrinterOutline',
+			onClick: printWithOpen,
+			id: 'print-open',
+			disabled: !printReady
+		}),
 		[printReady, printWithOpen]
 	);
-	const actions = useMemo(() => [...actionsProp, ...printActions], [actionsProp, printActions]);
+	const actions = useMemo(() => [...actionsProp, printAction], [actionsProp, printAction]);
 
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
