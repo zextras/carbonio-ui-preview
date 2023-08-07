@@ -27,12 +27,10 @@
 	"author": "Zextras SF Team <https://www.zextras.com/carbonio/>",
 	"license": "AGPL-3.0-only",
 	"devDependencies": {
-		"@babel/core": "^7.20.12",
-		"@babel/plugin-proposal-class-properties": "^7.18.6",
-		"@babel/plugin-transform-runtime": "^7.19.6",
-		"@babel/preset-env": "^7.20.2",
-		"@babel/preset-react": "^7.18.6",
-		"@babel/preset-typescript": "^7.18.6",
+		"@babel/core": "^7.22.9",
+		"@babel/preset-env": "^7.22.9",
+		"@babel/preset-react": "^7.22.5",
+		"@babel/preset-typescript": "^7.22.5",
 		"@commitlint/cli": "^17.6.7",
 		"@commitlint/config-conventional": "^17.6.7",
 		"@faker-js/faker": "^7.6.0",
@@ -46,9 +44,8 @@
 		"@types/react-pdf": "^6.2.0",
 		"@types/styled-components": "^5.1.26",
 		"@zextras/carbonio-ui-configs": "^0.1.11",
-		"babel-jest": "^29.4.3",
 		"babel-plugin-i18next-extract": "^0.9.0",
-		"babel-plugin-styled-components": "^2.0.7",
+		"babel-plugin-styled-components": "^2.1.4",
 		"eslint": "^8.34.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-jest-dom": "^4.0.3",
@@ -66,7 +63,7 @@
 		"web-streams-polyfill": "^3.2.1"
 	},
 	"dependencies": {
-		"core-js": "^3.28.0",
+		"core-js": "^3.32.0",
 		"react-pdf": "^6.2.2"
 	},
 	"peerDependencies": {
