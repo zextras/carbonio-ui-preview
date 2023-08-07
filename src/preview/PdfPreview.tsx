@@ -143,6 +143,7 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	pageLabel?: string;
 	errorLabel?: string;
 	loadingLabel?: string;
+	printActionTooltipLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -178,7 +179,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		onPreviousPreview,
 		pageLabel,
 		errorLabel = 'Failed to load document preview.',
-		loadingLabel = 'Loading document preview…'
+		loadingLabel = 'Loading document preview…',
+		printActionTooltipLabel = 'Print'
 	},
 	ref
 ) {
@@ -445,13 +447,13 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 
 	const printAction = useMemo<HeaderAction>(
 		() => ({
-			tooltipLabel: 'Print with open',
+			tooltipLabel: printActionTooltipLabel,
 			icon: 'PrinterOutline',
 			onClick: printWithOpen,
 			id: 'print-open',
 			disabled: !printReady
 		}),
-		[printReady, printWithOpen]
+		[printActionTooltipLabel, printReady, printWithOpen]
 	);
 	const actions = useMemo(() => [printAction, ...actionsProp], [actionsProp, printAction]);
 
