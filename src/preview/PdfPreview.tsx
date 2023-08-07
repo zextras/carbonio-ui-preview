@@ -6,10 +6,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Container, Portal, useCombinedRefs, getColor } from '@zextras/carbonio-design-system';
+import { size as lodashSize } from 'lodash';
 import map from 'lodash/map';
 import noop from 'lodash/noop';
-import type { DocumentProps } from 'react-pdf';
-import { PageProps } from 'react-pdf';
+import type { DocumentProps, PDFPageProxy, PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -27,7 +27,8 @@ import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledCompone
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
-import { MakeOptional } from '../utils/utils';
+import { type MakeOptional } from '../utils/type-utils';
+import { print } from '../utils/utils';
 
 const Overlay = styled.div`
 	height: 100vh;
@@ -142,6 +143,7 @@ type PdfPreviewProps = Partial<Omit<HeaderProps, 'closeAction'>> & {
 	pageLabel?: string;
 	errorLabel?: string;
 	loadingLabel?: string;
+	printActionTooltipLabel?: string;
 } & Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'>;
 
 const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -154,7 +156,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		extension = '',
 		filename = '',
 		size = '',
-		actions = [],
+		actions: actionsProp = [],
 		closeAction,
 		onClose,
 		useFallback = false,
@@ -177,7 +179,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		onPreviousPreview,
 		pageLabel,
 		errorLabel = 'Failed to load document preview.',
-		loadingLabel = 'Loading document preview…'
+		loadingLabel = 'Loading document preview…',
+		printActionTooltipLabel = 'Print'
 	},
 	ref
 ) {
@@ -185,8 +188,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const [fetchFailed, setFetchFailed] = useState(false);
 
 	useEffect(() => {
-		// Checks whether is a string but not a data URI.
-		if (typeof src === 'string' && !/^data:/.test(src)) {
+		// Check whether is a string but not a data URI.
+		if (typeof src === 'string' && !src.startsWith('data:')) {
 			const controller = new AbortController();
 			fetch(src, { signal: controller.signal, cache: forceCache ? 'force-cache' : undefined })
 				.then((res) => res.blob())
@@ -205,6 +208,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const previewRef: React.MutableRefObject<HTMLDivElement | null> = useCombinedRefs(ref);
 	const documentLoaded = useRef(useFallback);
 	const pageRefs = useRef<React.RefObject<HTMLElement>[]>([]);
+	const pdfPageProxyListRef = useRef<{ [pageIndex: number]: PDFPageProxy }>({});
 
 	const [numPages, setNumPages] = useState<number | null>(null);
 	const [currentPage, setCurrentPage] = useState<number>(0);
@@ -280,6 +284,20 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		[observePage]
 	);
 
+	const [printReady, setPrintReady] = useState(false);
+
+	const pageOnRenderSuccess = useCallback<NonNullable<PageProps['onRenderSuccess']>>(
+		(page): void => {
+			registerPageObserver(page);
+			setPrintReady(lodashSize(pdfPageProxyListRef.current) === numPages);
+		},
+		[numPages, registerPageObserver]
+	);
+
+	const pageOnLoadSuccess = useCallback<NonNullable<PageProps['onLoadSuccess']>>((page) => {
+		pdfPageProxyListRef.current[page._pageIndex] = page;
+	}, []);
+
 	const pageElements = useMemo(() => {
 		if (numPages) {
 			pageRefs.current = [];
@@ -290,7 +308,8 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 					<Page
 						key={`page_${index + 1}`}
 						pageNumber={index + 1}
-						onRenderSuccess={registerPageObserver}
+						onRenderSuccess={pageOnRenderSuccess}
+						onLoadSuccess={pageOnLoadSuccess}
 						width={currentZoom}
 						renderTextLayer={renderTextLayer}
 						renderAnnotationLayer={renderAnnotationLayer}
@@ -300,7 +319,14 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 			});
 		}
 		return [];
-	}, [currentZoom, numPages, registerPageObserver, renderAnnotationLayer, renderTextLayer]);
+	}, [
+		currentZoom,
+		numPages,
+		pageOnLoadSuccess,
+		pageOnRenderSuccess,
+		renderAnnotationLayer,
+		renderTextLayer
+	]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
 		(document) => {
@@ -323,7 +349,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 	const $customContent = useMemo(() => {
 		if (useFallback) {
 			return (
-				customContent || (
+				customContent ?? (
 					<PreviewCriteriaAlternativeContent
 						downloadSrc={
 							(typeof src === 'string' && src) ||
@@ -403,6 +429,34 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 		};
 	}, [eventListener, show]);
 
+	const printWithOpen = useCallback<HeaderAction['onClick']>(
+		(e) => {
+			e.stopPropagation();
+			if (documentFile) {
+				if (typeof documentFile === 'string') {
+					fetch(documentFile)
+						.then((res) => res.blob())
+						.then((file) => print(file));
+				} else {
+					print(documentFile);
+				}
+			}
+		},
+		[documentFile]
+	);
+
+	const printAction = useMemo<HeaderAction>(
+		() => ({
+			tooltipLabel: printActionTooltipLabel,
+			icon: 'PrinterOutline',
+			onClick: printWithOpen,
+			id: 'print-open',
+			disabled: !printReady
+		}),
+		[printActionTooltipLabel, printReady, printWithOpen]
+	);
+	const actions = useMemo(() => [printAction, ...actionsProp], [actionsProp, printAction]);
+
 	return (
 		<Portal show={show} disablePortal={disablePortal} container={container}>
 			<Overlay onClick={onOverlayClick}>
@@ -412,7 +466,7 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 							<Navigator>
 								<PageController
 									pageLabel={pageLabel}
-									pagesNumber={numPages || 0}
+									pagesNumber={numPages ?? 0}
 									currentPage={currentPage}
 									onPageChange={onPageChange}
 								/>
