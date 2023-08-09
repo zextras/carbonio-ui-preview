@@ -14,7 +14,7 @@ interface ProvidersWrapperProps {
 	children?: React.ReactElement;
 }
 
-const ProvidersWrapper = ({ children }: ProvidersWrapperProps): JSX.Element => (
+const ProvidersWrapper = ({ children }: ProvidersWrapperProps): React.JSX.Element => (
 	<ThemeProvider>{children}</ThemeProvider>
 );
 

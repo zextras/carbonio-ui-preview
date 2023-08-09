@@ -47,7 +47,7 @@ export const PageController = ({
 	currentPage,
 	pagesNumber,
 	onPageChange
-}: PageControllerProps): JSX.Element => {
+}: PageControllerProps): React.JSX.Element => {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const setInputValue = useCallback((value: number) => {

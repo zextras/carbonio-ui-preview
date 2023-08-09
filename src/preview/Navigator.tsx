@@ -25,6 +25,6 @@ export interface NavigatorProps {
 	children: React.ReactElement | React.ReactElement[];
 }
 
-export const Navigator = ({ children }: NavigatorProps): JSX.Element => (
+export const Navigator = ({ children }: NavigatorProps): React.JSX.Element => (
 	<StyledContainer onClick={(ev): void => ev.stopPropagation()}>{children}</StyledContainer>
 );

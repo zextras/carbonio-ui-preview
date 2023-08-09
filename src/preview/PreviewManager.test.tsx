@@ -17,7 +17,7 @@ import { setup } from 'test-utils';
 
 const PreviewManagerTester = (
 	props: Parameters<PreviewManagerContextType['createPreview']>[0]
-): JSX.Element => {
+): React.JSX.Element => {
 	const { createPreview } = useContext(PreviewsManagerContext);
 	const onClickHandler = (): void => {
 		createPreview(props);
@@ -28,7 +28,7 @@ const PreviewManagerTester = (
 const PreviewManagerInitTester = (props: {
 	initPar: Parameters<PreviewManagerContextType['initPreview']>[0];
 	idToOpen: string;
-}): JSX.Element => {
+}): React.JSX.Element => {
 	const { initPreview, openPreview } = useContext(PreviewsManagerContext);
 	const { idToOpen, initPar } = props;
 	useEffect(() => {

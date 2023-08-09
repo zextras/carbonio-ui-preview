@@ -21,7 +21,7 @@ interface FocusContainerProps {
 	children: React.ReactChild | React.ReactChildren;
 }
 
-const FocusWithin = ({ children, returnFocus = true }: FocusContainerProps): JSX.Element => {
+const FocusWithin = ({ children, returnFocus = true }: FocusContainerProps): React.JSX.Element => {
 	const contentRef = useRef<HTMLDivElement | null>(null);
 	const startSentinelRef = useRef<HTMLDivElement | null>(null);
 	const endSentinelRef = useRef<HTMLDivElement | null>(null);
