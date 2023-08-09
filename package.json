@@ -33,7 +33,7 @@
 		"@babel/preset-typescript": "^7.22.5",
 		"@commitlint/cli": "^17.7.0",
 		"@commitlint/config-conventional": "^17.7.0",
-		"@faker-js/faker": "^7.6.0",
+		"@faker-js/faker": "^8.0.2",
 		"@testing-library/jest-dom": "^5.16.5",
 		"@testing-library/react": "^12.1.5",
 		"@testing-library/user-event": "^14.4.3",
