@@ -27,8 +27,8 @@
 	"author": "Zextras SF Team <https://www.zextras.com/carbonio/>",
 	"license": "AGPL-3.0-only",
 	"devDependencies": {
-		"@babel/core": "^7.22.9",
-		"@babel/preset-env": "^7.22.9",
+		"@babel/core": "^7.22.10",
+		"@babel/preset-env": "^7.22.10",
 		"@babel/preset-react": "^7.22.5",
 		"@babel/preset-typescript": "^7.22.5",
 		"@commitlint/cli": "^17.7.0",
@@ -38,7 +38,7 @@
 		"@testing-library/react": "^12.1.5",
 		"@testing-library/user-event": "^14.4.3",
 		"@types/jest": "^29.5.3",
-		"@types/lodash": "^4.14.191",
+		"@types/lodash": "^4.14.196",
 		"@types/react": "^17.0.53",
 		"@types/react-dom": "^17.0.19",
 		"@types/react-pdf": "^6.2.0",
@@ -67,7 +67,7 @@
 		"lodash": "^4.17.21",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
-		"styled-components": "^5.3.6"
+		"styled-components": "^5.3.11"
 	},
 	"browserslist": [
 		">1%",
