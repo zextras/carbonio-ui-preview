@@ -29,32 +29,30 @@ const FocusWithin = ({ children, returnFocus = true }: FocusContainerProps): Rea
 	const onStartSentinelFocus = useCallback(() => {
 		if (contentRef.current) {
 			const node = last(contentRef.current.querySelectorAll<HTMLElement>('[tabindex]'));
-			node && node.focus();
+			node?.focus();
 		}
 	}, []);
 
 	const onEndSentinelFocus = useCallback(() => {
 		if (contentRef.current) {
 			const node = contentRef.current.querySelector<HTMLElement>('[tabindex]');
-			node && node.focus();
+			node?.focus();
 		}
 	}, []);
 
 	useEffect(() => {
-		const documentElement = window.top?.document || document;
+		const documentElement = window.top?.document ?? document;
 		const focusedElement = documentElement.activeElement as HTMLElement;
 
-		contentRef.current && contentRef.current.focus();
-		startSentinelRef.current &&
-			startSentinelRef.current.addEventListener('focus', onStartSentinelFocus);
-		endSentinelRef.current && endSentinelRef.current.addEventListener('focus', onEndSentinelFocus);
+		contentRef.current?.focus();
+		startSentinelRef.current?.addEventListener('focus', onStartSentinelFocus);
+		endSentinelRef.current?.addEventListener('focus', onEndSentinelFocus);
 		const startSentinelRefSave = startSentinelRef.current;
 		const endSentinelRefSave = endSentinelRef.current;
 
 		return (): void => {
-			startSentinelRefSave &&
-				startSentinelRefSave.removeEventListener('focus', onStartSentinelFocus);
-			endSentinelRefSave && endSentinelRefSave.removeEventListener('focus', onEndSentinelFocus);
+			startSentinelRefSave?.removeEventListener('focus', onStartSentinelFocus);
+			endSentinelRefSave?.removeEventListener('focus', onEndSentinelFocus);
 			// return focus to previous initial element
 			if (focusedElement && returnFocus) {
 				focusedElement.focus();
