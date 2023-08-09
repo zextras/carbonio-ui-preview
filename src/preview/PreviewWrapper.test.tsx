@@ -8,14 +8,15 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 
 import { PreviewWrapper } from './PreviewWrapper';
-import { setup } from '../utils/test-utils';
+import { SELECTORS } from '../constants/test';
+import { setup } from 'test-utils';
 
 describe('Preview Wrapper', () => {
 	test('Render the pdf preview for type pdf', async () => {
 		const onClose = jest.fn();
 		setup(<PreviewWrapper show src="" onClose={onClose} previewType="pdf" />);
-		await screen.findByTestId('pdf-preview-container');
-		expect(screen.getByTestId('pdf-preview-container')).toBeVisible();
+		await screen.findByTestId(SELECTORS.previewContainer);
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeVisible();
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
 
@@ -24,6 +25,6 @@ describe('Preview Wrapper', () => {
 		setup(<PreviewWrapper show src="" onClose={onClose} previewType="image" />);
 		await screen.findByRole('img');
 		expect(screen.getByRole('img')).toBeVisible();
-		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
+		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 	});
 });

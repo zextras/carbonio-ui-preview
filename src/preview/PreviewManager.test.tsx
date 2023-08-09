@@ -12,7 +12,8 @@ import {
 	PreviewManagerContextType,
 	PreviewsManagerContext
 } from './PreviewManager';
-import { setup } from '../utils/test-utils';
+import { KEYBOARD_KEY, SELECTORS } from '../constants/test';
+import { setup } from 'test-utils';
 
 const PreviewManagerTester = (
 	props: Parameters<PreviewManagerContextType['createPreview']>[0]
@@ -50,13 +51,13 @@ describe('Preview Manager', () => {
 		);
 
 		expect(screen.getByRole('button', { name: /create preview/i })).toBeVisible();
-		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
+		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 		await user.click(screen.getByRole('button', { name: /create preview/i }));
-		await screen.findByTestId('pdf-preview-container');
-		expect(screen.getByTestId('pdf-preview-container')).toBeVisible();
-		await user.keyboard('{Escape}');
+		await screen.findByTestId(SELECTORS.previewContainer);
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeVisible();
+		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
-		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
+		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 	});
 
 	test('Show the preview of an image by calling createPreview and hide it with close action', async () => {
@@ -72,7 +73,7 @@ describe('Preview Manager', () => {
 		await user.click(screen.getByRole('button', { name: /create preview/i }));
 		await screen.findByRole('img');
 		expect(screen.getByRole('img')).toBeVisible();
-		await user.keyboard('{Escape}');
+		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
@@ -111,40 +112,40 @@ describe('Preview Manager', () => {
 			);
 
 			expect(screen.getByRole('button', { name: /open preview/i })).toBeVisible();
-			expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
+			expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 			await user.click(screen.getByRole('button', { name: /open preview/i }));
-			await screen.findByTestId('pdf-preview-container');
-			expect(screen.getByTestId('pdf-preview-container')).toBeVisible();
+			await screen.findByTestId(SELECTORS.previewContainer);
+			expect(screen.getByTestId(SELECTORS.previewContainer)).toBeVisible();
 
 			expect(screen.getByText(/alpha/i)).toBeVisible();
 
 			let pageInput = screen.getByRole('textbox', { name: /current page/i });
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
-			await user.keyboard('{ArrowRight}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_RIGHT);
 			expect(screen.getByText(/alpha/i)).toBeVisible();
 			// remove focus
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(pageInput).not.toHaveFocus();
-			await user.keyboard('{ArrowRight}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_RIGHT);
 			expect(screen.getByText(/beta/i)).toBeVisible();
-			await user.keyboard('{ArrowRight}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_RIGHT);
 			expect(screen.getByText(/gamma/i)).toBeVisible();
-			await user.keyboard('{ArrowRight}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_RIGHT);
 			expect(screen.getByText(/gamma/i)).toBeVisible();
 			pageInput = screen.getByRole('textbox', { name: /current page/i });
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
-			await user.keyboard('{ArrowLeft}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_LEFT);
 			expect(screen.getByText(/gamma/i)).toBeVisible();
 			// remove focus
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(pageInput).not.toHaveFocus();
-			await user.keyboard('{ArrowLeft}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_LEFT);
 			expect(screen.getByText(/beta/i)).toBeVisible();
-			await user.keyboard('{ArrowLeft}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_LEFT);
 			expect(screen.getByText(/alpha/i)).toBeVisible();
-			await user.keyboard('{ArrowLeft}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_LEFT);
 			expect(screen.getByText(/alpha/i)).toBeVisible();
 		});
 	});

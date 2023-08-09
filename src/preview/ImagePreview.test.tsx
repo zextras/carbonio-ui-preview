@@ -9,6 +9,7 @@ import { faker } from '@faker-js/faker';
 import { screen } from '@testing-library/react';
 
 import { ImagePreview, ImagePreviewProps } from './ImagePreview';
+import { KEYBOARD_KEY } from '../constants/test';
 import { setup } from 'test-utils';
 
 describe('Image Preview', () => {
@@ -51,7 +52,7 @@ describe('Image Preview', () => {
 		const img = faker.image.url();
 		const onClose = jest.fn();
 		const { user } = setup(<ImagePreview show src={img} onClose={onClose} />);
-		await user.keyboard('{Escape}');
+		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
 	});
 

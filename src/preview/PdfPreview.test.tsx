@@ -9,8 +9,9 @@ import { act, screen, waitFor, waitForElementToBeRemoved } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import fetch from 'jest-fetch-mock';
 
-import { ZOOM_STEPS } from './constants';
 import { PdfPreview, PdfPreviewProps } from './PdfPreview';
+import { ZOOM_STEPS } from '../constants';
+import { KEYBOARD_KEY, SELECTORS } from '../constants/test';
 import { loadPDF, setup, triggerObserver } from 'test-utils';
 
 const pdfFile = loadPDF('./__mocks__/_pdf.pdf');
@@ -30,9 +31,9 @@ describe('Pdf Preview', () => {
 		});
 		await screen.findByText(/Loading document preview…/i);
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
-		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeInTheDocument();
 		// eslint-disable-next-line testing-library/no-node-access
-		const pageElement = document.querySelector('[data-page-number="1"]');
+		const pageElement = document.querySelector(SELECTORS.pdfPage(1));
 		expect(pageElement).toBeDefined();
 		expect(pageElement).not.toBeNull();
 		expect(pageElement).toBeInTheDocument();
@@ -47,9 +48,9 @@ describe('Pdf Preview', () => {
 		expect(loadingElement).toBeInTheDocument();
 		await waitForElementToBeRemoved(loadingElement);
 
-		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeInTheDocument();
 		// eslint-disable-next-line testing-library/no-node-access
-		const pageElement = document.querySelector('[data-page-number="1"]');
+		const pageElement = document.querySelector(SELECTORS.pdfPage(1));
 		expect(pageElement).toBeDefined();
 		expect(pageElement).not.toBeNull();
 		expect(pageElement).toBeInTheDocument();
@@ -64,9 +65,9 @@ describe('Pdf Preview', () => {
 		expect(loadingElement).toBeInTheDocument();
 		await waitForElementToBeRemoved(loadingElement);
 
-		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeInTheDocument();
 		// eslint-disable-next-line testing-library/no-node-access
-		const pageElement = document.querySelector('[data-page-number="1"]');
+		const pageElement = document.querySelector(SELECTORS.pdfPage(1));
 		expect(pageElement).toBeDefined();
 		expect(pageElement).not.toBeNull();
 		expect(pageElement).toBeInTheDocument();
@@ -78,7 +79,7 @@ describe('Pdf Preview', () => {
 			setupOptions: { advanceTimers: () => Promise.resolve() }
 		});
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
-		expect(screen.queryByTestId('pdf-preview-container')).not.toBeInTheDocument();
+		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 	});
 
 	test('If pdf is not valid render an error message', async () => {
@@ -91,7 +92,7 @@ describe('Pdf Preview', () => {
 		await screen.findByText(/Loading document preview…/i);
 		await screen.findByText(/Failed to load document preview./i);
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
-		expect(screen.getByTestId('pdf-preview-container')).toBeInTheDocument();
+		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeInTheDocument();
 	});
 
 	test('If fallback is requested, does not render the pdf but the fallback instead', async () => {
@@ -167,7 +168,7 @@ describe('Pdf Preview', () => {
 		});
 		await screen.findByText(/Loading document preview…/i);
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
-		await user.keyboard('{Escape}');
+		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
 	});
 
@@ -237,7 +238,7 @@ describe('Pdf Preview', () => {
 		await screen.findByText(/Loading document preview…/i);
 		await waitFor(() =>
 			// eslint-disable-next-line testing-library/no-node-access
-			expect(document.querySelector('[data-page-number="1"]')).toBeInTheDocument()
+			expect(document.querySelector(SELECTORS.pdfPage(1))).toBeInTheDocument()
 		);
 		const action1Item = screen.getByTestId('icon: Activity');
 		const action2Item = screen.getByTestId('icon: People');
@@ -585,7 +586,7 @@ describe('Pdf Preview', () => {
 			expect(pageInput).toHaveDisplayValue('1');
 			await user.clear(pageInput);
 			await user.type(pageInput, '2');
-			await user.type(pageInput, '{Enter}');
+			await user.type(pageInput, KEYBOARD_KEY.ENTER);
 			expect(pageInput).not.toHaveFocus();
 			expect(pageInput).toHaveDisplayValue('2');
 		});
@@ -645,7 +646,7 @@ describe('Pdf Preview', () => {
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
 			expect(pageInput).toHaveDisplayValue('1');
 			// eslint-disable-next-line testing-library/no-node-access
-			const page2Element = document.querySelector<HTMLElement>('[data-page-number="2"]');
+			const page2Element = document.querySelector<HTMLElement>(SELECTORS.pdfPage(2));
 			expect(page2Element).not.toBeNull();
 			await triggerObserver(page2Element as HTMLElement);
 			expect(pageInput).toHaveDisplayValue('2');
@@ -666,7 +667,7 @@ describe('Pdf Preview', () => {
 			await user.type(pageInput, '4');
 			expect(pageInput).toHaveFocus();
 			// eslint-disable-next-line testing-library/no-node-access
-			const page2Element = document.querySelector<HTMLElement>('[data-page-number="2"]');
+			const page2Element = document.querySelector<HTMLElement>(SELECTORS.pdfPage(2));
 			expect(page2Element).not.toBeNull();
 			await triggerObserver(page2Element as HTMLElement);
 			expect(pageInput).toHaveDisplayValue('2');
@@ -687,9 +688,9 @@ describe('Pdf Preview', () => {
 			await user.clear(pageInput);
 			await user.type(pageInput, '4');
 			expect(pageInput).toHaveFocus();
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(onClose).not.toHaveBeenCalled();
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(onClose).toHaveBeenCalledTimes(1);
 		});
 	});
@@ -707,9 +708,9 @@ describe('Pdf Preview', () => {
 				expect(screen.getByText(/page/i)).toBeVisible();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
 				expect(pageInput).toHaveDisplayValue('1');
-				await user.keyboard('{End}');
+				await user.keyboard(KEYBOARD_KEY.END);
 				expect(pageInput).toHaveDisplayValue('4');
-				await user.keyboard('{Home}');
+				await user.keyboard(KEYBOARD_KEY.HOME);
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 			test('click End go to last page and Home return to the first page, but they do not work if the page input is focussed ', async () => {
@@ -725,24 +726,24 @@ describe('Pdf Preview', () => {
 				expect(pageInput).toHaveDisplayValue('1');
 				await user.click(pageInput);
 				expect(pageInput).toHaveFocus();
-				await user.keyboard('{End}');
+				await user.keyboard(KEYBOARD_KEY.END);
 				expect(pageInput).not.toHaveDisplayValue('4');
 				expect(pageInput).toHaveDisplayValue('1');
 				// remove focus
-				await user.keyboard('{Escape}');
+				await user.keyboard(KEYBOARD_KEY.ESC);
 				expect(pageInput).not.toHaveFocus();
-				await user.keyboard('{End}');
+				await user.keyboard(KEYBOARD_KEY.END);
 				expect(pageInput).toHaveDisplayValue('4');
 				// focus input again
 				await user.click(pageInput);
 				expect(pageInput).toHaveFocus();
-				await user.keyboard('{Home}');
+				await user.keyboard(KEYBOARD_KEY.HOME);
 				expect(pageInput).not.toHaveDisplayValue('1');
 				expect(pageInput).toHaveDisplayValue('4');
 				// remove focus
-				await user.keyboard('{Escape}');
+				await user.keyboard(KEYBOARD_KEY.ESC);
 				expect(pageInput).not.toHaveFocus();
-				await user.keyboard('{Home}');
+				await user.keyboard(KEYBOARD_KEY.HOME);
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 		});
@@ -759,21 +760,21 @@ describe('Pdf Preview', () => {
 				expect(screen.getByText(/page/i)).toBeVisible();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
 				expect(pageInput).toHaveDisplayValue('1');
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).toHaveDisplayValue('2');
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).toHaveDisplayValue('3');
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).toHaveDisplayValue('4');
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).toHaveDisplayValue('4');
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).toHaveDisplayValue('3');
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).toHaveDisplayValue('2');
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).toHaveDisplayValue('1');
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 			test('click PageDown go to the next page and PageUp go to the previous page, but they do not work if the page input is focussed ', async () => {
@@ -789,24 +790,24 @@ describe('Pdf Preview', () => {
 				expect(pageInput).toHaveDisplayValue('1');
 				await user.click(pageInput);
 				expect(pageInput).toHaveFocus();
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).not.toHaveDisplayValue('2');
 				expect(pageInput).toHaveDisplayValue('1');
 				// remove focus
-				await user.keyboard('{Escape}');
+				await user.keyboard(KEYBOARD_KEY.ESC);
 				expect(pageInput).not.toHaveFocus();
-				await user.keyboard('{PageDown}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_DOWN);
 				expect(pageInput).toHaveDisplayValue('2');
 				// focus input again
 				await user.click(pageInput);
 				expect(pageInput).toHaveFocus();
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).not.toHaveDisplayValue('1');
 				expect(pageInput).toHaveDisplayValue('2');
 				// remove focus
-				await user.keyboard('{Escape}');
+				await user.keyboard(KEYBOARD_KEY.ESC);
 				expect(pageInput).not.toHaveFocus();
-				await user.keyboard('{PageUp}');
+				await user.keyboard(KEYBOARD_KEY.PAGE_UP);
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 		});
@@ -826,22 +827,22 @@ describe('Pdf Preview', () => {
 			expect(pageInput).toHaveDisplayValue('1');
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
-			await user.keyboard('{ArrowDown}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_DOWN);
 			expect(scrollByFn).not.toHaveBeenCalled();
 			// remove focus
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(pageInput).not.toHaveFocus();
-			await user.keyboard('{ArrowDown}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_DOWN);
 			expect(scrollByFn).toHaveBeenCalledTimes(1);
 			expect(scrollByFn).toHaveBeenCalledWith(0, 40);
 			await user.click(pageInput);
 			expect(pageInput).toHaveFocus();
-			await user.keyboard('{ArrowUp}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_UP);
 			expect(scrollByFn).toHaveBeenCalledTimes(1);
 			// remove focus
-			await user.keyboard('{Escape}');
+			await user.keyboard(KEYBOARD_KEY.ESC);
 			expect(pageInput).not.toHaveFocus();
-			await user.keyboard('{ArrowUp}');
+			await user.keyboard(KEYBOARD_KEY.ARROW_UP);
 			expect(scrollByFn).toHaveBeenCalledTimes(2);
 			expect(scrollByFn).toHaveBeenCalledWith(0, -40);
 		});
