@@ -16,12 +16,13 @@
 		"build": "npm run clean && npm run build-cjs && npm run build-esm",
 		"prepare": "is-ci || husky install",
 		"prepack": "npm run build",
-		"type-check": "tsc --noEmit",
+		"type-check": "tsc --project tsconfig.type-check.json",
 		"type-check:watch": "npm run type-check -- --watch",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to node_modules/@zextras/carbonio-ui-configs src",
 		"packTo": "npm pack --pack-destination $PKG_PATH && cd $PKG_PATH && npm i zextras-carbonio-ui-preview-$npm_package_version.tgz",
 		"deploy": "npm pack && rm -rf $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/* && tar -xf zextras-carbonio-ui-preview-$npm_package_version.tgz -C $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/ --strip-components 1",
-		"test": "jest"
+		"test": "jest",
+		"postbuild": "is-ci || ./scripts/check-build.sh"
 	},
 	"keywords": [],
 	"author": "Zextras SF Team <https://www.zextras.com/carbonio/>",
