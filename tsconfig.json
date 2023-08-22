@@ -15,7 +15,7 @@
 			"test-utils": ["./utils/test-utils"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"include": ["src/**/*.ts", "src/**/*.tsx", "jest-setup.ts"],
 	"exclude": ["./node_modules/*"],
 	"ts-node": {
 		"transpileOnly": true

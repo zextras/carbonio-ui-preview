@@ -3,13 +3,13 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import * as fs from 'fs';
 
 import React from 'react';
 
 import { render, RenderOptions, RenderResult, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '@zextras/carbonio-design-system';
+import * as fs from 'fs';
 
 interface ProvidersWrapperProps {
 	children?: React.ReactElement;
