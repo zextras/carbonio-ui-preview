@@ -13,9 +13,10 @@
 		"baseUrl": "src",
 		"paths": {
 			"test-utils": ["./utils/test-utils"]
-		}
+		},
+		"types": ["@testing-library/jest-dom"]
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "jest-setup.ts"],
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
 	"exclude": ["./node_modules/*"],
 	"ts-node": {
 		"transpileOnly": true
