@@ -9,25 +9,26 @@ import { faker } from '@faker-js/faker';
 import { screen } from '@testing-library/react';
 
 import { ImagePreview, ImagePreviewProps } from './ImagePreview';
-import { setup } from '../utils/test-utils';
+import { KEYBOARD_KEY } from '../constants/test';
+import { setup } from 'test-utils';
 
 describe('Image Preview', () => {
 	test('Render an image', () => {
-		const img = faker.image.image();
+		const img = faker.image.url();
 		const onClose = jest.fn();
 		setup(<ImagePreview show src={img} onClose={onClose} />);
 		expect(screen.getByRole('img')).toBeVisible();
 	});
 
 	test('If show is false does not render an image', () => {
-		const img = faker.image.image();
+		const img = faker.image.url();
 		const onClose = jest.fn();
 		setup(<ImagePreview show={false} src={img} onClose={onClose} />);
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
 
 	test('Additional data are visible', () => {
-		const img = faker.image.image();
+		const img = faker.image.url();
 		const onClose = jest.fn();
 		setup(
 			<ImagePreview
@@ -48,15 +49,15 @@ describe('Image Preview', () => {
 	});
 
 	test('Escape key close the preview', async () => {
-		const img = faker.image.image();
+		const img = faker.image.url();
 		const onClose = jest.fn();
 		const { user } = setup(<ImagePreview show src={img} onClose={onClose} />);
-		await user.keyboard('{Escape}');
+		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
 	});
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
-		const img = faker.image.image();
+		const img = faker.image.url();
 		const onClose = jest.fn();
 		const actions: ImagePreviewProps['actions'] = [
 			{

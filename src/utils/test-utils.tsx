@@ -3,6 +3,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+
 import React from 'react';
 
 import { render, RenderOptions, RenderResult, waitFor } from '@testing-library/react';
@@ -14,7 +15,7 @@ interface ProvidersWrapperProps {
 	children?: React.ReactElement;
 }
 
-const ProvidersWrapper = ({ children }: ProvidersWrapperProps): JSX.Element => (
+const ProvidersWrapper = ({ children }: ProvidersWrapperProps): React.JSX.Element => (
 	<ThemeProvider>{children}</ThemeProvider>
 );
 

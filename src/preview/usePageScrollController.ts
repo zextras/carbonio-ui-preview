@@ -16,7 +16,7 @@ export function usePageScrollController(
 	const observedPagesRef = useRef<HTMLElement[]>([]);
 
 	const destroyObserver = useCallback(() => {
-		updatePageObserverRef.current && updatePageObserverRef.current.disconnect();
+		updatePageObserverRef.current?.disconnect();
 	}, []);
 
 	const initObserver = useCallback(() => {
