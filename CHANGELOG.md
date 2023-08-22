@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/zextras/carbonio-ui-preview/compare/v1.2.0...v1.2.1) (2023-08-22)
+
+
+### Bug Fixes
+
+* **build:** fix tsconfig to restore build folder structure ([bd88c37](https://github.com/zextras/carbonio-ui-preview/commit/bd88c37d02877e72345b8caed89a153b02f8ac8b)), closes [#34](https://github.com/zextras/carbonio-ui-preview/issues/34)
+
 ## [1.2.0](https://github.com/zextras/carbonio-ui-preview/compare/v1.1.0...v1.2.0) (2023-08-22)
 
 
