@@ -81,7 +81,6 @@ const PreviewManager: React.FC = ({ children }) => {
 					  };
 			return (
 				<PreviewWrapper
-					key={Date.now().toString()}
 					{...props}
 					show
 					onClose={closePreview}
@@ -131,11 +130,14 @@ const PreviewManager: React.FC = ({ children }) => {
 		[previews, setOpenArrayIndex]
 	);
 
+	const previewManagerContextValue = useMemo(
+		() => ({ createPreview, initPreview, openPreview, emptyPreview }),
+		[createPreview, emptyPreview, initPreview, openPreview]
+	);
+
 	return (
 		<>
-			<PreviewsManagerContext.Provider
-				value={{ createPreview, initPreview, openPreview, emptyPreview }}
-			>
+			<PreviewsManagerContext.Provider value={previewManagerContextValue}>
 				{children}
 			</PreviewsManagerContext.Provider>
 			{previewElement}

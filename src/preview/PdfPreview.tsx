@@ -27,6 +27,7 @@ import { AbsoluteLeftIconButton, AbsoluteRightIconButton } from './StyledCompone
 import { usePageScrollController } from './usePageScrollController';
 import { useZoom } from './useZoom';
 import { ZoomController } from './ZoomController';
+import { SCROLL_STEP } from '../constants';
 import { type MakeOptional } from '../utils/type-utils';
 import { print } from '../utils/utils';
 
@@ -388,32 +389,44 @@ const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function Pr
 
 	const eventListener = useCallback<(e: KeyboardEvent) => void>(
 		(event) => {
-			if (event.key === 'Escape') {
-				onClose(event);
-			} else if (event.key === 'ArrowRight' && onNextPreview) {
-				onNextPreview(event);
-			} else if (event.key === 'ArrowLeft' && onPreviousPreview) {
-				onPreviousPreview(event);
-			} else if (event.key === 'Home') {
-				if (currentPage > 1) {
-					onPageChange(1);
-				}
-			} else if (event.key === 'End') {
-				if (numPages && currentPage < numPages) {
-					onPageChange(numPages);
-				}
-			} else if (event.key === 'PageUp') {
-				if (currentPage > 1) {
-					onPageChange(currentPage - 1);
-				}
-			} else if (event.key === 'PageDown') {
-				if (numPages && currentPage < numPages) {
-					onPageChange(currentPage + 1);
-				}
-			} else if (event.key === 'ArrowUp') {
-				previewRef.current?.scrollBy(0, -40);
-			} else if (event.key === 'ArrowDown') {
-				previewRef.current?.scrollBy(0, 40);
+			switch (event.key) {
+				case 'Escape':
+					onClose(event);
+					break;
+				case 'ArrowRight':
+					onNextPreview?.(event);
+					break;
+				case 'ArrowLeft':
+					onPreviousPreview?.(event);
+					break;
+				case 'Home':
+					if (currentPage > 1) {
+						onPageChange(1);
+					}
+					break;
+				case 'End':
+					if (numPages && currentPage < numPages) {
+						onPageChange(numPages);
+					}
+					break;
+				case 'PageUp':
+					if (currentPage > 1) {
+						onPageChange(currentPage - 1);
+					}
+					break;
+				case 'PageDown':
+					if (numPages && currentPage < numPages) {
+						onPageChange(currentPage + 1);
+					}
+					break;
+				case 'ArrowUp':
+					previewRef.current?.scrollBy(0, -SCROLL_STEP);
+					break;
+				case 'ArrowDown':
+					previewRef.current?.scrollBy(0, SCROLL_STEP);
+					break;
+				default:
+					break;
 			}
 		},
 		[currentPage, numPages, onClose, onNextPreview, onPageChange, onPreviousPreview, previewRef]

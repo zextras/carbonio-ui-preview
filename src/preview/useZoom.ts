@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import findIndex from 'lodash/findIndex';
 import findLastIndex from 'lodash/findLastIndex';
 
-import { ZOOM_STEPS } from './constants';
+import { ZOOM_STEPS } from '../constants';
 
 type UseZoomReturnType = {
 	currentZoom: number;

@@ -53,7 +53,7 @@ export const ZoomController = ({
 	upperLimitReachedLabel = 'Maximum zoom level reached',
 	zoomInLabel = 'Zoom in',
 	zoomOutLabel = 'Zoom out'
-}: ZoomControllerProps): JSX.Element => (
+}: ZoomControllerProps): React.JSX.Element => (
 	<Container orientation="horizontal" gap="0.5rem" width="fit">
 		<Tooltip label={decrementable ? zoomOutLabel : lowerLimitReachedLabel}>
 			<CustomIconButton
