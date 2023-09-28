@@ -1,14 +1,13 @@
 MIT License (MIT) applies to:
 
 @babel/core, Copyright (c) 2014-present Sebastian McKenzie and other contributors
-@babel/plugin-proposal-class-properties, Copyright (c) 2014-present Sebastian McKenzie and other contributors
-@babel/plugin-transform-runtime, Copyright (c) 2014-present Sebastian McKenzie and other contributors
 @babel/preset-env, Copyright (c) 2014-present Sebastian McKenzie and other contributors
 @babel/preset-react, Copyright (c) 2014-present Sebastian McKenzie and other contributors
 @babel/preset-typescript, Copyright (c) 2014-present Sebastian McKenzie and other contributors
 @commitlint/cli, Copyright (c) 2016 - present Mario Nebl
 @commitlint/config-conventional, Copyright (c) 2016 - present Mario Nebl
 @faker-js/faker, Copyright (c) 2022 - Copyright (c) 2020 Marak Squires
+@testing-library/dom, Copyright (c) 2017 Kent C. Dodds
 @testing-library/jest-dom, Copyright (c) 2017 Kent C. Dodds
 @testing-library/react, Copyright (c) 2017 Kent C. Dodds
 @testing-library/user-event, Copyright (c) 2020 Giorgio Polvara
@@ -18,16 +17,10 @@ MIT License (MIT) applies to:
 @types/react-pdf, Copyright (c) Microsoft Corporation.
 @types/react, Copyright (c) Microsoft Corporation.
 @types/styled-components, Copyright (c) Microsoft Corporation.
-babel-jest, Copyright (c) Meta Platforms, Inc. and affiliates.
 babel-plugin-i18next-extract, Copyright 2019 Gilbert Gilb's <gilbsgilbert@gmail.com>
 babel-plugin-styled-components, Copyright (c) 2016-present Vladimir Danchenkov and Maximilian Stoiber
 core-js, Copyright (c) 2014-2023 Denis Pushkarev
-eslint-plugin-import, Copyright (c) 2015 Ben Mosher
-eslint-plugin-jest-dom, Copyright (c) 2019 Ben Monro
 eslint-plugin-notice, Copyright (c) 2017 Nick Deis
-eslint-plugin-testing-library, Copyright (c) 2019 Mario Beltrán Alarcón
-eslint-plugin-unused-imports, Copyright (c) 2022 Mikkel Holmer Pedersen
-eslint, Copyright OpenJS Foundation and other contributors, <www.openjsf.org>
 husky, Copyright (c) 2021 typicode
 is-ci, Copyright (c) 2016-2021 Thomas Watson Steen
 jest-canvas-mock,
@@ -40,6 +33,7 @@ react-dom, Copyright (c) Facebook, Inc. and its affiliates.
 react-pdf, Copyright (c) 2017–2023 Wojciech Maj
 react, Copyright (c) Facebook, Inc. and its affiliates.
 styled-components, Copyright (c) 2016-present Glen Maddern and Maximilian Stoiber
+ts-node, Copyright (c) 2014 Blake Embrey (hello@blakeembrey.com)
 web-streams-polyfill, Copyright (c) 2020 Mattias Buelens. Copyright (c) 2016 Diwank Singh Tomer
 
 MIT License
