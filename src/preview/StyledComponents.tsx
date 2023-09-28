@@ -11,6 +11,7 @@ export const AbsoluteLeftIconButton = styled(IconButton)`
 	position: absolute;
 	left: 0.5rem;
 	top: 50%;
+	z-index: 1;
 `;
 
 export const AbsoluteRightIconButton = styled(IconButton)`
