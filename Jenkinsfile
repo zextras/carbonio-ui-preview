@@ -206,7 +206,7 @@ String[] pkgVersionParts
 pipeline {
     agent {
         node {
-            label "nodejs-agent-v2"
+            label "nodejs-agent-v4"
         }
     }
     parameters {
@@ -285,7 +285,7 @@ pipeline {
                 stage("Lint") {
                     agent {
                         node {
-                            label "nodejs-agent-v2"
+                            label "nodejs-agent-v4"
                         }
                     }
                     steps {
@@ -303,7 +303,7 @@ pipeline {
                 stage("TypeCheck") {
                     agent {
                         node {
-                            label "nodejs-agent-v2"
+                            label "nodejs-agent-v4"
                         }
                     }
                     steps {
@@ -321,7 +321,7 @@ pipeline {
                 stage("Unit Tests") {
                     agent {
                         node {
-                            label "nodejs-agent-v2"
+                            label "nodejs-agent-v4"
                         }
                     }
                     steps {
@@ -343,13 +343,7 @@ pipeline {
                                         allowEmptyResults: true,
                                         testResults: 'junit.xml'
                                     )
-                                    publishCoverage(
-                                        adapters: [
-                                            istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
-                                        ],
-                                        calculateDiffForChangeRequests: true,
-                                        failNoReports: false
-                                    )
+                                    recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'coverage/cobertura-coverage.xml']])
                                 }
                             }
                         }
@@ -358,7 +352,7 @@ pipeline {
                 stage("SonarQube Check") {
                     agent {
                         node {
-                            label 'nodejs-agent-v2'
+                            label 'nodejs-agent-v4'
                         }
                     }
                     steps {
@@ -382,7 +376,7 @@ pipeline {
         stage("Build") {
             agent {
                 node {
-                    label "nodejs-agent-v2"
+                    label "nodejs-agent-v4"
                 }
             }
             when {
@@ -409,7 +403,7 @@ pipeline {
         stage("Bump Version") {
             agent {
                 node {
-                    label "nodejs-agent-v2"
+                    label "nodejs-agent-v4"
                 }
             }
             when {
@@ -485,7 +479,7 @@ pipeline {
         stage("Release in NPM") {
             agent {
                 node {
-                    label "nodejs-agent-v2"
+                    label "nodejs-agent-v4"
                 }
             }
             when {
