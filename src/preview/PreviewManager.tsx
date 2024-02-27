@@ -71,14 +71,14 @@ const PreviewManager: React.FC = ({ children }) => {
 					: (e): void => {
 							e.stopPropagation();
 							setOpenArrayIndex(openArrayIndex - 1);
-					  };
+						};
 			const onNextPreviewCallback: PreviewWrapperProps['onNextPreview'] =
 				openArrayIndex === previews.length - 1
 					? undefined
 					: (e): void => {
 							e.stopPropagation();
 							setOpenArrayIndex(openArrayIndex + 1);
-					  };
+						};
 			return (
 				<PreviewWrapper
 					{...props}
