@@ -55,6 +55,25 @@ _(Optional)_ Custom component for the fallback
 </td></tr>
 <tr><td>
 
+[documentOptions?](./carbonio-ui-preview.pdfpreviewprops.documentoptions.md)
+
+
+</td><td>
+
+
+</td><td>
+
+DocumentProps\['options'\]
+
+
+</td><td>
+
+_(Optional)_ optional Document options
+
+
+</td></tr>
+<tr><td>
+
 [errorLabel?](./carbonio-ui-preview.pdfpreviewprops.errorlabel.md)
 
 
@@ -259,6 +278,25 @@ string \| File \| Blob \| ArrayBuffer
 </td><td>
 
 Preview source
+
+
+</td></tr>
+<tr><td>
+
+[target?](./carbonio-ui-preview.pdfpreviewprops.target.md)
+
+
+</td><td>
+
+
+</td><td>
+
+'display' \| 'print'
+
+
+</td><td>
+
+_(Optional)_ Target device for pdf, display or print
 
 
 </td></tr>

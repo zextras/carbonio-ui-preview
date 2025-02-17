@@ -12,6 +12,7 @@ import { Document, Page } from 'react-pdf';
 
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import { CustomCanvas } from './CustomCanvas.js';
 import { HeaderAction } from './Header.js';
 import { usePageScrollController } from './hooks/usePageScrollController.js';
 import { useZoom } from './hooks/useZoom.js';
@@ -64,7 +65,13 @@ export interface PdfPreviewProps
 	loadingLabel?: string;
 	/** Label for the print action */
 	printActionTooltipLabel?: string;
+	/** Target device for pdf, display or print */
+	target?: 'display' | 'print';
+	/** optional Document options */
+	documentOptions?: DocumentProps['options'];
 }
+
+const PrintRenderer: React.FC = () => <CustomCanvas intent="print" />;
 
 /** Main component for the preview of a pdf */
 export const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(function PreviewFn(
@@ -103,7 +110,9 @@ export const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(func
 		loadingLabel = 'Loading document preview…',
 		printActionTooltipLabel = 'Print',
 		previousTooltip,
-		nextTooltip
+		nextTooltip,
+		target = 'display',
+		documentOptions
 	},
 	ref
 ) {
@@ -222,6 +231,8 @@ export const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(func
 				pageRefs.current.push(pageRef);
 				return (
 					<Page
+						renderMode={target === 'print' ? 'custom' : undefined}
+						customRenderer={target === 'print' ? PrintRenderer : undefined}
 						key={`page_${index + 1}`}
 						pageNumber={index + 1}
 						onRenderSuccess={pageOnRenderSuccess}
@@ -241,7 +252,8 @@ export const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(func
 		pageOnLoadSuccess,
 		pageOnRenderSuccess,
 		renderAnnotationLayer,
-		renderTextLayer
+		renderTextLayer,
+		target
 	]);
 
 	const onDocumentLoadSuccess = useCallback<NonNullable<DocumentProps['onLoadSuccess']>>(
@@ -434,6 +446,7 @@ export const PdfPreview = React.forwardRef<HTMLDivElement, PdfPreviewProps>(func
 					{$customContent ||
 						(src && (
 							<Document
+								options={documentOptions}
 								className={styles.document}
 								file={documentFile}
 								onLoadSuccess={onDocumentLoadSuccess}

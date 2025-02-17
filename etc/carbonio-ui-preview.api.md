@@ -4,6 +4,7 @@
 
 ```ts
 
+import type { DocumentProps } from 'react-pdf';
 import * as React_2 from 'react';
 import { default as React_3 } from 'react';
 import { Theme } from '@zextras/carbonio-design-system';
@@ -53,6 +54,7 @@ export const PdfPreview: React_2.ForwardRefExoticComponent<PdfPreviewProps & Rea
 // @public (undocumented)
 export interface PdfPreviewProps extends Omit<PreviewNavigatorProps, 'onOverlayClick'>, Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'> {
     customContent?: React_2.ReactElement;
+    documentOptions?: DocumentProps['options'];
     errorLabel?: string;
     fitToWidthLabel?: string;
     forceCache?: boolean;
@@ -64,6 +66,7 @@ export interface PdfPreviewProps extends Omit<PreviewNavigatorProps, 'onOverlayC
     renderTextLayer?: boolean;
     resetZoomLabel?: string;
     src: string | File | Blob | ArrayBuffer;
+    target?: 'display' | 'print';
     upperLimitReachedLabel?: string;
     useFallback?: boolean;
     zoomInLabel?: string;
