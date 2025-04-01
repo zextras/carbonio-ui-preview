@@ -125,7 +125,7 @@ export const loadPDF = (
 	file: File;
 } => {
 	const raw = fs.readFileSync(path);
-	const arrayBuffer = raw.buffer;
+	const arrayBuffer = new Uint8Array(raw).buffer;
 
 	return {
 		raw,

@@ -26,7 +26,7 @@ async function waitForDocumentToLoad(): Promise<void> {
 }
 
 describe('Pdf Preview', () => {
-	test.each<keyof typeof pdfFile>(['dataURI', 'file', 'blob'])(
+	test.each<'dataURI' | 'file' | 'blob'>(['dataURI', 'file', 'blob'])(
 		'Render a pdf document from %s',
 		async (src) => {
 			const onClose = jest.fn();
