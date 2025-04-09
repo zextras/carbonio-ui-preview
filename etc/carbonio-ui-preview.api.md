@@ -104,9 +104,11 @@ export const PreviewManager: ({ children }: {
 // @public (undocumented)
 export interface PreviewManagerContextType {
     createPreview: (item: MakeOptional<PreviewItem, 'id'>) => void;
+    currentIndex: number;
     emptyPreview: () => void;
     initPreview: (items: PreviewItem[]) => void;
     openPreview: (id: string) => void;
+    previews: PreviewItem[];
 }
 
 // Warning: (ae-forgotten-export) The symbol "HeaderProps" needs to be exported by the entry point index.d.ts

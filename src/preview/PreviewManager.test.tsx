@@ -3,15 +3,17 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import * as React from 'react';
 
 import { screen } from '@testing-library/react';
+import { Text } from '@zextras/carbonio-design-system';
 
 import {
+	PreviewItem,
 	PreviewManager,
 	PreviewManagerContextType,
-	PreviewsManagerContext
+	usePreview
 } from './PreviewManager.js';
 import { KEYBOARD_KEY, SELECTORS } from '../tests/constants.js';
 import { setup } from '../tests/utils.js';
@@ -19,7 +21,7 @@ import { setup } from '../tests/utils.js';
 const PreviewManagerTester = (
 	props: Parameters<PreviewManagerContextType['createPreview']>[0]
 ): React.JSX.Element => {
-	const { createPreview } = useContext(PreviewsManagerContext);
+	const { createPreview } = usePreview();
 	const onClickHandler = (): void => {
 		createPreview(props);
 	};
@@ -27,10 +29,10 @@ const PreviewManagerTester = (
 };
 
 const PreviewManagerInitTester = (props: {
-	initPar: Parameters<PreviewManagerContextType['initPreview']>[0];
+	initPar: PreviewItem[];
 	idToOpen: string;
 }): React.JSX.Element => {
-	const { initPreview, openPreview } = useContext(PreviewsManagerContext);
+	const { initPreview, openPreview, currentIndex, previews, emptyPreview } = usePreview();
 	const { idToOpen, initPar } = props;
 	useEffect(() => {
 		initPreview(initPar);
@@ -39,7 +41,14 @@ const PreviewManagerInitTester = (props: {
 	const onClickHandler = (): void => {
 		openPreview(idToOpen);
 	};
-	return <button onClick={onClickHandler}>Open preview</button>;
+	return (
+		<div>
+			<Text>{`currentIndex: ${currentIndex}`}</Text>
+			<Text>{`item lenght: ${previews.length}`}</Text>
+			<button onClick={onClickHandler}>Open preview</button>
+			<button onClick={emptyPreview}>Empty preview</button>
+		</div>
+	);
 };
 
 describe('Preview Manager', () => {
@@ -146,5 +155,79 @@ describe('Preview Manager', () => {
 			await user.keyboard(KEYBOARD_KEY.ARROW_LEFT);
 			expect(screen.getByText(/alpha/i)).toBeVisible();
 		});
+	});
+
+	it('should return 0 as currentIndex when open the first item', async () => {
+		const onClose = jest.fn();
+		const { user } = setup(
+			<PreviewManager>
+				<PreviewManagerInitTester
+					initPar={[
+						{ id: 'id1', previewType: 'pdf', filename: 'alpha', src: '', onClose },
+						{ id: 'id2', previewType: 'image', filename: 'beta', src: '', onClose },
+						{ id: 'id3', previewType: 'pdf', filename: 'gamma', src: '', onClose }
+					]}
+					idToOpen={'id1'}
+				/>
+			</PreviewManager>
+		);
+		await user.click(screen.getByRole('button', { name: /open preview/i }));
+		expect(screen.getByText(/currentIndex: 0/i)).toBeVisible();
+	});
+
+	it('should return 1 as currentIndex when open the second item', async () => {
+		const onClose = jest.fn();
+		const { user } = setup(
+			<PreviewManager>
+				<PreviewManagerInitTester
+					initPar={[
+						{ id: 'id1', previewType: 'pdf', filename: 'alpha', src: '', onClose },
+						{ id: 'id2', previewType: 'image', filename: 'beta', src: '', onClose },
+						{ id: 'id3', previewType: 'pdf', filename: 'gamma', src: '', onClose }
+					]}
+					idToOpen={'id2'}
+				/>
+			</PreviewManager>
+		);
+		await user.click(screen.getByRole('button', { name: /open preview/i }));
+		expect(screen.getByText(/currentIndex: 1/i)).toBeVisible();
+	});
+
+	it('should return 2 as currentIndex when open the third item', async () => {
+		const onClose = jest.fn();
+		const { user } = setup(
+			<PreviewManager>
+				<PreviewManagerInitTester
+					initPar={[
+						{ id: 'id1', previewType: 'pdf', filename: 'alpha', src: '', onClose },
+						{ id: 'id2', previewType: 'image', filename: 'beta', src: '', onClose },
+						{ id: 'id3', previewType: 'pdf', filename: 'gamma', src: '', onClose }
+					]}
+					idToOpen={'id3'}
+				/>
+			</PreviewManager>
+		);
+		await user.click(screen.getByRole('button', { name: /open preview/i }));
+		expect(screen.getByText(/currentIndex: 2/i)).toBeVisible();
+	});
+
+	it('should return 0 as item length after emptying the preview', async () => {
+		const onClose = jest.fn();
+		const { user } = setup(
+			<PreviewManager>
+				<PreviewManagerInitTester
+					initPar={[
+						{ id: 'id1', previewType: 'pdf', filename: 'alpha', src: '', onClose },
+						{ id: 'id2', previewType: 'image', filename: 'beta', src: '', onClose },
+						{ id: 'id3', previewType: 'pdf', filename: 'gamma', src: '', onClose }
+					]}
+					idToOpen={'id1'}
+				/>
+			</PreviewManager>
+		);
+		await user.click(screen.getByRole('button', { name: /open preview/i }));
+		expect(screen.getByText(/item lenght: 3/i)).toBeVisible();
+		await user.click(screen.getByRole('button', { name: /empty preview/i }));
+		expect(screen.getByText(/item lenght: 0/i)).toBeVisible();
 	});
 });

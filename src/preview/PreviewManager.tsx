@@ -40,6 +40,10 @@ export interface PreviewManagerContextType {
 	openPreview: (id: string) => void;
 	/** Clear the initialized previews */
 	emptyPreview: () => void;
+	/** The list of initialized previews */
+	previews: PreviewItem[];
+	/** The index of the currently opened preview */
+	currentIndex: number;
 }
 
 /**
@@ -50,7 +54,9 @@ export const PreviewsManagerContext = createContext<PreviewManagerContextType>({
 	createPreview: () => undefined,
 	initPreview: () => undefined,
 	openPreview: () => undefined,
-	emptyPreview: () => undefined
+	emptyPreview: () => undefined,
+	previews: [],
+	currentIndex: -1
 });
 
 /** Util hook to quick access to the preview functions */
@@ -79,28 +85,28 @@ export const PreviewManager = ({ children }: { children: React.ReactNode }): Rea
 		[]
 	);
 
-	const [openArrayIndex, setOpenArrayIndex] = useState(-1);
+	const [currentIndex, setCurrentIndex] = useState(-1);
 
 	const previewElement: React.ReactElement | undefined = useMemo(() => {
-		if (openArrayIndex >= 0) {
-			const { onClose, ...props } = previews[openArrayIndex];
+		if (currentIndex >= 0) {
+			const { onClose, ...props } = previews[currentIndex];
 			const closePreview: PreviewWrapperProps['onClose'] = (ev) => {
 				if (onClose) onClose(ev);
-				setOpenArrayIndex(-1);
+				setCurrentIndex(-1);
 			};
 			const onPreviousPreviewCallback: PreviewWrapperProps['onPreviousPreview'] =
-				openArrayIndex === 0
+				currentIndex === 0
 					? undefined
 					: (e: React.SyntheticEvent | KeyboardEvent): void => {
 							e.stopPropagation();
-							setOpenArrayIndex(openArrayIndex - 1);
+							setCurrentIndex(currentIndex - 1);
 						};
 			const onNextPreviewCallback: PreviewWrapperProps['onNextPreview'] =
-				openArrayIndex === previews.length - 1
+				currentIndex === previews.length - 1
 					? undefined
 					: (e: React.SyntheticEvent | KeyboardEvent): void => {
 							e.stopPropagation();
-							setOpenArrayIndex(openArrayIndex + 1);
+							setCurrentIndex(currentIndex + 1);
 						};
 			return (
 				<PreviewWrapper
@@ -114,7 +120,7 @@ export const PreviewManager = ({ children }: { children: React.ReactNode }): Rea
 			);
 		}
 		return undefined;
-	}, [openArrayIndex, previews]);
+	}, [currentIndex, previews]);
 
 	const createPreview = useCallback<PreviewManagerContextType['createPreview']>(
 		(args) => {
@@ -122,7 +128,7 @@ export const PreviewManager = ({ children }: { children: React.ReactNode }): Rea
 				type: 'init',
 				value: [{ id: 'default-id', ...args }]
 			});
-			setOpenArrayIndex(0);
+			setCurrentIndex(0);
 		},
 		[dispatchPreviews]
 	);
@@ -131,7 +137,7 @@ export const PreviewManager = ({ children }: { children: React.ReactNode }): Rea
 		dispatchPreviews({
 			type: 'empty'
 		});
-		setOpenArrayIndex(-1);
+		setCurrentIndex(-1);
 	}, [dispatchPreviews]);
 
 	const initPreview = useCallback<(args: PreviewItem[]) => void>(
@@ -148,15 +154,15 @@ export const PreviewManager = ({ children }: { children: React.ReactNode }): Rea
 		(id) => {
 			const index = previews.findIndex((preview) => preview.id === id);
 			if (index >= 0) {
-				setOpenArrayIndex(index);
+				setCurrentIndex(index);
 			}
 		},
-		[previews, setOpenArrayIndex]
+		[previews, setCurrentIndex]
 	);
 
 	const previewManagerContextValue = useMemo(
-		() => ({ createPreview, initPreview, openPreview, emptyPreview }),
-		[createPreview, emptyPreview, initPreview, openPreview]
+		() => ({ createPreview, initPreview, openPreview, emptyPreview, previews, currentIndex }),
+		[createPreview, emptyPreview, initPreview, openPreview, previews, currentIndex]
 	);
 
 	return (

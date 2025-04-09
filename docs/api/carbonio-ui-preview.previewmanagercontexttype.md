@@ -54,6 +54,25 @@ Initialize and open the preview for the given item
 </td></tr>
 <tr><td>
 
+[currentIndex](./carbonio-ui-preview.previewmanagercontexttype.currentindex.md)
+
+
+</td><td>
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+The index of the currently opened preview
+
+
+</td></tr>
+<tr><td>
+
 [emptyPreview](./carbonio-ui-preview.previewmanagercontexttype.emptypreview.md)
 
 
@@ -106,6 +125,25 @@ Initialize the preview for the given items. This function does not open the prev
 </td><td>
 
 Open the preview for the item with the given id. The item must have been initialized before with the initPreview method.
+
+
+</td></tr>
+<tr><td>
+
+[previews](./carbonio-ui-preview.previewmanagercontexttype.previews.md)
+
+
+</td><td>
+
+
+</td><td>
+
+[PreviewItem](./carbonio-ui-preview.previewitem.md)<!-- -->\[\]
+
+
+</td><td>
+
+The list of initialized previews
 
 
 </td></tr>
