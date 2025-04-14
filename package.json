@@ -59,7 +59,7 @@
 		"@types/node": "^18.19.34",
 		"@types/react": "^18.2.77",
 		"@types/react-dom": "^18.2.25",
-		"@zextras/carbonio-ui-configs": "^1.0.1",
+		"@zextras/carbonio-ui-configs": "^2.1.0",
 		"babel-jest": "^29.7.0",
 		"conventional-changelog-conventionalcommits": "^8.0.0",
 		"eslint-plugin-notice": "^1.0.0",
