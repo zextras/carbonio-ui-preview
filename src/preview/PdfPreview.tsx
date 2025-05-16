@@ -11,7 +11,7 @@ import type { DocumentProps, PageProps } from 'react-pdf';
 import { Document, Page } from 'react-pdf';
 
 import 'react-pdf/dist/Page/TextLayer.css';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
+import './AnnotationLayer.css';
 import { HeaderAction } from './Header.js';
 import { usePageScrollController } from './hooks/usePageScrollController.js';
 import { useZoom } from './hooks/useZoom.js';
