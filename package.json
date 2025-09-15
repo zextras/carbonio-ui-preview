@@ -76,7 +76,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"core-js": "^3.43.0",
+		"core-js": "^3.45.1",
 		"react-pdf": "^9.2.1"
 	},
 	"peerDependencies": {
