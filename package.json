@@ -42,8 +42,8 @@
 	"author": "Zextras DEV Team <https://www.zextras.com/carbonio/>",
 	"license": "AGPL-3.0-only",
 	"devDependencies": {
-		"@babel/core": "^7.27.1",
-		"@babel/preset-env": "^7.27.2",
+		"@babel/core": "^7.28.4",
+		"@babel/preset-env": "^7.28.3",
 		"@babel/preset-react": "^7.27.1",
 		"@babel/preset-typescript": "^7.27.1",
 		"@commitlint/cli": "^20.0.0",
@@ -60,7 +60,6 @@
 		"@types/react": "^18.2.77",
 		"@types/react-dom": "^18.2.25",
 		"@zextras/carbonio-ui-configs": "^1.0.1",
-		"babel-jest": "^29.7.0",
 		"conventional-changelog-conventionalcommits": "^9.1.0",
 		"eslint-plugin-notice": "^1.0.0",
 		"eslint-plugin-tsdoc": "^0.4.0",
