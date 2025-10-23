@@ -30,9 +30,7 @@ describe('PreviewNavigator', () => {
 		});
 
 		it('render the tooltip "Next" when the user hovers on the next button', async () => {
-			const { user } = setup(
-				<PreviewNavigator onClose={vi.fn()} show onNextPreview={vi.fn()} />
-			);
+			const { user } = setup(<PreviewNavigator onClose={vi.fn()} show onNextPreview={vi.fn()} />);
 			await user.hover(screen.getByRoleWithIcon('button', { icon: 'icon: ArrowForwardOutline' }));
 			expect(await screen.findByText(/next/i)).toBeVisible();
 		});

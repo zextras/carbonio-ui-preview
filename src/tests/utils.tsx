@@ -5,7 +5,6 @@
  */
 
 import * as React from 'react';
-import { vi } from 'vitest';
 
 import {
 	ByRoleMatcher,
@@ -147,6 +146,7 @@ export const loadPDF = (
 };
 
 export async function triggerObserver(observedElement: HTMLElement): Promise<void> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const { calls } = (window.IntersectionObserver as any).mock;
 	const [onChange] = calls[calls.length - 1];
 	// trigger the intersection on the observed element

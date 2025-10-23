@@ -24,8 +24,10 @@ globalThis.fetch = fetch;
 
 // Polyfill for Promise.withResolvers (needed for pdfjs-dist)
 if (!Promise.withResolvers) {
+	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, func-names
 	Promise.withResolvers = function <T>() {
 		let resolve: (value: T | PromiseLike<T>) => void;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let reject: (reason?: any) => void;
 		const promise = new Promise<T>((res, rej) => {
 			resolve = res;

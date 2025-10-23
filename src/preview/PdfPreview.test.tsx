@@ -394,11 +394,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		const getPreviewClientWidthMock = vi.spyOn(
-			ref.current as HTMLDivElement,
-			'clientWidth',
-			'get'
-		);
+		const getPreviewClientWidthMock = vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get');
 		getPreviewClientWidthMock.mockReturnValueOnce(mockPdfWidth[0]);
 
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
@@ -431,9 +427,9 @@ describe('Pdf Preview', () => {
 			`${ZOOM_STEPS[0]}`
 		);
 		expect(onClose).not.toHaveBeenCalled();
-		vi
-			.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get')
-			.mockReturnValue(ZOOM_STEPS[ZOOM_STEPS.length - 1]);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(
+			ZOOM_STEPS[ZOOM_STEPS.length - 1]
+		);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		expect(screen.getAllByTestId(SELECTORS.pdfPageMock)[0]).toHaveAttribute(
 			dataPageWidthAttribute,
