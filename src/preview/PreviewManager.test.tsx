@@ -53,7 +53,7 @@ const PreviewManagerInitTester = (props: {
 
 describe('Preview Manager', () => {
 	test('Show the preview of a pdf by calling createPreview and hide it with close action', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerTester src="" previewType="pdf" onClose={onClose} />
@@ -71,7 +71,7 @@ describe('Preview Manager', () => {
 	});
 
 	test('Show the preview of an image by calling createPreview and hide it with close action', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerTester src="" previewType="image" onClose={onClose} />
@@ -88,7 +88,7 @@ describe('Preview Manager', () => {
 	});
 
 	test('Multiple calls to createPreview replace the previewer', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerTester src="image.png" previewType="image" onClose={onClose} />
@@ -104,7 +104,7 @@ describe('Preview Manager', () => {
 
 	describe('keyboard shortcuts', () => {
 		test('ArrowRight and ArrowLeft', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			const { user } = setup(
 				<PreviewManager>
 					<PreviewManagerInitTester
@@ -158,7 +158,7 @@ describe('Preview Manager', () => {
 	});
 
 	it('should return 0 as currentIndex when open the first item', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerInitTester
@@ -176,7 +176,7 @@ describe('Preview Manager', () => {
 	});
 
 	it('should return 1 as currentIndex when open the second item', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerInitTester
@@ -194,7 +194,7 @@ describe('Preview Manager', () => {
 	});
 
 	it('should return 2 as currentIndex when open the third item', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerInitTester
@@ -212,7 +212,7 @@ describe('Preview Manager', () => {
 	});
 
 	it('should return 0 as item length after emptying the preview', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(
 			<PreviewManager>
 				<PreviewManagerInitTester

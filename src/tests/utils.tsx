@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react';
+import { vi } from 'vitest';
 
 import {
 	ByRoleMatcher,
@@ -106,7 +107,7 @@ export function setup(
 	}
 ): { user: ReturnType<(typeof userEvent)['setup']> } & ReturnType<typeof render> {
 	return {
-		user: userEvent.setup({ advanceTimers: jest.advanceTimersByTime, ...options?.setupOptions }),
+		user: userEvent.setup(options?.setupOptions),
 		...customRender(ui, options?.renderOptions)
 	};
 }
@@ -146,7 +147,7 @@ export const loadPDF = (
 };
 
 export async function triggerObserver(observedElement: HTMLElement): Promise<void> {
-	const { calls } = (window.IntersectionObserver as jest.Mock<IntersectionObserver>).mock;
+	const { calls } = (window.IntersectionObserver as any).mock;
 	const [onChange] = calls[calls.length - 1];
 	// trigger the intersection on the observed element
 	await waitFor(() =>

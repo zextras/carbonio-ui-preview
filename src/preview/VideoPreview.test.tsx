@@ -15,19 +15,19 @@ describe('Video Preview', () => {
 	const cannotBePlayedMessage = 'This video cannot be played.';
 
 	test('Render a video', () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<VideoPreview show src={'video'} onClose={onClose} />);
 		expect(screen.getByTestId('video')).toBeVisible();
 	});
 
 	test('If show is false does not render the video', () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<VideoPreview show={false} src={''} onClose={onClose} />);
 		expect(screen.queryByTestId('video')).not.toBeInTheDocument();
 	});
 
 	test('Additional data are visible', () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(
 			<VideoPreview
 				show
@@ -44,26 +44,26 @@ describe('Video Preview', () => {
 	});
 
 	test('Escape key close the preview', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<VideoPreview show src={''} onClose={onClose} />);
 		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
 	});
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
-		const onClose = jest.fn<void, Parameters<VideoPreviewProps['onClose']>>((ev) => {
+		const onClose = vi.fn<void, Parameters<VideoPreviewProps['onClose']>>((ev) => {
 			ev.preventDefault();
 		});
 		const actions: VideoPreviewProps['actions'] = [
 			{
 				id: 'action1',
 				icon: 'Activity',
-				onClick: jest.fn()
+				onClick: vi.fn()
 			},
 			{
 				id: 'action2',
 				icon: 'People',
-				onClick: jest.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
+				onClick: vi.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 					ev.preventDefault();
 				}),
 				disabled: true
@@ -108,11 +108,11 @@ describe('Video Preview', () => {
 	});
 
 	it('should not render the video when canPlayType return empty string on mime type (mime type not supported)', () => {
-		jest.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('');
+		vi.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('');
 
 		setup(
 			<VideoPreview
-				onClose={jest.fn()}
+				onClose={vi.fn()}
 				show
 				src={''}
 				filename="video name"
@@ -125,53 +125,53 @@ describe('Video Preview', () => {
 	});
 
 	it('should render the video when mime type props is not provided', () => {
-		setup(<VideoPreview onClose={jest.fn()} show src={''} filename="video name" />);
+		setup(<VideoPreview onClose={vi.fn()} show src={''} filename="video name" />);
 
 		expect(screen.getByTestId('video')).toBeVisible();
 		expect(screen.queryByText(cannotBePlayedMessage)).not.toBeInTheDocument();
 	});
 
 	it('should render the video when canPlayType return maybe string on mime type', () => {
-		jest.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('maybe');
+		vi.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('maybe');
 		const mimeType = 'video/mp4';
-		setup(<VideoPreview onClose={jest.fn()} show src={''} mimeType={mimeType} />);
+		setup(<VideoPreview onClose={vi.fn()} show src={''} mimeType={mimeType} />);
 		expect(screen.getByTestId('video')).toBeVisible();
 		expect(screen.queryByText(cannotBePlayedMessage)).not.toBeInTheDocument();
 	});
 
 	it('should render the video when canPlayType return probably string on mime type', () => {
-		jest.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('probably');
+		vi.spyOn(HTMLVideoElement.prototype, 'canPlayType').mockReturnValue('probably');
 		const mimeType = 'video/mp4';
-		setup(<VideoPreview onClose={jest.fn()} show src={''} mimeType={mimeType} />);
+		setup(<VideoPreview onClose={vi.fn()} show src={''} mimeType={mimeType} />);
 		expect(screen.getByTestId('video')).toBeVisible();
 		expect(screen.queryByText(cannotBePlayedMessage)).not.toBeInTheDocument();
 	});
 
 	it('should render the fail string when video request fails', async () => {
-		setup(<VideoPreview onClose={jest.fn()} show src={''} />);
+		setup(<VideoPreview onClose={vi.fn()} show src={''} />);
 		fireEvent.error(screen.getByTestId('video'));
 		expect(await screen.findByText(cannotBePlayedMessage)).toBeVisible();
 	});
 
 	it('should call video play when keyboard space is clicked', async () => {
-		jest.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(true);
-		const playStub = jest.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
+		vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(true);
+		const playStub = vi.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
 
-		const pauseStub = jest.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
+		const pauseStub = vi.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
 
-		const { user } = setup(<VideoPreview onClose={jest.fn()} show src={''} />);
+		const { user } = setup(<VideoPreview onClose={vi.fn()} show src={''} />);
 		await user.keyboard(' ');
 		expect(playStub).toHaveBeenCalled();
 		expect(pauseStub).not.toHaveBeenCalled();
 	});
 
 	it('should call video pause when video is not paused and keyboard space is clicked', async () => {
-		jest.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(false);
-		const pauseStub = jest.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
+		vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(false);
+		const pauseStub = vi.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
 
-		const playStub = jest.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
+		const playStub = vi.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
 
-		const { user } = setup(<VideoPreview onClose={jest.fn()} show src={''} />);
+		const { user } = setup(<VideoPreview onClose={vi.fn()} show src={''} />);
 		await user.keyboard(' ');
 		expect(pauseStub).toHaveBeenCalled();
 		expect(playStub).not.toHaveBeenCalled();

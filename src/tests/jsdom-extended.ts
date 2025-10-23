@@ -3,22 +3,31 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { TestEnvironment } from 'jest-environment-jsdom';
+import { populateGlobal } from 'vitest/environments';
+import type { Environment } from 'vitest';
 
-class JSDOMEnvironmentExtended extends TestEnvironment {
-	constructor(...args: ConstructorParameters<typeof TestEnvironment>) {
-		super(...args);
+export default <Environment>{
+	name: 'jsdom-extended',
+	transformMode: 'ssr',
+	async setup(global) {
+		// Use populateGlobal from jsdom
+		const { teardown } = await populateGlobal(global, {
+			bindFunctions: true
+		}, 'jsdom');
 
-		this.global.ReadableStream = ReadableStream;
-		this.global.TextDecoder = TextDecoder;
-		this.global.TextEncoder = TextEncoder;
-		this.global.Blob = Blob;
-		this.global.Headers = Headers;
-		this.global.FormData = FormData;
-		this.global.Request = Request;
-		this.global.Response = Response;
-		this.global.fetch = fetch;
+		// Add missing globals from Node.js environment
+		global.ReadableStream = ReadableStream;
+		global.TextDecoder = TextDecoder;
+		global.TextEncoder = TextEncoder;
+		global.Blob = Blob;
+		global.Headers = Headers;
+		global.FormData = FormData;
+		global.Request = Request;
+		global.Response = Response;
+		global.fetch = fetch;
+
+		return {
+			teardown
+		};
 	}
-}
-
-export default JSDOMEnvironmentExtended;
+};

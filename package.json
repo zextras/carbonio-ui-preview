@@ -30,7 +30,10 @@
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to node_modules/@zextras/carbonio-ui-configs src",
 		"packTo": "npm pack --pack-destination $PKG_PATH && cd $PKG_PATH && npm i zextras-carbonio-ui-preview-$npm_package_version.tgz",
 		"deploy": "npm pack && rm -rf $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/* && tar -xf zextras-carbonio-ui-preview-$npm_package_version.tgz -C $PKG_PATH/node_modules/@zextras/carbonio-ui-preview/ --strip-components 1",
-		"test": "jest",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"test:coverage": "vitest run --coverage",
 		"postbuild": "is-ci || ./scripts/check-build.sh",
 		"copy-styles": "cp src/preview/*.css lib/preview/"
 	},
@@ -59,6 +62,8 @@
 		"@types/node": "^20.17.47",
 		"@types/react": "^18.2.77",
 		"@types/react-dom": "^18.2.25",
+		"@vitest/coverage-v8": "^4.0.1",
+		"@vitest/ui": "^4.0.1",
 		"@zextras/carbonio-ui-configs": "^1.0.1",
 		"conventional-changelog-conventionalcommits": "^9.1.0",
 		"eslint-plugin-notice": "^1.0.0",
@@ -72,7 +77,8 @@
 		"jest-junit": "^16.0.0",
 		"semantic-release": "^24.2.9",
 		"ts-node": "^10.9.2",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"vitest": "^4.0.1"
 	},
 	"dependencies": {
 		"core-js": "^3.45.1",
