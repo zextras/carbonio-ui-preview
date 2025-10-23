@@ -57,7 +57,7 @@ describe('Image Preview', () => {
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
 		const img = faker.image.url();
-		const onClose = vi.fn<void, Parameters<ImagePreviewProps['onClose']>>((ev) => {
+		const onClose = vi.fn((ev: React.SyntheticEvent | KeyboardEvent) => {
 			ev.preventDefault();
 		});
 		const actions: ImagePreviewProps['actions'] = [

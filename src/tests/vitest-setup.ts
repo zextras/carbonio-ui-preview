@@ -8,10 +8,7 @@ import { act } from '@testing-library/react';
 import failOnConsole from 'jest-fail-on-console';
 import { vi } from 'vitest';
 
-// Mock react-pdf with the manual mock from __mocks__ directory
-vi.mock('react-pdf');
-
-// Add missing globals from Node.js environment that are needed in jsdom
+// Add missing globals from Node.js environment that are needed in happy-dom
 globalThis.ReadableStream = ReadableStream;
 globalThis.TextDecoder = TextDecoder;
 globalThis.TextEncoder = TextEncoder;

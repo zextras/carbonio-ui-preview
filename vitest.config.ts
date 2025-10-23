@@ -9,8 +9,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	test: {
-		// Test environment - using jsdom
-		environment: 'jsdom',
+		// Test environment - using happy-dom
+		environment: 'happy-dom',
 		
 		// Setup files to run before each test
 		setupFiles: ['./src/tests/vitest-setup.ts'],

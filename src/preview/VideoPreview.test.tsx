@@ -51,7 +51,7 @@ describe('Video Preview', () => {
 	});
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
-		const onClose = vi.fn<void, Parameters<VideoPreviewProps['onClose']>>((ev) => {
+		const onClose = vi.fn((ev: React.SyntheticEvent | KeyboardEvent) => {
 			ev.preventDefault();
 		});
 		const actions: VideoPreviewProps['actions'] = [
@@ -155,9 +155,13 @@ describe('Video Preview', () => {
 
 	it('should call video play when keyboard space is clicked', async () => {
 		vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(true);
-		const playStub = vi.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
+		const playStub = vi
+			.spyOn(window.HTMLVideoElement.prototype, 'play')
+			.mockImplementation(() => Promise.resolve());
 
-		const pauseStub = vi.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
+		const pauseStub = vi
+			.spyOn(window.HTMLVideoElement.prototype, 'pause')
+			.mockImplementation(() => undefined);
 
 		const { user } = setup(<VideoPreview onClose={vi.fn()} show src={''} />);
 		await user.keyboard(' ');
@@ -167,9 +171,13 @@ describe('Video Preview', () => {
 
 	it('should call video pause when video is not paused and keyboard space is clicked', async () => {
 		vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockReturnValue(false);
-		const pauseStub = vi.spyOn(window.HTMLVideoElement.prototype, 'pause').mockImplementation();
+		const pauseStub = vi
+			.spyOn(window.HTMLVideoElement.prototype, 'pause')
+			.mockImplementation(() => undefined);
 
-		const playStub = vi.spyOn(window.HTMLVideoElement.prototype, 'play').mockImplementation();
+		const playStub = vi
+			.spyOn(window.HTMLVideoElement.prototype, 'play')
+			.mockImplementation(() => Promise.resolve());
 
 		const { user } = setup(<VideoPreview onClose={vi.fn()} show src={''} />);
 		await user.keyboard(' ');
