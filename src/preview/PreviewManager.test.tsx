@@ -9,9 +9,6 @@ import * as React from 'react';
 import { screen } from '@testing-library/react';
 import { Text } from '@zextras/carbonio-design-system';
 
-// Mock react-pdf with the manual mock from __mocks__ directory
-vi.mock('react-pdf');
-
 import {
 	PreviewItem,
 	PreviewManager,

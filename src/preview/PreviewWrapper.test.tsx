@@ -5,9 +5,6 @@
  */
 import { screen } from '@testing-library/react';
 
-// Mock react-pdf with the manual mock from __mocks__ directory
-vi.mock('react-pdf');
-
 import { PreviewWrapper } from './PreviewWrapper.js';
 import { SELECTORS } from '../tests/constants.js';
 import { setup } from '../tests/utils.js';

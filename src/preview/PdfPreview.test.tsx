@@ -7,9 +7,6 @@ import * as React from 'react';
 
 import { act, waitFor } from '@testing-library/react';
 
-// Mock react-pdf with the manual mock from __mocks__ directory
-vi.mock('react-pdf');
-
 import { PdfPreview, PdfPreviewProps } from './PdfPreview.js';
 import { ZOOM_STEPS } from '../constants/index.js';
 import { KEYBOARD_KEY, SELECTORS } from '../tests/constants.js';
