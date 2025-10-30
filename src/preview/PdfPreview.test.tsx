@@ -448,7 +448,6 @@ describe('Pdf Preview', () => {
 	});
 
 	it('should not download the pdf if the fallback is shown', async () => {
-		vi.useFakeTimers();
 		const fetchFn = vi.spyOn(global, 'fetch');
 		setup(
 			<PdfPreview
@@ -460,9 +459,7 @@ describe('Pdf Preview', () => {
 			/>
 		);
 		expect(screen.getByText('show fallback')).toBeVisible();
-		await vi.advanceTimersToNextTimerAsync();
 		expect(fetchFn).not.toHaveBeenCalled();
-		vi.useRealTimers();
 	});
 
 	describe('Page selector', () => {

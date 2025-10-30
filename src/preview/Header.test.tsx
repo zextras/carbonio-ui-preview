@@ -82,10 +82,6 @@ describe('Header', () => {
 		const action2 = screen.getByTestId(`icon: ${actions[1].icon}`);
 		const action3 = screen.getByTestId(`icon: ${actions[2].icon}`);
 		const actionClose = screen.getByTestId(`icon: ${closeAction.icon}`);
-		// register listeners - use fake timers temporarily
-		vi.useFakeTimers();
-		vi.runOnlyPendingTimers();
-		vi.useRealTimers();
 		expect(screen.queryByText(/activity one/i)).not.toBeInTheDocument();
 		await user.hover(action1);
 		await screen.findByText(/activity one/i);
