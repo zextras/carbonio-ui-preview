@@ -4,20 +4,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import os from 'os';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	test: {
 		// Test environment - using happy-dom
-		environment: 'happy-dom',
-		
+		environment: 'jsdom',
+
 		// Setup files to run before each test
 		setupFiles: ['./src/tests/vitest-setup.ts'],
-		
+
 		// Enable globals (describe, it, expect, etc.)
 		globals: true,
-		
+
 		// Coverage configuration
 		coverage: {
 			provider: 'v8',
@@ -34,28 +33,16 @@ export default defineConfig({
 				'lib-esm/**'
 			]
 		},
-		
+
 		// Restore mocks before every test
 		restoreMocks: true,
-		
+
 		// Test path ignore patterns
-		exclude: [
-			'**/node_modules/**',
-			'**/coverage/**',
-			'**/lib/**',
-			'**/lib-esm/**'
-		],
-		
+		exclude: ['**/node_modules/**', '**/coverage/**', '**/lib/**', '**/lib-esm/**'],
+
 		// Module name mapping (like Jest's moduleNameMapper)
 		alias: {
-			'\\.(css|less)$': 'identity-obj-proxy',
-		},
-		
-		// Max workers (50% of available CPUs)
-		poolOptions: {
-			threads: {
-				maxThreads: Math.max(1, Math.ceil((os.cpus().length || 1) * 0.5))
-			}
+			'\\.(css|less)$': 'identity-obj-proxy'
 		}
 	}
 });

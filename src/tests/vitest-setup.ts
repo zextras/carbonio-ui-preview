@@ -5,8 +5,8 @@
  */
 import '@testing-library/jest-dom';
 import { act } from '@testing-library/react';
-import failOnConsole from 'jest-fail-on-console';
 import { vi } from 'vitest';
+import failOnConsole from 'vitest-fail-on-console';
 
 // Mock react-pdf to use the manual mock implementation
 vi.mock('react-pdf', async () => import('../../__mocks__/react-pdf.js'));
