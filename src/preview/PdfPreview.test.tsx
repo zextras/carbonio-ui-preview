@@ -25,6 +25,8 @@ async function waitForDocumentToLoad(): Promise<void> {
 	await waitFor(() => expect(loadingElement).not.toBeInTheDocument());
 }
 
+vi.mock('react-pdf');
+
 describe('Pdf Preview', () => {
 	test.each<'dataURI' | 'file' | 'blob'>(['dataURI', 'file', 'blob'])(
 		'Render a pdf document from %s',

@@ -9,6 +9,8 @@ import { PreviewWrapper } from './PreviewWrapper.js';
 import { SELECTORS } from '../tests/constants.js';
 import { setup } from '../tests/utils.js';
 
+vi.mock('react-pdf');
+
 describe('Preview Wrapper', () => {
 	test('Render the pdf preview for type pdf', async () => {
 		const onClose = vi.fn();

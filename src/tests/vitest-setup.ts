@@ -8,56 +8,9 @@ import { act } from '@testing-library/react';
 import { vi } from 'vitest';
 import failOnConsole from 'vitest-fail-on-console';
 
-// Mock react-pdf to use the manual mock implementation
-vi.mock('react-pdf', async () => import('../../__mocks__/react-pdf.js'));
-
-// Add missing globals from Node.js environment that are needed in happy-dom
-globalThis.ReadableStream = ReadableStream;
-globalThis.TextDecoder = TextDecoder;
-globalThis.TextEncoder = TextEncoder;
-globalThis.Blob = Blob;
-globalThis.Headers = Headers;
-globalThis.FormData = FormData;
-globalThis.Request = Request;
-globalThis.Response = Response;
-globalThis.fetch = fetch;
-
-// Polyfill for Promise.withResolvers (needed for pdfjs-dist)
-if (!Promise.withResolvers) {
-	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, func-names
-	Promise.withResolvers = function <T>() {
-		let resolve: (value: T | PromiseLike<T>) => void;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		let reject: (reason?: any) => void;
-		const promise = new Promise<T>((res, rej) => {
-			resolve = res;
-			reject = rej;
-		});
-		return { promise, resolve: resolve!, reject: reject! };
-	};
-}
-
-failOnConsole({
-	shouldFailOnError: false,
-	shouldFailOnWarn: false
-});
+failOnConsole();
 
 beforeAll(() => {
-	// https://jestjs.io/docs/en/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
-	Object.defineProperty(window, 'matchMedia', {
-		writable: true,
-		value: vi.fn().mockImplementation((query) => ({
-			matches: false,
-			media: query,
-			onchange: null,
-			addListener: vi.fn(), // Deprecated
-			removeListener: vi.fn(), // Deprecated
-			addEventListener: vi.fn(),
-			removeEventListener: vi.fn(),
-			dispatchEvent: vi.fn()
-		}))
-	});
-
 	window.resizeTo = function resizeTo(width, height): void {
 		Object.assign(this, {
 			innerWidth: width,

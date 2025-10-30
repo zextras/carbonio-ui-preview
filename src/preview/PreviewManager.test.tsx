@@ -51,6 +51,8 @@ const PreviewManagerInitTester = (props: {
 	);
 };
 
+vi.mock('react-pdf');
+
 describe('Preview Manager', () => {
 	test('Show the preview of a pdf by calling createPreview and hide it with close action', async () => {
 		const onClose = vi.fn();
