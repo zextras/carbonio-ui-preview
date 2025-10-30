@@ -279,7 +279,7 @@ pipeline {
                 container('nodejs-' + nodeVersion) {
                     script {
                         withCredentials([usernamePassword(credentialsId: 'npm-zextras-bot-auth-token', usernameVariable: 'AUTH_USERNAME', passwordVariable: 'NPM_TOKEN')]) {
-                            withCredentials([usernamePassword(credentialsId: 'tarsier-bot-pr-token-github', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                            withCredentials([usernamePassword(credentialsId: 'jenkins-integration-with-github-account', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
                                 npxCmd(
                                     script: "semantic-release",
                                     install: true
@@ -305,7 +305,7 @@ pipeline {
                             sh(script: """
                                 git push origin HEAD:refs/heads/${versionBumperBranchName}
                             """)
-                            withCredentials([usernamePassword(credentialsId: 'tarsier-bot-pr-token-github', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                            withCredentials([usernamePassword(credentialsId: 'jenkins-integration-with-github-account', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
                                 sh(script: """
                                     curl https://api.github.com/repos/${getRepositoryName()}/pulls \
                                     -X POST \
