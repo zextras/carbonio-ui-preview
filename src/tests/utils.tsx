@@ -22,6 +22,7 @@ import {
 import { userEvent } from '@testing-library/user-event';
 import { ThemeProvider } from '@zextras/carbonio-design-system';
 import * as fs from 'fs';
+import { Mock } from 'vitest';
 
 type ExtendedQueries = typeof queries & typeof customQueries;
 
@@ -146,8 +147,7 @@ export const loadPDF = (
 };
 
 export async function triggerObserver(observedElement: HTMLElement): Promise<void> {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const { calls } = (window.IntersectionObserver as any).mock;
+	const { calls } = (window.IntersectionObserver as Mock).mock;
 	const [onChange] = calls[calls.length - 1];
 	// trigger the intersection on the observed element
 	await waitFor(() =>

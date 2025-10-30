@@ -6,43 +6,55 @@
 
 import { defineConfig } from 'vitest/config';
 
+const isCI = process.env.CI === 'true';
+
 export default defineConfig({
 	test: {
-		// Test environment - using happy-dom
-		environment: 'jsdom',
-
-		// Setup files to run before each test
-		setupFiles: ['./src/tests/vitest-setup.ts'],
-
-		// Enable globals (describe, it, expect, etc.)
-		globals: true,
-
-		// Coverage configuration
-		coverage: {
-			provider: 'v8',
-			reporter: ['text', 'cobertura', 'lcov'],
-			include: ['src/**/*.{js,ts,jsx,tsx}'],
-			exclude: [
-				'**/node_modules/**',
-				'src/tests/**',
-				'src/types/**',
-				'**/*.test.*',
-				'**/*.spec.*',
-				'coverage/**',
-				'lib/**',
-				'lib-esm/**'
-			]
+		reporters: isCI ? ['default', 'junit'] : ['verbose'],
+		outputFile: {
+			junit: './junit.xml'
 		},
-
-		// Restore mocks before every test
+		retry: isCI ? 2 : 0,
+		environment: 'jsdom',
+		setupFiles: ['./src/tests/vitest-setup.ts'],
 		restoreMocks: true,
+		maxWorkers: isCI ? 2 : undefined,
+		coverage: {
+			enabled: true,
+			provider: 'v8',
+			reporter: isCI ? ['text', 'cobertura', 'lcov'] : ['text', 'html'],
+			include: ['src/**/*.{ts,tsx}'],
+			exclude: [
+				// Test files
+				'**/*.test.{ts,tsx}',
+				'**/*.spec.{ts,tsx}',
 
-		// Test path ignore patterns
-		exclude: ['**/node_modules/**', '**/coverage/**', '**/lib/**', '**/lib-esm/**'],
+				// Type definitions
+				'**/*.d.ts',
 
-		// Module name mapping (like Jest's moduleNameMapper)
-		alias: {
-			'\\.(css|less)$': 'identity-obj-proxy'
-		}
+				// Test utilities
+				'**/setupTests.{ts,tsx}',
+				'**/testUtils.{ts,tsx}',
+				'**/test-utils.{ts,tsx}',
+				'**/vitest-setup.ts',
+
+				// Test folders
+				'**/__tests__/**',
+				'**/__mocks__/**',
+
+				// Build artifacts
+				'**/dist/**',
+				'**/coverage/**',
+				'**/node_modules/**'
+			],
+			thresholds: {
+				branches: 75,
+				functions: 75,
+				lines: 75,
+				statements: 75
+			}
+		},
+		globals: true,
+		testTimeout: 60000
 	}
 });

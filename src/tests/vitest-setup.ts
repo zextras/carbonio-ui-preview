@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import '@testing-library/jest-dom';
-import { act } from '@testing-library/react';
 import { vi } from 'vitest';
 import failOnConsole from 'vitest-fail-on-console';
 
@@ -50,16 +49,6 @@ beforeAll(() => {
 	});
 });
 
-beforeEach(() => {
-	// before each
-});
-
 afterEach(() => {
-	act(() => {
-		window.resizeTo(1024, 768);
-	});
-});
-
-afterAll(() => {
-	// after all
+	window.resizeTo(1024, 768);
 });
