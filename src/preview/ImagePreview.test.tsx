@@ -14,21 +14,21 @@ import { setup, screen } from '../tests/utils.js';
 describe('Image Preview', () => {
 	test('Render an image', () => {
 		const img = faker.image.url();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<ImagePreview show src={img} onClose={onClose} />);
 		expect(screen.getByRole('presentation')).toBeVisible();
 	});
 
 	test('If show is false does not render an image', () => {
 		const img = faker.image.url();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<ImagePreview show={false} src={img} onClose={onClose} />);
 		expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
 	});
 
 	test('Additional data are visible', () => {
 		const img = faker.image.url();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(
 			<ImagePreview
 				show
@@ -49,7 +49,7 @@ describe('Image Preview', () => {
 
 	test('Escape key close the preview', async () => {
 		const img = faker.image.url();
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<ImagePreview show src={img} onClose={onClose} />);
 		await user.keyboard(KEYBOARD_KEY.ESC);
 		expect(onClose).toHaveBeenCalled();
@@ -57,19 +57,19 @@ describe('Image Preview', () => {
 
 	test('Click on actions calls onClose if event is not stopped by the action itself', async () => {
 		const img = faker.image.url();
-		const onClose = jest.fn<void, Parameters<ImagePreviewProps['onClose']>>((ev) => {
+		const onClose = vi.fn((ev: React.SyntheticEvent | KeyboardEvent) => {
 			ev.preventDefault();
 		});
 		const actions: ImagePreviewProps['actions'] = [
 			{
 				id: 'action1',
 				icon: 'Activity',
-				onClick: jest.fn()
+				onClick: vi.fn()
 			},
 			{
 				id: 'action2',
 				icon: 'People',
-				onClick: jest.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
+				onClick: vi.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 					ev.preventDefault();
 				}),
 				disabled: true

@@ -14,13 +14,13 @@ describe('Header', () => {
 			{
 				id: 'action1',
 				icon: 'ActivityOutline',
-				onClick: jest.fn()
+				onClick: vi.fn()
 			}
 		];
 		const closeAction: HeaderProps['closeAction'] = {
 			id: 'closeAction',
 			icon: 'CloseOutline',
-			onClick: jest.fn()
+			onClick: vi.fn()
 		};
 		setup(
 			<Header
@@ -44,19 +44,19 @@ describe('Header', () => {
 			{
 				id: 'action1',
 				icon: 'ActivityOutline',
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 				tooltipLabel: 'Activity One'
 			},
 			{
 				id: 'action2',
 				icon: 'PeopleOutline',
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 				tooltipLabel: ''
 			},
 			{
 				id: 'action3',
 				icon: 'Airplane',
-				onClick: jest.fn(),
+				onClick: vi.fn(),
 				disabled: true,
 				tooltipLabel: 'Airplane tooltip action'
 			}
@@ -64,7 +64,7 @@ describe('Header', () => {
 		const closeAction: HeaderProps['closeAction'] = {
 			id: 'closeAction',
 			icon: 'CloseOutline',
-			onClick: jest.fn(),
+			onClick: vi.fn(),
 			tooltipLabel: 'Close'
 		};
 
@@ -82,8 +82,6 @@ describe('Header', () => {
 		const action2 = screen.getByTestId(`icon: ${actions[1].icon}`);
 		const action3 = screen.getByTestId(`icon: ${actions[2].icon}`);
 		const actionClose = screen.getByTestId(`icon: ${closeAction.icon}`);
-		// register listeners
-		jest.runOnlyPendingTimers();
 		expect(screen.queryByText(/activity one/i)).not.toBeInTheDocument();
 		await user.hover(action1);
 		await screen.findByText(/activity one/i);

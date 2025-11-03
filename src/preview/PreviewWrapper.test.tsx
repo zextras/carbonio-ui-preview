@@ -9,9 +9,11 @@ import { PreviewWrapper } from './PreviewWrapper.js';
 import { SELECTORS } from '../tests/constants.js';
 import { setup } from '../tests/utils.js';
 
+vi.mock('react-pdf');
+
 describe('Preview Wrapper', () => {
 	test('Render the pdf preview for type pdf', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<PreviewWrapper show src="" onClose={onClose} previewType="pdf" />);
 		await screen.findByTestId(SELECTORS.previewContainer);
 		expect(screen.getByTestId(SELECTORS.previewContainer)).toBeVisible();
@@ -19,14 +21,14 @@ describe('Preview Wrapper', () => {
 	});
 
 	test('Render the image previewer for type image', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<PreviewWrapper show src="" onClose={onClose} previewType="image" />);
 		expect(await screen.findByRole('presentation')).toBeVisible();
 		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 	});
 
 	test('Render the video previewer for type video', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<PreviewWrapper show src="" onClose={onClose} previewType="video" />);
 		const video = await screen.findByTestId('video');
 		expect(video).toBeVisible();
