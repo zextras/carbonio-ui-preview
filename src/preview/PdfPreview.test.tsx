@@ -25,11 +25,13 @@ async function waitForDocumentToLoad(): Promise<void> {
 	await waitFor(() => expect(loadingElement).not.toBeInTheDocument());
 }
 
+vi.mock('react-pdf');
+
 describe('Pdf Preview', () => {
 	test.each<'dataURI' | 'file' | 'blob'>(['dataURI', 'file', 'blob'])(
 		'Render a pdf document from %s',
 		async (src) => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			setup(<PdfPreview show src={pdfFile[src]} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			// eslint-disable-next-line testing-library/no-node-access
@@ -38,10 +40,10 @@ describe('Pdf Preview', () => {
 	);
 
 	it('should retrieve the pdf from a uri', async () => {
-		const fetchFn = jest
+		const fetchFn = vi
 			.spyOn(global, 'fetch')
 			.mockImplementation(() => Promise.resolve(new Response(pdfFile.blob)));
-		setup(<PdfPreview show src={'/test/url'} onClose={jest.fn()} />);
+		setup(<PdfPreview show src={'/test/url'} onClose={vi.fn()} />);
 		await waitForDocumentToLoad();
 		expect(fetchFn).toHaveBeenCalled();
 		// eslint-disable-next-line testing-library/no-node-access
@@ -49,22 +51,22 @@ describe('Pdf Preview', () => {
 	});
 
 	test('If show is false does not render the pdf', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<PdfPreview show={false} src={pdfFile.dataURI} onClose={onClose} />);
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 		expect(screen.queryByTestId(SELECTORS.previewContainer)).not.toBeInTheDocument();
 	});
 
 	test('If pdf is not valid render an error message', async () => {
-		jest.spyOn(global, 'fetch').mockReturnValue(Promise.reject(new Error('API is down')));
-		const onClose = jest.fn();
+		vi.spyOn(global, 'fetch').mockReturnValue(Promise.reject(new Error('API is down')));
+		const onClose = vi.fn();
 		setup(<PdfPreview show src="invalid-pdf.pdf" onClose={onClose} />);
 		expect(await screen.findByText(/Failed to load document preview./i)).toBeVisible();
 		expect(screen.queryByText(/Loading document preview…/i)).not.toBeInTheDocument();
 	});
 
 	test('If fallback is requested, does not render the pdf but the fallback instead', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(
 			<PdfPreview show src={pdfFile.dataURI} onClose={onClose} useFallback openSrc="open-src" />
 		);
@@ -78,7 +80,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Render a custom fallback', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const CustomContent = <div>Custom content</div>;
 		setup(
 			<PdfPreview
@@ -103,7 +105,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Additional data are visible', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(
 			<PdfPreview
 				show
@@ -120,7 +122,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Escape key close the preview', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 		await waitForDocumentToLoad();
 		await user.keyboard(KEYBOARD_KEY.ESC);
@@ -128,7 +130,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Close action calls onClose if no click action is provided', async () => {
-		const onClose = jest.fn((e: React.SyntheticEvent | KeyboardEvent) => {
+		const onClose = vi.fn((e: React.SyntheticEvent | KeyboardEvent) => {
 			e.preventDefault();
 		});
 		const closeAction: PdfPreviewProps['closeAction'] = {
@@ -149,19 +151,19 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Click on actions calls onClose if event is not stopped by the action itself, instead if is disabled it is not propagated anyway ', async () => {
-		const onClose = jest.fn<void, Parameters<PdfPreviewProps['onClose']>>((ev) => {
+		const onClose = vi.fn((ev: React.SyntheticEvent | KeyboardEvent) => {
 			ev.preventDefault();
 		});
 		const actions: PdfPreviewProps['actions'] = [
 			{
 				id: 'action1',
 				icon: 'Activity',
-				onClick: jest.fn()
+				onClick: vi.fn()
 			},
 			{
 				id: 'action2',
 				icon: 'People',
-				onClick: jest.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
+				onClick: vi.fn((ev: React.MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
 					ev.preventDefault();
 				}),
 				disabled: true
@@ -207,7 +209,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Zoom starts at lowest step', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 		await waitForDocumentToLoad();
 		expect(screen.getAllByTestId(SELECTORS.pdfPageMock)[0]).toHaveAttribute(
@@ -217,7 +219,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Decrease zoom is disabled when zoom is at lowest point', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 		await waitForDocumentToLoad();
 		const zoomOutButton = screen.getByRoleWithIcon('button', { icon: zoomOutIcon });
@@ -231,7 +233,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Increase and decrease zoom change zoom by 1 step per time', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomOutIcon)).toBeVisible();
@@ -259,7 +261,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Increase zoom is disabled when zoom is at greatest point', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 		await waitForDocumentToLoad();
 		const zoomInButton = screen.getByRoleWithIcon('button', { icon: zoomInIcon });
@@ -273,7 +275,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Fit to width zoom set width of pdf to width of the window', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const mockPdfWidth = 1000;
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
@@ -281,7 +283,7 @@ describe('Pdf Preview', () => {
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
 		expect(screen.queryByTestId(zoomResetWidthIcon)).not.toBeInTheDocument();
 		expect(ref.current).not.toBeNull();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		expect(screen.getAllByTestId(SELECTORS.pdfPageMock)[0]).toHaveAttribute(
 			dataPageWidthAttribute,
@@ -292,7 +294,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Reset zoom set width to lowest step', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const mockPdfWidth = 1000;
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
@@ -300,7 +302,7 @@ describe('Pdf Preview', () => {
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
 		expect(screen.queryByTestId(zoomResetWidthIcon)).not.toBeInTheDocument();
 		expect(ref.current).not.toBeNull();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		expect(screen.getAllByTestId(SELECTORS.pdfPageMock)[0]).toHaveAttribute(
 			dataPageWidthAttribute,
@@ -318,13 +320,13 @@ describe('Pdf Preview', () => {
 	});
 
 	test('When client width is lower than lowest zoom step and zoom is set to fit to width, decrease zoom is disabled and increase is enabled', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const mockPdfWidth = ZOOM_STEPS[0] - 1;
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		const zoomOutButton = screen.getByRoleWithIcon('button', { icon: zoomOutIcon });
 		expect(zoomOutButton).toBeDisabled();
@@ -333,13 +335,13 @@ describe('Pdf Preview', () => {
 	});
 
 	test('When client width is greater than greatest zoom step and zoom is set to fit to width, decrease zoom is enabled and increase is disabled', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const mockPdfWidth = ZOOM_STEPS[ZOOM_STEPS.length - 1] + 1;
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		const zoomInButton = screen.getByRoleWithIcon('button', { icon: zoomInIcon });
 		expect(zoomInButton).toBeDisabled();
@@ -348,7 +350,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('After fit to width, decrease zoom set zoom to nearest lower zoom step', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		// set client width to be between second and third steps
 		const stepToReach = 1;
@@ -356,7 +358,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		const zoomOutButton = screen.getByRoleWithIcon('button', { icon: zoomOutIcon });
 		expect(zoomOutButton).toBeEnabled();
@@ -368,7 +370,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('After fit to width, increase zoom set zoom to nearest greater zoom step', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		// set client width to be between second and third steps
 		const stepToReach = 2;
@@ -376,7 +378,7 @@ describe('Pdf Preview', () => {
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		jest.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(mockPdfWidth);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		const zoomInButton = screen.getByRoleWithIcon('button', { icon: zoomInIcon });
 		expect(zoomInButton).toBeEnabled();
@@ -388,17 +390,13 @@ describe('Pdf Preview', () => {
 	});
 
 	test('When fit to width is active, resize of the window update width of the pdf', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const mockPdfWidth = [1001, 1501, 2001];
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
 		expect(screen.getByTestId(zoomFitToWidthIcon)).toBeVisible();
-		const getPreviewClientWidthMock = jest.spyOn(
-			ref.current as HTMLDivElement,
-			'clientWidth',
-			'get'
-		);
+		const getPreviewClientWidthMock = vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get');
 		getPreviewClientWidthMock.mockReturnValueOnce(mockPdfWidth[0]);
 
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
@@ -419,7 +417,7 @@ describe('Pdf Preview', () => {
 	});
 
 	test('Click on disabled decrease/increase zoom actions does not change step and does not close preview', async () => {
-		const onClose = jest.fn();
+		const onClose = vi.fn();
 		const ref = React.createRef<HTMLDivElement>();
 		const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} ref={ref} />);
 		await waitForDocumentToLoad();
@@ -431,9 +429,9 @@ describe('Pdf Preview', () => {
 			`${ZOOM_STEPS[0]}`
 		);
 		expect(onClose).not.toHaveBeenCalled();
-		jest
-			.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get')
-			.mockReturnValue(ZOOM_STEPS[ZOOM_STEPS.length - 1]);
+		vi.spyOn(ref.current as HTMLDivElement, 'clientWidth', 'get').mockReturnValue(
+			ZOOM_STEPS[ZOOM_STEPS.length - 1]
+		);
 		await user.click(screen.getByTestId(zoomFitToWidthIcon));
 		expect(screen.getAllByTestId(SELECTORS.pdfPageMock)[0]).toHaveAttribute(
 			dataPageWidthAttribute,
@@ -450,24 +448,23 @@ describe('Pdf Preview', () => {
 	});
 
 	it('should not download the pdf if the fallback is shown', async () => {
-		const fetchFn = jest.spyOn(global, 'fetch');
+		const fetchFn = vi.spyOn(global, 'fetch');
 		setup(
 			<PdfPreview
 				show
 				src={'/test/url'}
-				onClose={jest.fn()}
+				onClose={vi.fn()}
 				useFallback
 				contentLabel={'show fallback'}
 			/>
 		);
 		expect(screen.getByText('show fallback')).toBeVisible();
-		await jest.advanceTimersToNextTimerAsync();
 		expect(fetchFn).not.toHaveBeenCalled();
 	});
 
 	describe('Page selector', () => {
 		test('shows page controller', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			expect(screen.getByText(/page/i)).toBeVisible();
@@ -477,7 +474,7 @@ describe('Pdf Preview', () => {
 		});
 
 		test('blur is a confirmation event on page input', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -490,7 +487,7 @@ describe('Pdf Preview', () => {
 		});
 
 		test('enter key is a confirmation event on page input', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -503,8 +500,8 @@ describe('Pdf Preview', () => {
 		});
 
 		test('when input is confirmed, input loses focus and the document is scrolled to typed page', async () => {
-			const onClose = jest.fn();
-			const scrollIntoViewFn = jest.fn();
+			const onClose = vi.fn();
+			const scrollIntoViewFn = vi.fn();
 			window.HTMLElement.prototype.scrollIntoView = scrollIntoViewFn;
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
@@ -520,8 +517,8 @@ describe('Pdf Preview', () => {
 		});
 
 		test('when input is confirmed with an invalid value, input loses focus and the input value is reset to previous valid page', async () => {
-			const onClose = jest.fn();
-			const scrollIntoViewFn = jest.fn();
+			const onClose = vi.fn();
+			const scrollIntoViewFn = vi.fn();
 			window.HTMLElement.prototype.scrollIntoView = scrollIntoViewFn;
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
@@ -536,7 +533,7 @@ describe('Pdf Preview', () => {
 		});
 
 		test('on scroll, if focus is not on input, value is updated with current page', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -549,7 +546,7 @@ describe('Pdf Preview', () => {
 		});
 
 		test('on scroll, if focus is on input, value is updated with current page', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -566,7 +563,7 @@ describe('Pdf Preview', () => {
 		});
 
 		test('must press esc key 2 times to make user exit from the preview, when focus is on input', async () => {
-			const onClose = jest.fn();
+			const onClose = vi.fn();
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();
 			const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -582,7 +579,7 @@ describe('Pdf Preview', () => {
 	describe('keyboard shortcuts', () => {
 		describe('Home and End', () => {
 			test('click End go to last page and Home return to the first page', async () => {
-				const onClose = jest.fn();
+				const onClose = vi.fn();
 				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 				await waitForDocumentToLoad();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -593,7 +590,7 @@ describe('Pdf Preview', () => {
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 			test('click End go to last page and Home return to the first page, but they do not work if the page input is focussed ', async () => {
-				const onClose = jest.fn();
+				const onClose = vi.fn();
 				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 				await waitForDocumentToLoad();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -624,7 +621,7 @@ describe('Pdf Preview', () => {
 
 		describe('PageUp and PageDown', () => {
 			test('click PageDown go to the next page and PageUp go to the previous page', async () => {
-				const onClose = jest.fn();
+				const onClose = vi.fn();
 				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 				await waitForDocumentToLoad();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -647,7 +644,7 @@ describe('Pdf Preview', () => {
 				expect(pageInput).toHaveDisplayValue('1');
 			});
 			test('click PageDown go to the next page and PageUp go to the previous page, but they do not work if the page input is focussed ', async () => {
-				const onClose = jest.fn();
+				const onClose = vi.fn();
 				const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 				await waitForDocumentToLoad();
 				const pageInput = screen.getByRole('textbox', { name: /current page/i });
@@ -677,8 +674,8 @@ describe('Pdf Preview', () => {
 		});
 
 		test('ArrowUp and ArrowDown', async () => {
-			const onClose = jest.fn();
-			const scrollByFn = jest.fn();
+			const onClose = vi.fn();
+			const scrollByFn = vi.fn();
 			window.HTMLElement.prototype.scrollBy = scrollByFn;
 			const { user } = setup(<PdfPreview show src={pdfFile.dataURI} onClose={onClose} />);
 			await waitForDocumentToLoad();

@@ -16,10 +16,6 @@ updates:
         patterns:
           - "@babel*"
           - "babel-*"
-      jest:
-        patterns:
-          - "jest*"
-          - "@types/jest"
       pre-commit:
         patterns:
           - "@commitlint/*"
