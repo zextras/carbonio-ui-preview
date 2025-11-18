@@ -6,20 +6,20 @@
 
 // git utils
 String getRepositoryName() {
-    return sh(script: '''#!/bin/bash
+    return sh(script: '''
         git remote -v | head -n1 | cut -d$'\t' -f2 | cut -d' ' -f1 | sed -e 's!https://github.com/!!g' -e 's!git@github.com:!!g' -e 's!.git!!g'
     ''', returnStdout: true).trim()
 }
 
 String getLastTag() {
-    return sh(script: '''#!/bin/bash
+    return sh(script: '''
         git describe --tags --abbrev=0
     ''', returnStdout: true).trim()
 }
 
 Boolean tagExistsAtHead() {
     try {
-        sh(script: '''#!/bin/bash
+        sh(script: '''
             git describe --tags --exact-match
         ''', returnStdout: true)
         return true
@@ -31,10 +31,17 @@ Boolean tagExistsAtHead() {
 // Package utils
 String getPackageName() {
     return sh(
-        script: """#!/usr/bin/env bash
+        script: """
             cat package.json \
             | jq --raw-output '.name'
             """,
+        returnStdout: true
+    ).trim()
+}
+
+def getNodeVersion() {
+    return sh(
+        script: 'sed "s/^[vV]//" .nvmrc | cut -d. -f1',
         returnStdout: true
     ).trim()
 }
@@ -48,13 +55,12 @@ void nodeCmd(Map args = [:]) {
     if (fileExists('.nvmrc')) {
         version = ''
     } else {
-        version = (args.version != null) ? "${args.version} " : '16'
+        version = (args.version != null) ? "${args.version} " : '20'
     }
     sh(
-        script: """#!/usr/bin/env bash
-            ${varEnv.join(' ')} source load_nvm && nvm install ${version} && nvm use ${version} \
-            ${install ? '&& npm ci ' : ''} \
-            ${args.script != null ? "&& ${args.script} " : ''} \
+        script: """
+            ${varEnv.join(' ')}
+            ${args.script != null ? "${args.script} " : ''} \
         """
     )
 }
@@ -71,15 +77,12 @@ void npxCmd(Map args = [:]) {
 }
 
 void npmLogin(String npmAuthToken) {
-    if (!fileExists(file: '.npmrc')) {
-        sh(
-            script: """
-                touch .npmrc;
-                echo "//registry.npmjs.org/:_authToken=${npmAuthToken}" > .npmrc
-            """,
-            returnStdout: false
-        )
-    }
+    sh(
+        script: """
+            echo "//registry.npmjs.org/:_authToken=${npmAuthToken}" >> .npmrc
+        """,
+        returnStdout: false
+    )
 }
 
 
@@ -87,14 +90,14 @@ void npmLogin(String npmAuthToken) {
 Boolean isReleaseBranch
 Boolean isDevelBranch
 Boolean isPullRequest
-Boolean lcovIsPresent
+String nodeVersion
 // PROJECT DETAILS
 String pkgName
 
 pipeline {
     agent {
         node {
-            label "nodejs-agent-v4"
+            label "nodejs-v1"
         }
     }
     parameters {
@@ -108,56 +111,65 @@ pipeline {
     post {
         always {
             script {
-                def commitEmail = sh(
-                    script: "git --no-pager show -s --format='%ae'",
-                    returnStdout: true
-                ).trim()
-                emailext(
-                    attachLog: true,
-                    body: "\$DEFAULT_CONTENT",
-                    recipientProviders: [requestor()],
-                    subject: "\$DEFAULT_SUBJECT",
-                    to: "${commitEmail}"
-                )
+                container('base') {
+                    def commitEmail = sh(
+                        script: "git --no-pager show -s --format='%ae'",
+                        returnStdout: true
+                    ).trim()
+                    emailext(
+                        attachLog: true,
+                        body: "\$DEFAULT_CONTENT",
+                        recipientProviders: [requestor()],
+                        subject: "\$DEFAULT_SUBJECT",
+                        to: "${commitEmail}"
+                    )
+                }
             }
         }
     }
     stages {
         stage("Read settings") {
             steps {
-                script {
-                    isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
-                    echo "isReleaseBranch: ${isReleaseBranch}"
-                    isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
-                    echo "isDevelBranch: ${isDevelBranch}"
-                    isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
-                    echo "isPullRequest: ${isPullRequest}"
-                    pkgName = getPackageName()
-                    echo "pkgName: ${pkgName}"
-                    isSonarQubeEnabled = params.RUN_SONARQUBE == true && (isPullRequest || isDevelBranch || isReleaseBranch)
-                    echo "isSonarQubeEnabled: ${isSonarQubeEnabled}"
-                }
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: "npm-zextras-bot-auth-token",
-                        usernameVariable: "NPM_USERNAME",
-                        passwordVariable: "NPM_PASSWORD"
-                    )
-                ]) {
+                container('base') {
                     script {
-                        npmLogin(NPM_PASSWORD)
+                        isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
+                        echo "isReleaseBranch: ${isReleaseBranch}"
+                        isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
+                        echo "isDevelBranch: ${isDevelBranch}"
+                        isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
+                        echo "isPullRequest: ${isPullRequest}"
+                        pkgName = getPackageName()
+                        echo "pkgName: ${pkgName}"
+                        nodeVersion = getNodeVersion()
+                        echo "NodeJS Major Version: $nodeVersion"
+                        isSonarQubeEnabled = params.RUN_SONARQUBE == true && (isPullRequest || isDevelBranch || isReleaseBranch)
+                        echo "isSonarQubeEnabled: ${isSonarQubeEnabled}"
+                    }
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: "npm-zextras-bot-auth-token",
+                            usernameVariable: "NPM_USERNAME",
+                            passwordVariable: "NPM_PASSWORD"
+                        )
+                    ]) {
+                        script {
+                            npmLogin(NPM_PASSWORD)
+                        }
                     }
                 }
-                stash(
-                    includes: ".npmrc",
-                    name: ".npmrc"
-                )
             }
         }
-        //============================================ Test ====================================================================
+        stage('Install dependencies') {
+            steps {
+                container('nodejs-' + nodeVersion) {
+                    script {
+                        sh 'npm ci'
+                    }
+                }
+            }
+        }        
         stage("Tests") {
             when {
-                beforeAgent true
                 anyOf {
                     expression { isSonarQubeEnabled == true }
                     expression { isPullRequest == true }
@@ -167,74 +179,57 @@ pipeline {
             }
             parallel {
                 stage("Lint") {
-                    agent {
-                        node {
-                            label "nodejs-agent-v4"
-                        }
-                    }
                     steps {
-                        script {
-                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                unstash(name: ".npmrc")
-                                nodeCmd(
-                                    install: true,
-                                    script: "npm run lint"
-                                )
+                        container('nodejs-' + nodeVersion) {
+                            script {
+                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                    nodeCmd(
+                                        install: true,
+                                        script: "npm run lint"
+                                    )
+                                }
                             }
                         }
                     }
                 }
                 stage("TypeCheck") {
-                    agent {
-                        node {
-                            label "nodejs-agent-v4"
-                        }
-                    }
                     steps {
-                        script {
-                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                unstash(name: ".npmrc")
-                                nodeCmd(
-                                    install: true,
-                                    script: "npm run type-check"
-                                )
+                        container('nodejs-' + nodeVersion) {
+                            script {
+                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                    nodeCmd(
+                                        install: true,
+                                        script: "npm run type-check"
+                                    )
+                                }
                             }
                         }
                     }
                 }
                 stage("Unit Tests") {
-                    agent {
-                        node {
-                            label "nodejs-agent-v4"
-                        }
-                    }
                     steps {
-                        script {
-                            catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                                unstash(name: ".npmrc")
-                                nodeCmd(
-                                    install: true,
-                                    script: "npm run test"
-                                )
+                        container('nodejs-' + nodeVersion) {
+                            script {
+                                catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                                    nodeCmd(
+                                        install: true,
+                                        script: "npm run test"
+                                    )
+                                }
                             }
                         }
                     }
                     post {
                         success {
-                            script {
-                                if (fileExists('junit.xml')) {
-                                    junit(
-                                        allowEmptyResults: true,
-                                        testResults: 'junit.xml'
-                                    )
-                                    recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'coverage/cobertura-coverage.xml']])
-                                }
-                                if (fileExists('coverage/lcov.info')) {
-                                    lcovIsPresent = true
-                                    stash(
-                                        includes: 'coverage/lcov.info',
-                                        name: 'lcov.info'
-                                    )
+                            container('nodejs-' + nodeVersion) {
+                                script {
+                                    if (fileExists('junit.xml')) {
+                                        junit(
+                                            allowEmptyResults: true,
+                                            testResults: 'junit.xml'
+                                        )
+                                        recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'coverage/cobertura-coverage.xml']])
+                                    }
                                 }
                             }
                         }
@@ -243,71 +238,53 @@ pipeline {
             }
         }
         stage("SonarQube Check") {
-            agent {
-                node {
-                    label 'nodejs-agent-v4'
-                }
-            }
             when {
-                beforeAgent(true)
                 allOf {
                     expression { isSonarQubeEnabled == true }
                 }
             }
             steps {
-                script {
-                    if (lcovIsPresent) {
-                        unstash(name: 'lcov.info')
-                    }
-                    // remove @zextras/ prefix to make pkgName a valid sonarqube project key
-                    def sonarQubeProjectKey = pkgName.replaceAll("@zextras/", "")
-                    withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
-                        script {
-                            npxCmd(
-                                script: "sonarqube-scanner -Dsonar.projectKey=${sonarQubeProjectKey} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
-                            )
+                container('nodejs-' + nodeVersion) {
+                    script {
+                        // remove @zextras/ prefix to make pkgName a valid sonarqube project key
+                        def sonarQubeProjectKey = pkgName.replaceAll("@zextras/", "")
+                        withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
+                            script {
+                                npxCmd(
+                                    script: "sonarqube-scanner -Dsonar.projectKey=${sonarQubeProjectKey} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-
-        // ===================================== Build ==============================================================
         stage("Build") {
-            agent {
-                node {
-                    label "nodejs-agent-v4"
-                }
-            }
             steps {
-                script {
-                    unstash(name: '.npmrc')
-                    script {
-                        nodeCmd(
-                            install: true,
-                            script: 'npm run build'
-                        )
-                    }
+                container('nodejs-' + nodeVersion) {
+                    nodeCmd(
+                        install: true,
+                        script: "npm run build"
+                    )
                 }
             }
         }
-
-        // ============================================ Release Automation ==============================================
         stage('Release') {
             when {
-                beforeAgent true
                 allOf {
                     expression { isPullRequest == false }
                 }
             }
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'npm-zextras-bot-auth-token', usernameVariable: 'AUTH_USERNAME', passwordVariable: 'NPM_TOKEN')]) {
-                        withCredentials([usernamePassword(credentialsId: 'tarsier-bot-pr-token-github', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-                            npxCmd(
-                                script: "semantic-release",
-                                install: true
-                            )
+                container('nodejs-' + nodeVersion) {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'npm-zextras-bot-auth-token', usernameVariable: 'AUTH_USERNAME', passwordVariable: 'NPM_TOKEN')]) {
+                            withCredentials([usernamePassword(credentialsId: 'jenkins-integration-with-github-account', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                                npxCmd(
+                                    script: "semantic-release",
+                                    install: true
+                                )
+                            }
                         }
                     }
                 }
@@ -315,32 +292,33 @@ pipeline {
         }
         stage('Open release to devel pull request') {
             when {
-                beforeAgent true
                 allOf {
                     expression { isReleaseBranch == true }
                     expression { tagExistsAtHead() == true }
                 }
             }
             steps {
-                script {
-                    catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
-                        String versionBumperBranchName = "version-bumper/${getLastTag()}"
-                        sh(script: """#!/bin/bash
-                            git push origin HEAD:refs/heads/${versionBumperBranchName}
-                        """)
-                        withCredentials([usernamePassword(credentialsId: 'tarsier-bot-pr-token-github', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                container('nodejs-' + nodeVersion) {
+                    script {
+                        catchError(buildResult: "UNSTABLE", stageResult: "FAILURE") {
+                            String versionBumperBranchName = "version-bumper/${getLastTag()}"
                             sh(script: """
-                                curl https://api.github.com/repos/${getRepositoryName()}/pulls \
-                                -X POST \
-                                -H 'Accept: application/vnd.github.v3+json' \
-                                -H 'Authorization: token ${GH_TOKEN}' \
-                                -d '{
-                                    \"title\": \"chore(release): ${getLastTag()}\",
-                                    \"head\": \"${versionBumperBranchName}\",
-                                    \"base\": \"devel\",
-                                    \"maintainer_can_modify\": true
-                                }'
+                                git push origin HEAD:refs/heads/${versionBumperBranchName}
                             """)
+                            withCredentials([usernamePassword(credentialsId: 'jenkins-integration-with-github-account', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                                sh(script: """
+                                    curl https://api.github.com/repos/${getRepositoryName()}/pulls \
+                                    -X POST \
+                                    -H 'Accept: application/vnd.github.v3+json' \
+                                    -H 'Authorization: token ${GH_TOKEN}' \
+                                    -d '{
+                                        \"title\": \"chore(release): ${getLastTag()}\",
+                                        \"head\": \"${versionBumperBranchName}\",
+                                        \"base\": \"devel\",
+                                        \"maintainer_can_modify\": true
+                                    }'
+                                """)
+                            }
                         }
                     }
                 }

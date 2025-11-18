@@ -37,8 +37,8 @@ export const Document = ({
 
 	return (
 		<div data-testid={'react-pdf-document'}>
-			{isLoading && loading}
-			{!isLoading && !file && noData}
+			{isLoading && (typeof loading === 'function' ? loading() : loading)}
+			{!isLoading && !file && (typeof noData === 'function' ? noData() : noData)}
 			{!isLoading && file && children}
 		</div>
 	);
@@ -49,6 +49,6 @@ export const Page = ({ pageNumber, pageIndex, inputRef, width }: PageProps): Rea
 		data-testid={'react-pdf-page'}
 		data-page-number={pageNumber ?? pageIndex}
 		data-page-width={width}
-		ref={inputRef}
+		ref={inputRef as React.LegacyRef<HTMLDivElement>}
 	></div>
 );

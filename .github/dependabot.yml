@@ -16,10 +16,6 @@ updates:
         patterns:
           - "@babel*"
           - "babel-*"
-      jest:
-        patterns:
-          - "jest*"
-          - "@types/jest"
       pre-commit:
         patterns:
           - "@commitlint/*"
@@ -27,10 +23,6 @@ updates:
       testing-library:
         patterns:
           - "@testing-library/*"
-      styled-components:
-        patterns:
-          - "styled-components"
-          - "@types/styled-components"
       react:
         patterns:
           - "react"
