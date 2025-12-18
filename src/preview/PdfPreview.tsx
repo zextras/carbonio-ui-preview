@@ -30,7 +30,8 @@ import { print } from '../utils/utils.js';
 type Page = Parameters<NonNullable<PageProps['onLoadSuccess']>>[0];
 
 export interface PdfPreviewProps
-	extends Omit<PreviewNavigatorProps, 'onOverlayClick'>,
+	extends
+		Omit<PreviewNavigatorProps, 'onOverlayClick'>,
 		Omit<PreviewCriteriaAlternativeContentProps, 'downloadSrc'> {
 	/** Preview source */
 	src: string | File | Blob | ArrayBuffer;
