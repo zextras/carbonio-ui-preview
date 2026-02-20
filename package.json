@@ -78,7 +78,7 @@
 		"react-pdf": "^10.2.0"
 	},
 	"peerDependencies": {
-		"@zextras/carbonio-design-system": "^8.0.0 || ^9.0.0-devel || ^10.0.0-devel || ^11.0.0-devel",
+		"@zextras/carbonio-design-system": "^8.0.0 || ^9.0.0-devel || ^10.0.0-devel || ^11.0.0-devel || ^12.0.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
