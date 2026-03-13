@@ -45,8 +45,8 @@
 	"author": "Zextras DEV Team <https://www.zextras.com/carbonio/>",
 	"license": "AGPL-3.0-only",
 	"devDependencies": {
-		"@commitlint/cli": "^20.4.2",
-		"@commitlint/config-conventional": "^20.4.2",
+		"@commitlint/cli": "^20.4.4",
+		"@commitlint/config-conventional": "^20.4.4",
 		"@faker-js/faker": "^10.1.0",
 		"@microsoft/api-documenter": "^7.28.9",
 		"@microsoft/api-extractor": "^7.53.0",
