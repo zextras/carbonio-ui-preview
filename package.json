@@ -67,7 +67,7 @@
 		"is-ci": "^4.1.0",
 		"jsdom": "^27.0.1",
 		"semantic-release": "^24.2.9",
-		"sonarqube-scanner": "^4.3.4",
+		"sonarqube-scanner": "^4.3.5",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.9.3",
 		"vitest": "^3.2.4",
