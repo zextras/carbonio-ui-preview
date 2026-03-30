@@ -74,7 +74,7 @@
 		"vitest-fail-on-console": "^0.10.1"
 	},
 	"dependencies": {
-		"core-js": "^3.45.1",
+		"core-js": "^3.49.0",
 		"react-pdf": "^10.2.0"
 	},
 	"peerDependencies": {
