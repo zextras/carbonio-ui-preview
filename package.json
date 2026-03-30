@@ -65,7 +65,7 @@
 		"eslint-plugin-tsdoc": "^0.4.0",
 		"husky": "^9.1.7",
 		"is-ci": "^4.1.0",
-		"jsdom": "^27.0.1",
+		"jsdom": "^27.4.0",
 		"semantic-release": "^24.2.9",
 		"sonarqube-scanner": "^4.3.5",
 		"ts-node": "^10.9.2",
