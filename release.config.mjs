@@ -8,18 +8,10 @@
  */
 export default {
 	branches: [
-		'release',
+		'devel',
 		{
 			name: 'beta',
 			prerelease: true
-		},
-		{
-			name: 'devel',
-			prerelease: true
-		},
-		{
-			name: 'next/+([0-9]).+([0-9]).+([0-9])',
-			prerelease: '${name.replace(/[\\/\\.]/g, "-")}'
 		}
 	],
 	plugins: [
