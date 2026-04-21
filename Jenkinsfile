@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// FLAGS
-String nodeVersion
-
 // Package utils
 String getPackageName() {
     return sh(
