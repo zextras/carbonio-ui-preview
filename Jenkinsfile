@@ -94,7 +94,7 @@ pipeline {
                         echo "isSonarQubeEnabled: ${isSonarQubeEnabled}"
 					}
 				}
-				container('nodejs-' + nodeVersion) {
+				container('pnpm') {
 					script {
 						sh 'corepack enable'
 					}
@@ -114,7 +114,7 @@ pipeline {
 		}
 		stage('Install dependencies') {
 			steps {
-				container('nodejs-' + nodeVersion) {
+				container('pnpm') {
 					script {
 						sh 'pnpm install --frozen-lockfile'
 					}
@@ -133,7 +133,7 @@ pipeline {
 			parallel {
 				stage('Lint') {
 					steps {
-						container('nodejs-' + nodeVersion) {
+						container('pnpm') {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								sh 'pnpm run lint'
 							}
@@ -142,7 +142,7 @@ pipeline {
 				}
 				stage('TypeCheck') {
 					steps {
-						container('nodejs-' + nodeVersion) {
+						container('pnpm') {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								sh 'pnpm run type-check'
 							}
@@ -151,7 +151,7 @@ pipeline {
 				}
 				stage('Unit Tests') {
 					steps {
-						container('nodejs-' + nodeVersion) {
+						container('pnpm') {
 							catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
 								sh 'pnpm run test'
 							}
@@ -159,7 +159,7 @@ pipeline {
 					}
 					post {
 						success {
-							container('nodejs-' + nodeVersion) {
+							container('pnpm') {
 								script {
                                     if (fileExists('junit.xml')) {
                                         junit(
@@ -182,7 +182,7 @@ pipeline {
                 }
 			}
 			steps {
-				container('nodejs-' + nodeVersion) {
+				container('pnpm') {
 					script {
                         // remove @zextras/ prefix to make pkgName a valid sonarqube project key
                         def sonarQubeProjectKey = pkgName.replaceAll("@zextras/", "")
@@ -195,7 +195,7 @@ pipeline {
 		}
 		stage('Build') {
 			steps {
-				container('nodejs-' + nodeVersion) {
+				container('pnpm') {
 					script {
 						sh 'pnpm run build'
 					}
@@ -209,7 +209,7 @@ pipeline {
                 }
 			}
 			steps {
-				container('nodejs-' + nodeVersion) {
+				container('pnpm') {
 					script {
 						withCredentials([usernamePassword(credentialsId: 'npm-zextras-bot-auth-token', usernameVariable: 'AUTH_USERNAME', passwordVariable: 'NPM_TOKEN')]) {
 							withCredentials([usernamePassword(credentialsId: 'jenkins-integration-with-github-account', usernameVariable: 'GH_USERNAME', passwordVariable: 'GH_TOKEN')]) {
