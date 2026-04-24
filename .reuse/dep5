@@ -21,6 +21,10 @@ Files: .nvmrc
 Copyright: 2023 Zextras <https://www.zextras.com>
 License: CC0-1.0
 
+Files: pnpm-lock.yaml
+Copyright: 2023 Zextras <https://www.zextras.com>
+License: CC0-1.0
+
 Files: *.json
 Copyright: 2023 Zextras <https://www.zextras.com>
 License: AGPL-3.0-only
