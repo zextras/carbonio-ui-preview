@@ -91,9 +91,9 @@
 	],
 	"engines": {
 		"node": "v22",
-		"pnpm": ">=10"
+		"pnpm": ">=10.34.4"
 	},
-	"packageManager": "pnpm@10.32.1",
+	"packageManager": "pnpm@10.34.4",
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"core-js",
