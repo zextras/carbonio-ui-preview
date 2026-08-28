@@ -50,6 +50,8 @@ String nodeVersion
 // PROJECT DETAILS
 String pkgName
 
+properties(defaultPipelineProperties())
+
 pipeline {
 	agent {
 		node {
