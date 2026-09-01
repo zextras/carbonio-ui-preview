@@ -82,7 +82,7 @@ pipeline {
 					script {
 						isReleaseBranch = "${BRANCH_NAME}" ==~ /(release|master)/
                         echo "isReleaseBranch: ${isReleaseBranch}"
-                        isDevelBranch = "${BRANCH_NAME}" ==~ /devel/
+                        isDevelBranch = env.BRANCH_IS_PRIMARY == 'true'
                         echo "isDevelBranch: ${isDevelBranch}"
                         isPullRequest = "${BRANCH_NAME}" ==~ /PR-\d+/
                         echo "isPullRequest: ${isPullRequest}"
