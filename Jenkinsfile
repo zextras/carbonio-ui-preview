@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 library(
-    identifier: 'jenkins-lib-common@v4.10.0',
+    identifier: 'jenkins-lib-common@v4.10.10',
     retriever: modernSCM([
         $class: 'GitSCMSource',
         remote: 'git@github.com:zextras/jenkins-lib-common.git',
@@ -198,7 +198,7 @@ pipeline {
                         // remove @zextras/ prefix to make pkgName a valid sonarqube project key
                         def sonarQubeProjectKey = pkgName.replaceAll("@zextras/", "")
 						withSonarQubeEnv(credentialsId: 'sonarqube-user-token', installationName: 'SonarQube instance') {
-							sh "pnpm exec sonar-scanner -Dsonar.projectKey=${sonarQubeProjectKey} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
+							sh "pnpm exec sonar-scanner-npm -Dsonar.projectKey=${sonarQubeProjectKey} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
 						}
 					}
 				}
