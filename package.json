@@ -75,7 +75,6 @@
 		"vitest-fail-on-console": "0.10.1"
 	},
 	"dependencies": {
-		"core-js": "3.50.0",
 		"react-pdf": "10.4.1"
 	},
 	"peerDependencies": {
@@ -99,7 +98,6 @@
 			"conventional-changelog-conventionalcommits": "9.3.1"
 		},
 		"onlyBuiltDependencies": [
-			"core-js",
 			"esbuild",
 			"unrs-resolver"
 		]

@@ -14,9 +14,6 @@ importers:
       '@zextras/carbonio-design-system':
         specifier: ^11.0.0-devel || ^12.0.0
         version: 12.1.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(date-fns@3.6.0)(lodash@4.18.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      core-js:
-        specifier: 3.50.0
-        version: 3.50.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1721,9 +1718,6 @@ packages:
 
   core-js@3.49.0:
     resolution: {integrity: sha512-es1U2+YTtzpwkxVLwAFdSpaIMyQaq0PBgm3YD1W3Qpsn1NAmO3KSgZfu+oGSWVu6NvLHoHCV/aYcsE5wiB7ALg==}
-
-  core-js@3.50.0:
-    resolution: {integrity: sha512-BRWgOLKkFeCgRudR6zrs8p9XJZcE14grzKMMssoYrk6krtuEZ7MTKPIY5RzOnqsEKIR9kst7wNzphttraT+Yqw==}
 
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -6082,8 +6076,6 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   core-js@3.49.0: {}
-
-  core-js@3.50.0: {}
 
   core-util-is@1.0.3: {}
 
