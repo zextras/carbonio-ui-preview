@@ -1,21 +1,11 @@
 {
+	"extends": "@zextras/carbonio-ui-configs/rules/tsconfig.type-check.json",
 	"compilerOptions": {
 		"target": "ES6",
-		"lib": ["dom", "dom.iterable", "ESNext"],
-		"allowJs": true,
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
+		"jsx": "react-jsx",
+		"noUncheckedIndexedAccess": false,
 		"forceConsistentCasingInFileNames": true,
 		"noFallthroughCasesInSwitch": true,
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"noEmit": true,
-		"jsx": "react-jsx",
-		"noImplicitAny": false,
 		"types": ["vitest/globals", "node"]
 	},
 	"include": ["src"]
