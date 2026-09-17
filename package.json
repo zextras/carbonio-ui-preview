@@ -75,7 +75,7 @@
 		"vitest-fail-on-console": "0.10.1"
 	},
 	"dependencies": {
-		"react-pdf": "10.4.1"
+		"react-pdf": "11.0.0"
 	},
 	"peerDependencies": {
 		"@zextras/carbonio-design-system": "^11.0.0-devel || ^12.0.0",
