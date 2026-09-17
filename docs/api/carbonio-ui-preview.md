@@ -21,7 +21,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[PreviewManager({ children })](./carbonio-ui-preview.previewmanager.md)
+[PreviewManager(input)](./carbonio-ui-preview.previewmanager.md)
 
 
 </td><td>
@@ -232,3 +232,4 @@ Define an item for the preview. It can be of type 'image' or 'pdf'. The id is re
 
 </td></tr>
 </tbody></table>
+

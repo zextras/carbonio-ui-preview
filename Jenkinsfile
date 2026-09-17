@@ -213,6 +213,26 @@ pipeline {
 				}
 			}
 		}
+		stage('Check generated docs') {
+			steps {
+				container('pnpm') {
+					catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+						sh '''
+							CHANGES=$(git status --porcelain -- docs/)
+							if [ -n "$CHANGES" ]; then
+								echo 'docs/api/ is out of date with the source.'
+								echo 'The Build stage regenerated it and the result differs from what is committed.'
+								echo 'Run `pnpm run build` locally and commit the regenerated files.'
+								echo "$CHANGES"
+								git --no-pager diff --stat -- docs/
+								exit 1
+							fi
+							echo 'docs/api/ is up to date.'
+						'''
+					}
+				}
+			}
+		}
 		stage('Release to NPM') {
 			when {
 				allOf {

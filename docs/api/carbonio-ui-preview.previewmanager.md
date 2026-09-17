@@ -9,7 +9,7 @@ The manager for showing multiple previews. From within it, the PreviewsManagerCo
 **Signature:**
 
 ```typescript
-PreviewManager: ({ children }: {
+PreviewManager: (input: {
     children: React.ReactNode;
 }) => React.JSX.Element
 ```
@@ -34,7 +34,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-{ children }
+input
 
 
 </td><td>
@@ -47,6 +47,7 @@ Description
 
 </td></tr>
 </tbody></table>
+
 **Returns:**
 
 React.JSX.Element

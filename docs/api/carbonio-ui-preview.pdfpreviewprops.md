@@ -339,3 +339,4 @@ _(Optional)_ Label for the zoom out action
 
 </td></tr>
 </tbody></table>
+
