@@ -2,6 +2,9 @@
 	"name": "@zextras/carbonio-ui-preview",
 	"version": "0.0.0-semantically-released",
 	"description": "Preview ui utility for Zextras Carbonio",
+	"carbonio": {
+		"name": "carbonio-ui-preview"
+	},
 	"main": "./lib/index.js",
 	"module": "./lib/index.js",
 	"types": "./lib/index.d.ts",
@@ -25,7 +28,9 @@
 		"build": "pnpm run build:lib && pnpm run build:docs",
 		"prepare": "is-ci || husky",
 		"prepack": "pnpm run build",
+		"bump-version": "semantic-release",
 		"type-check": "tsc",
+		"type-check:ci": "tsc && pnpm run build && ./scripts/check-docs.sh",
 		"type-check:watch": "pnpm run type-check -- --watch",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to node_modules/@zextras/carbonio-ui-configs src",
 		"packTo": "pnpm pack --pack-destination $PKG_PATH && cd $PKG_PATH && pnpm add zextras-carbonio-ui-preview-$npm_package_version.tgz",
