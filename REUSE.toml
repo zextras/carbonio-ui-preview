@@ -1,0 +1,70 @@
+version = 1
+SPDX-PackageName = "carbonio-ui-preview"
+SPDX-PackageSupplier = "Zextras s.r.l. <https://www.zextras.com/carbonio/>"
+SPDX-PackageDownloadLocation = "https://github.com/Zextras/carbonio-ui-preview"
+
+[[annotations]]
+path = ".husky/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "__mocks__/_pdf.pdf"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC-BY-NC-SA-4.0"
+
+[[annotations]]
+path = ".nvmrc"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "pnpm-lock.yaml"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "**.json"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "THIRDPARTIES"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "CHANGELOG.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "scripts/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = ".github/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2023 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "docs/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+[[annotations]]
+path = "etc/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Zextras <https://www.zextras.com>"
+SPDX-License-Identifier = "CC0-1.0"
