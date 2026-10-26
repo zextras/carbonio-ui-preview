@@ -67,8 +67,8 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(vitest@4.1.12)
       '@zextras/carbonio-ui-configs':
-        specifier: 3.0.10
-        version: 3.0.10(@testing-library/dom@10.4.2)(typescript@5.9.3)
+        specifier: 3.0.13
+        version: 3.0.13(@testing-library/dom@10.4.2)(typescript@5.9.3)
       conventional-changelog-conventionalcommits:
         specifier: 9.3.1
         version: 9.3.1
@@ -1280,8 +1280,8 @@ packages:
       react: ^18.3.1
       react-dom: ^18.3.1
 
-  '@zextras/carbonio-ui-configs@3.0.10':
-    resolution: {integrity: sha512-U0hzurz5TFuKULjCrkyb7bLOVQbRVNcQzVu+kVD4vzrHPdWYg1WA+yQmTm6EqzPMOyFi7iQRTmeEeT5ZOLf2ag==}
+  '@zextras/carbonio-ui-configs@3.0.13':
+    resolution: {integrity: sha512-goFuZDWQe8bMpnrWAuHlC6MVFcwrygoIAcuDhyNTC2NQprzxP7rf06sMoXxeQFrh6wyF0njXBgcvP6K5dib4uw==}
     peerDependencies:
       typescript: '>=5.4.0 <6.1.0'
 
@@ -5222,8 +5222,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.56.1(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.56.1(typescript@5.9.3)
-      '@typescript-eslint/types': 8.56.1
+      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@5.9.3)
+      '@typescript-eslint/types': 8.71.2
       debug: 4.4.3
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -5231,8 +5231,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.70.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.70.0(typescript@5.9.3)
-      '@typescript-eslint/types': 8.70.0
+      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@5.9.3)
+      '@typescript-eslint/types': 8.71.2
       debug: 4.4.3
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -5563,7 +5563,7 @@ snapshots:
       react-datepicker: 7.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
 
-  '@zextras/carbonio-ui-configs@3.0.10(@testing-library/dom@10.4.2)(typescript@5.9.3)':
+  '@zextras/carbonio-ui-configs@3.0.13(@testing-library/dom@10.4.2)(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.70.0(@typescript-eslint/parser@8.70.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.70.0(eslint@8.57.1)(typescript@5.9.3)
